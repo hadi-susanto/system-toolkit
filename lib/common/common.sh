@@ -10,7 +10,7 @@ if [[ -n "${NO_COLOR:-}" ]]; then
     readonly COLOR_YELLOW=''
     readonly COLOR_CYAN=''
     readonly COLOR_RESET=''
-elif [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 2 ]]; then
+elif [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; then
     readonly COLOR_GREEN=$'\033[0;32m'
     readonly COLOR_RED=$'\033[0;31m'
     readonly COLOR_YELLOW=$'\033[0;33m'

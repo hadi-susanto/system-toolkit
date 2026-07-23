@@ -46,7 +46,7 @@ Pass a command name to `help` for command-specific usage and behavior:
 
 ```bash
 bash ./syskit-bin.sh help install
-bash ./syskit-bin.sh help enable
+bash ./syskit-bin.sh status
 bash ./syskit-bash.sh help enable
 bash ./syskit-zsh.sh help status
 bash ./syskit-cfg.sh help install
@@ -60,7 +60,7 @@ system-toolkit/
 ├── syskit-bash.sh         Bash toolkit entrypoint
 ├── syskit-zsh.sh          Zsh toolkit entrypoint
 ├── syskit-cfg.sh          Configuration toolkit entrypoint
-├── bin/                   Binary and executable assets
+├── bin/                   Standalone executable scripts
 ├── config/                Configuration and preference assets
 ├── shell/                 Bash and Zsh integration assets
 └── lib/
@@ -94,17 +94,18 @@ Bash and Zsh share the `lib/shell/` controller. Their entrypoints pass the
 selected shell as the controller's first internal parameter, allowing
 shell-specific compatibility implementations to be loaded when needed.
 
-The lifecycle commands are currently scaffolds. They establish the command
-boundaries, help system, scope handling, and routing that future integration
-logic will implement.
+The binary toolkit installs standalone executable scripts directly into a local
+or global command directory. Other toolkit lifecycle commands establish their
+command boundaries, help systems, scope handling, and routing independently.
 
 # 🧩 Toolkits
 
 **Binary toolkit**
 
-The binary toolkit manages executable and binary integrations sourced from the
-`bin/` directory. Its install, uninstall, enable, and disable commands support
-local user scope or global system scope.
+The binary toolkit manages standalone executable scripts sourced from the
+`bin/` directory. It installs and uninstalls exact executable names in
+`~/.local/bin` by default or `/usr/local/bin` with global scope. Its status
+command compares SHA-256 checksums to report local and global state.
 
 **Shell toolkit**
 

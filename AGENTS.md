@@ -6,11 +6,15 @@
 - Every executable entrypoint and module phase script must enable strict mode immediately after the shebang using `set -euo pipefail`.
 - Sourced libraries, helpers, and shell-integration payloads must not change the caller's shell options. They must remain compatible with `set -euo pipefail`.
 - Quote variable expansions unless word splitting or pathname expansion is intentional.
+- Use `1` and `0` for internal Boolean variables and associative-array options.
+  Use `true` and `false` strings only for Boolean values originating from
+  environment variables, such as `FEATURE_ENABLE`.
 - Use guard clauses and avoid unnecessary nesting.
 - Prefer small, readable validation appropriate for this framework.
 - Use `NON_INTERACTIVE`, never `NONINTERACTIVE`.
 - Module canonical IDs use the `<category>/<module>` format.
 - Preserve unrelated user changes in the working tree.
+- Prefer (( ... )) for arithmetic conditions and numeric boolean flags. Prefer [[ ... ]] for string comparisons, pattern matching, and filesystem tests.
 
 ## Safety
 
@@ -106,7 +110,7 @@ Place a blank line before standalone `return` and `exit` statements when they fo
 Correct:
 
 ```bash
-if [[ "$failed" == "true" ]]; then
+if [[ "$failed" == "1" ]]; then
     log_error "Operation failed"
 
     exit 1
@@ -116,7 +120,7 @@ fi
 Incorrect:
 
 ```bash
-if [[ "$failed" == "true" ]]; then
+if [[ "$failed" == "1" ]]; then
     log_error "Operation failed"
     exit 1
 fi
@@ -189,7 +193,7 @@ The same principle applies outside loops. Do not use an early `return` solely to
 Prefer:
 
 ```bash
-if [[ "$enabled" == "true" ]]; then
+if [[ "$enabled" == "1" ]]; then
     enable_feature
 fi
 ```
@@ -197,7 +201,7 @@ fi
 Instead of:
 
 ```bash
-if [[ "$enabled" != "true" ]]; then
+if [[ "$enabled" != "1" ]]; then
     return 0
 fi
 
