@@ -1,0 +1,334 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly __COLOR_GREEN=$'\033[0;32m'
+    readonly __COLOR_RED=$'\033[0;31m'
+    readonly __COLOR_YELLOW=$'\033[0;33m'
+    readonly __COLOR_CYAN=$'\033[0;36m'
+    readonly __COLOR_RESET=$'\033[0m'
+else
+    readonly __COLOR_GREEN=""
+    readonly __COLOR_RED=""
+    readonly __COLOR_YELLOW=""
+    readonly __COLOR_CYAN=""
+    readonly __COLOR_RESET=""
+fi
+
+readonly __ICON_SUCCESS="✓"
+readonly __ICON_FAILURE="✗"
+readonly __ICON_PENDING="⏳"
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$__COLOR_RED" \
+        "$__COLOR_RESET" \
+        "$*" >&2
+}
+
+__usage() {
+    cat <<'EOF'
+Usage:
+  organize-files-by-date [OPTIONS]
+
+Description:
+  Organizes files from an input directory using a YYYYMMDD date found in each
+  filename. Matching files are copied into YYYY-MM-DD directories by default,
+  or moved when --move is used.
+
+Options:
+  -i, --input DIR  Directory to process. Default: current directory.
+
+  -a, --apply      Apply the planned changes and copy the matching files.
+                   Without this option, only a preview is printed.
+
+  -m, --move       Move matching files instead of copying them.
+                   This option requires --apply and does not enable it
+                   automatically.
+
+  -h, --help       Show this help message.
+
+Environment:
+  NO_COLOR         Disable colored status icons.
+  FORCE_COLOR      Enable colors even when output is not a terminal.
+
+Examples:
+  # Preview the planned copies
+  organize-files-by-date --input photos
+
+  # Copy the matching files
+  organize-files-by-date --input photos --apply
+
+  # Move the matching files
+  organize-files-by-date --input photos --apply --move
+EOF
+}
+
+__parse_args() {
+    local options_name="$1"
+    shift
+
+    local -n options_ref="$options_name"
+
+    options_ref=(
+        [APPLY]=0
+        [MOVE]=0
+        [HELP]=0
+        [INPUT]="."
+    )
+
+    while (($# > 0)); do
+        case "$1" in
+            -i | --input)
+                if (($# < 2)); then
+                    __log_error "Missing value for $1"
+
+                    return 1
+                fi
+
+                options_ref[INPUT]="$2"
+                shift 2
+                ;;
+            -a | --apply)
+                options_ref[APPLY]=1
+                shift
+                ;;
+            -m | --move)
+                options_ref[MOVE]=1
+                shift
+                ;;
+            -h | --help)
+                options_ref[HELP]=1
+                shift
+                ;;
+            --)
+                shift
+
+                if (($# > 0)); then
+                    __log_error "Unexpected positional argument: $1"
+
+                    return 1
+                fi
+                ;;
+            -*)
+                __log_error "Unknown option: $1"
+
+                return 1
+                ;;
+            *)
+                __log_error "Unexpected positional argument: $1"
+
+                return 1
+                ;;
+        esac
+    done
+}
+
+__validate_options() {
+    local options_name="$1"
+    local -n options_ref="$options_name"
+    
+    if (( options_ref[MOVE] && ! options_ref[APPLY] )); then
+        __log_error "The --move option requires --apply."
+
+        return 1
+    fi
+}
+
+__print_table_header() {
+    printf '%s\n' \
+        '------------------------------------------------------------------------------------------'
+    printf ' Working Directory: %s\n' "${1:-}"
+    printf '%s\n' \
+        '------------------------------------------------------------------------------------------'
+}
+
+__print_status() {
+    local index="$1"
+    local filename="$2"
+    local icon="$3"
+    local status_color="$4"
+    local message="$5"
+
+    printf '%3d. Source: %s\n' "$index" "$filename"
+    printf '     Status: %s %s%s%s\n' "$icon" "$status_color" "$message" "$__COLOR_RESET"
+}
+
+__process_entry() {
+    local index="$1"
+    local entry="$2"
+    local input_dir="$3"
+    local apply="$4"
+    local move="${5:-0}"
+    
+    local command
+    local command_name
+    if (( "$move" )); then
+        command="mv"
+        command_name="move"
+    else
+        command="cp"
+        command_name="copy"
+    fi
+
+    local filename="${entry##*/}"
+
+    if [[ ! -f "$entry" ]]; then
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_RED" \
+            "$__ICON_FAILURE" \
+            "Not a regular file"
+
+        return 0
+    fi
+
+    local date_pattern='(^|[^[:digit:]])([[:digit:]]{4})(0[1-9]|1[0-2])(0[1-9]|[12][[:digit:]]|3[01])'
+
+    if [[ ! "$filename" =~ $date_pattern ]]; then
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_RED" \
+            "$__ICON_FAILURE" \
+            "YYYYMMDD pattern not found"
+
+        return 0
+    fi
+
+    local year="${BASH_REMATCH[2]}"
+    local month="${BASH_REMATCH[3]}"
+    local day="${BASH_REMATCH[4]}"
+    local folder_name="$year-$month-$day"
+    local destination_dir="$input_dir/$folder_name"
+    local destination="$destination_dir/$filename"
+    local displayed_destination="$folder_name/$filename"
+
+    if [[ -e "$destination" ]] || [[ -L "$destination" ]]; then
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_RED" \
+            "$__ICON_FAILURE" \
+            "Destination already exists: $displayed_destination"
+
+        return 0
+    fi
+
+    if (( !apply )); then
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_YELLOW" \
+            "$__ICON_PENDING" \
+            "Pending $command_name to: $displayed_destination"
+
+        return 0
+    fi
+
+    if ! mkdir -p -- "$destination_dir"; then
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_RED" \
+            "$__ICON_FAILURE" \
+            "Failed to create directory: $folder_name"
+
+        return 0
+    fi
+    
+    if "$command" -- "$entry" "$destination"; then
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_GREEN" \
+            "$__ICON_SUCCESS" \
+            "$command_name to: $displayed_destination"
+    else
+        __print_status \
+            "$index" \
+            "$filename" \
+            "$__COLOR_RED" \
+            "$__ICON_FAILURE" \
+            "Failed to $command_name to: $displayed_destination"
+    fi
+}
+
+main() {
+    local -A options
+
+    if ! __parse_args options "$@"; then
+        printf '\n' >&2
+        __usage >&2
+
+        return 1
+    fi
+    
+    if ! __validate_options options; then
+        printf '\n' >&2
+        __usage >&2
+
+        return 1
+    fi
+
+    if ((options[HELP])); then
+        __usage
+
+        return 0
+    fi
+
+    local input_dir="${options[INPUT]}"
+    local apply="${options[APPLY]}"
+    local move="${options[MOVE]}"
+
+    if [[ ! -e "$input_dir" ]]; then
+        __log_error "Input does not exist: $input_dir"
+
+        return 1
+    fi
+
+    if [[ ! -d "$input_dir" ]]; then
+        __log_error "Input is not a directory: $input_dir"
+
+        return 1
+    fi
+
+    input_dir="$(realpath -- "$input_dir")"
+
+    local -a entries=()
+    local entry
+
+    while IFS= read -r -d '' entry; do
+        entries+=("$entry")
+    done < <(
+        find "$input_dir" \
+            -mindepth 1 \
+            -maxdepth 1 \
+            -print0
+    )
+
+    if ((${#entries[@]} == 0)); then
+        printf 'No entries found in: %s\n' "$input_dir"
+
+        return 0
+    fi
+
+    __print_table_header "$input_dir"
+
+    local index=0
+
+    for entry in "${entries[@]}"; do
+        ((++index))
+        __process_entry "$index" "$entry" "$input_dir" "$apply" "$move"
+    done
+    
+    if (( !apply )); then
+        printf "\n%sRunning in preview mode.
+No changes have been made. To apply these changes, rerun:
+  organize-files-by-date --apply%s\n" "$__COLOR_CYAN" "$__COLOR_RESET"
+    fi
+}
+
+main "$@"

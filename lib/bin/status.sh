@@ -74,8 +74,8 @@ main() {
     printf '  %s[✗]%s: Not Installed\n' "$COLOR_RED" "$COLOR_RESET"
     printf '  %s[↑]%s: Installed, update available (checksum mismatch)\n' "$COLOR_YELLOW" "$COLOR_RESET"
     printf '\nInstall Dir Statuses:\n'
-    printf '  (L)ocal : [$PATH: %s] %s\n' "$(__install_dir_status "$local_dir")" "$local_dir"
-    printf '  (G)lobal: [$PATH: %s] %s\n' "$(__install_dir_status "$global_dir")" "$global_dir"
+    printf '  [$PATH: %s] (L)ocal : %s\n' "$(__install_dir_status "$local_dir")" "$local_dir"
+    printf '  [$PATH: %s] (G)lobal: %s\n' "$(__install_dir_status "$global_dir")" "$global_dir"
 }
 
 main "$@"
