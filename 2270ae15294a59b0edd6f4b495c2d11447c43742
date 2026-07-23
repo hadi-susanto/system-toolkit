@@ -1,0 +1,37 @@
+lib/bin/help.sh
+  f1257c42033a0c25 6-7,14-16,19-20,26-27,43-44,47-48,51-54,57-60,66-67,70,73-74,77-79,85-86,89,95-96,120
+lib/bin/install.sh
+  f1257c42033a0c25 5,8-218,222-225,227,233-235,237-254
+lib/bin/__executables.sh
+  f1257c42033a0c25 1-123
+bin/README.md
+  f1257c42033a0c25 3,6-12
+lib/bin/__scope.sh
+  f1257c42033a0c25 2,4,6-7,10,12-14,16-17,19-20,22-31
+README.md
+  f1257c42033a0c25 49,63,97-99,105-108
+lib/bin/uninstall.sh
+  f1257c42033a0c25 5,8-155,159-162,164,170-172,175-180,183-194
+lib/bin/status.sh
+  f1257c42033a0c25 5-6,8-14,17-34,37-38,40-42,46-70,72-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "2270ae15294a59b0edd6f4b495c2d11447c43742",
+  "prompts": {
+    "f1257c42033a0c25": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f8d93-9a56-7c21-9d7b-80d6da332e4c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 682,
+      "total_deletions": 203,
+      "accepted_lines": 680,
+      "overriden_lines": 0
+    }
+  }
+}
