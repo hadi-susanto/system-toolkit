@@ -68,12 +68,6 @@ main() {
         uninstall)
             exec bash "$BIN_LIB/uninstall.sh" "${args[@]}"
             ;;
-        enable)
-            exec bash "$BIN_LIB/enable.sh" "${args[@]}"
-            ;;
-        disable)
-            exec bash "$BIN_LIB/disable.sh" "${args[@]}"
-            ;;
         status)
             exec bash "$BIN_LIB/status.sh" "${args[@]}"
             ;;

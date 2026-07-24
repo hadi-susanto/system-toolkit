@@ -1,0 +1,434 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_GREEN=$'\033[0;32m'
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_GREEN=""
+    readonly COLOR_RED=""
+    readonly COLOR_CYAN=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' "$COLOR_RED" "$COLOR_RESET" "$*" >&2
+}
+
+__usage() {
+    cat <<'EOF'
+Usage:
+  mkvmerge-process [OPTIONS] [MKVMERGE_OPTIONS...]
+
+Description:
+  Processes one media file or all matching files in a directory with mkvmerge.
+
+Options:
+  -i, --input FILE|DIR  Input file or directory. Default: current directory.
+  -o, --output DIR      Output directory. Default: <input-directory>/output.
+  -e, --extension EXT   Extension to include when input is a directory.
+                        Repeat this option to include multiple extensions.
+                        Default: mkv.
+  -d, --default         Shorthand for --default-track-flag.
+  -f, --forced          Shorthand for --forced-display-flag.
+  -a, --apply           Apply the planned mkvmerge execution.
+                        Without this option, only mkvmerge command printed.
+  -h, --help            Show this help message.
+
+MKVMERGE_OPTIONS:
+  Other arguments are forwarded to mkvmerge. When several values follow one
+  option, that option is repeated for every value.
+
+Environment:
+  NO_COLOR              Disable colored error labels.
+  FORCE_COLOR           Enable colors even when stderr is not a terminal.
+
+Examples:
+  mkvmerge-process --input movie.mkv --default 0:true 1:false --forced 2:true
+  mkvmerge-process \
+      --input movies \
+      --extension mkv \
+      --extension mp4 \
+      --language eng jpn \
+      --no-audio \
+      --apply
+EOF
+}
+
+__parse_args() {
+    local options_name="$1"
+    local extensions_name="$2"
+    local mkvmerge_args_name="$3"
+    shift 3
+
+    local -n options_ref="$options_name"
+    local -n extensions_ref="$extensions_name"
+    local -n mkvmerge_args_ref="$mkvmerge_args_name"
+
+    options_ref=(
+        [APPLY]=0
+        [HELP]=0
+        [INPUT]="."
+        [OUTPUT]=""
+    )
+    extensions_ref=()
+    mkvmerge_args_ref=()
+
+    while (( $# > 0 )); do
+        case "$1" in
+            -i | --input)
+                if (( $# < 2 )); then
+                    __log_error "Missing value for $1"
+
+                    return 1
+                fi
+
+                options_ref[INPUT]="$2"
+                shift 2
+                ;;
+            -o | --output)
+                if (( $# < 2 )); then
+                    __log_error "Missing value for $1"
+
+                    return 1
+                fi
+
+                options_ref[OUTPUT]="$2"
+                shift 2
+                ;;
+            -e | --extension)
+                if (( $# < 2 )); then
+                    __log_error "Missing value for $1"
+
+                    return 1
+                fi
+
+                extensions_ref+=("${2#.}")
+                shift 2
+                ;;
+            -a | --apply)
+                options_ref[APPLY]=1
+                shift
+                ;;
+            -h | --help)
+                options_ref[HELP]=1
+                shift
+                ;;
+            -d | --default)
+                mkvmerge_args_ref+=("--default-track-flag")
+                shift
+                ;;
+            -f | --forced)
+                mkvmerge_args_ref+=("--forced-display-flag")
+                shift
+                ;;
+            --)
+                shift
+                mkvmerge_args_ref+=("$@")
+
+                return 0
+                ;;
+            *)
+                mkvmerge_args_ref+=("$1")
+                shift
+                ;;
+        esac
+    done
+}
+
+__require_mkvmerge() {
+    if ! command -v mkvmerge >/dev/null 2>&1; then
+        __log_error "mkvmerge is required but is not installed"
+
+        return 1
+    fi
+}
+
+__expand_mkvmerge_args() {
+    local mkvmerge_args_name="$1"
+    shift 1
+
+    local -n expanded_args="$mkvmerge_args_name"
+    expanded_args=()
+
+    local current_option=""
+    local option_has_value=0
+    local argument
+
+    for argument in "$@"; do
+        if [[ "$argument" == -* ]]; then
+            if [[ -n "$current_option" ]] && (( !option_has_value )); then
+                expanded_args+=("$current_option")
+            fi
+
+            current_option="$argument"
+            option_has_value=0
+        else
+            if [[ -z "$current_option" ]]; then
+                __log_error "Value \"$argument\" has no preceding mkvmerge option"
+
+                return 1
+            fi
+
+            expanded_args+=("$current_option" "$argument")
+            option_has_value=1
+        fi
+    done
+
+    if [[ -n "$current_option" ]] && (( !option_has_value )); then
+        expanded_args+=("$current_option")
+    fi
+}
+
+__execute() {
+    local apply="$1"
+    local input_file="$2"
+    local output_file="$3"
+    shift 3
+
+    local -a command=(
+        mkvmerge
+        -o "$output_file"
+        "$@"
+        "$input_file"
+    )
+
+    if (( !apply )); then
+        printf '[DRY RUN]'
+        printf ' %q' "${command[@]}"
+        printf '\n'
+
+        return 0
+    fi
+
+    "${command[@]}"
+}
+
+__print_summary() {
+    local input="$1"
+    local output_folder="$2"
+    local apply="$3"
+    local file_count="$4"
+    if (( apply )); then
+        apply="Execute mkvmerge command."
+    else
+        apply="Show mkvmerge command only."
+    fi
+    shift 4
+
+    printf 'Summary\n'
+    printf '=======\n'
+    printf 'Input File/Folder : %q\n' "$input"
+    printf 'Output Folder     : %s\n' "$output_folder"
+    printf 'Extensions        : %s\n' "$@"
+    printf 'Files Found       : %s\n' "$file_count"
+    printf 'Apply Execution   : %s\n\n' "$apply"
+}
+
+__process_file() {
+    local input_file="$1"
+    local output_folder="$2"
+    local apply="$3"
+    shift 3
+
+    local output_file
+    output_file="$output_folder/$(basename -- "$input_file")"
+
+    if [[ "$output_file" == "$input_file" ]]; then
+        __log_error "Output file would overwrite the input file: $input_file"
+
+        return 1
+    fi
+
+    local input_extension="${input_file##*.}"
+    local -a mkvmerge_expanded_args
+
+    printf '[1/1] %s%s%s\n' "$COLOR_CYAN" "$(basename -- "$input_file")" "$COLOR_RESET"
+    printf '%s\n' '--------------------------------------------------'
+
+    __expand_mkvmerge_args mkvmerge_expanded_args "$@"
+    __execute "$apply" "$input_file" "$output_file" "${mkvmerge_expanded_args[@]}"
+    printf '\n'
+
+    __print_summary \
+        "$input_file" \
+        "$output_folder" \
+        "$apply" \
+        1 \
+        "${input_extension,,}"
+
+    printf 'mkvmerge Options:\n '
+    printf ' %q' "${mkvmerge_expanded_args[@]}"
+    printf '\n'
+}
+
+__collect_matching_files() {
+    local files_name="$1"
+    local input_folder="$2"
+    local extensions_name="$3"
+
+    local -n files_ref="$files_name"
+    local -n extensions_ref="$extensions_name"
+
+    files_ref=()
+
+    local file
+    local extension
+    local filename_extension
+
+    while IFS= read -r -d '' file; do
+        filename_extension="${file##*.}"
+        filename_extension="${filename_extension,,}"
+
+        for extension in "${extensions_ref[@]}"; do
+            if [[ "$filename_extension" == "$extension" ]]; then
+                files_ref+=("$file")
+                break
+            fi
+        done
+    done < <(find "$input_folder" -maxdepth 1 -type f -print0)
+}
+
+__process_folder() {
+    local input_folder="$1"
+    local output_folder="$2"
+    local apply="$3"
+    local extensions_name="$4"
+    local mkvmerge_args_name="$5"
+
+    local -n extensions_ref="$extensions_name"
+    local -n mkvmerge_args_ref="$mkvmerge_args_name"
+    local -a files=()
+
+    __collect_matching_files files "$input_folder" "$extensions_name"
+
+    if (( ${#files[@]} == 0 )); then
+        printf 'No matching files found.\n'
+
+        return 0
+    fi
+
+    local -a mkvmerge_expanded_args
+    local index=0
+    local file
+    local output_file
+
+    __expand_mkvmerge_args mkvmerge_expanded_args "${mkvmerge_args_ref[@]}"
+    for file in "${files[@]}"; do
+        (( ++index ))
+        output_file="$output_folder/$(basename -- "$file")"
+
+        printf '[%d/%d] %s%s%s\n' \
+            "$index" \
+            "${#files[@]}" \
+            "$COLOR_CYAN" "$(basename -- "$file")" "$COLOR_RESET"
+        printf '%s\n' '--------------------------------------------------'
+
+        __execute "$apply" "$file" "$output_file" "${mkvmerge_expanded_args[@]}" || return $?
+        printf '\n'
+    done
+
+    __print_summary \
+        "$input_folder" \
+        "$output_folder" \
+        "$apply" \
+        "${#files[@]}" \
+        "${extensions_ref[@]}"
+
+    printf 'mkvmerge Options:\n '
+    printf ' %q' "${mkvmerge_expanded_args[@]}"
+    printf '\n'
+}
+
+main() {
+    local -A options
+    local -a extensions
+    local -a mkvmerge_args
+
+    if ! __parse_args options extensions mkvmerge_args "$@"; then
+        printf '\n' >&2
+        __usage >&2
+
+        return 1
+    fi
+
+    if (( options[HELP] )); then
+        __usage
+
+        return 0
+    fi
+
+    __require_mkvmerge || return $?
+
+    local input="${options[INPUT]}"
+    local output_folder="${options[OUTPUT]}"
+    local apply="${options[APPLY]}"
+
+    if [[ ! -e "$input" ]]; then
+        __log_error "Input does not exist: $input"
+
+        return 1
+    fi
+
+    if (( ${#mkvmerge_args[@]} == 0 )); then
+        __log_error "No mkvmerge options were provided"
+        printf '\n' >&2
+        __usage >&2
+
+        return 1
+    fi
+
+    if [[ -z "$output_folder" ]]; then
+        if [[ -f "$input" ]]; then
+            output_folder="$(dirname -- "$input")/output"
+        else
+            output_folder="$input/output"
+        fi
+    fi
+
+    if ! mkdir -p -- "$output_folder"; then
+        __log_error "Failed to create output directory: $output_folder"
+
+        return 1
+    fi
+
+    if (( ${#extensions[@]} == 0 )); then
+        extensions=("mkv")
+    fi
+
+    local -a normalized_extensions=()
+    local extension
+
+    for extension in "${extensions[@]}"; do
+        extension="${extension#.}"
+        normalized_extensions+=("${extension,,}")
+    done
+
+    extensions=("${normalized_extensions[@]}")
+    input="$(realpath -- "$input")"
+    output_folder="$(realpath -- "$output_folder")"
+
+    if [[ -f "$input" ]]; then
+        __process_file "$input" "$output_folder" "$apply" "${mkvmerge_args[@]}"
+    elif [[ -d "$input" ]]; then
+        __process_folder "$input" "$output_folder" "$apply" extensions mkvmerge_args
+    else
+        __log_error "Unsupported input type: $input"
+
+        return 1
+    fi
+
+    if (( apply )); then
+        printf "\n%sExecution completed, please review mkvmerge logs above.%s\n" \
+            "$COLOR_CYAN" "$COLOR_RESET"
+    else
+        printf "\n%sRunning in preview mode.
+No mkvmerge being invoked. To execute mkvmerge command, rerun:
+  mkvmerge-process --apply%s\n" "$COLOR_CYAN" "$COLOR_RESET"
+    fi
+}
+
+main "$@"

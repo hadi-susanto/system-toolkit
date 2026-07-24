@@ -3,30 +3,28 @@ set -euo pipefail
 
 __basic_help() {
     cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
+System Toolkit Executable Integration
+-------------------------------------
 
 Usage:
   syskit-bin.sh [command] [args...]
 
 Commands:
   help [command]  Show basic help or details for a command.
-  install         Install SysKit binaries in a designated location.
-  uninstall       Remove installed SysKit binaries.
-  enable          Enable an installed binary integration.
-  disable         Disable the binary integration without removing it.
-  status          Show whether the binary integration is installed and enabled.
+  install         Install one or all SysKit executables.
+  uninstall       Remove named SysKit executables.
+  status          Show local and global installation status.
 
 Scope:
-  Install, uninstall, enable, and disable use local scope by default. Run
-  command-specific help to see the available scope options.
+  Install and uninstall use local scope by default. Global operations require
+  elevated privileges.
 EOF
 }
 
 __help_help() {
     cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
+System Toolkit Executable Integration
+-------------------------------------
 
 Usage:
   syskit-bin.sh help [command]
@@ -42,90 +40,63 @@ EOF
 
 __install_help() {
     cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
+System Toolkit Executable Integration
+-------------------------------------
 
 Usage:
-  syskit-bin.sh install [args...]
+  syskit-bin.sh install [options] <name...>
+  syskit-bin.sh install [options] all
 
 Options:
-  -l, --local   Install for the current user (default).
-  -g, --global  Install system-wide.
+  -l, --local   Install into ~/.local/bin (default).
+  -g, --global  Install into /usr/local/bin.
+  -f, --force   Overwrite existing destination files.
+  -a, --all     Install every available SysKit executable.
 
 Description:
-  Installs binaries from the SysKit binaries folder into the designated
-  directory for the current user or system-wide, based on the selected scope.
-  Run the enable command afterward to make the integration take effect.
+  Installs exact executable names from the SysKit bin directory with mode 0755.
+  The positional name "all" is equivalent to --all. Existing destinations are
+  skipped unless --force is given. Local installation warns when ~/.local/bin
+  is not present in PATH but does not modify shell configuration.
 EOF
 }
 
 __uninstall_help() {
     cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
+System Toolkit Executable Integration
+-------------------------------------
 
 Usage:
-  syskit-bin.sh uninstall [args...]
+  syskit-bin.sh uninstall [options] <name...>
+  syskit-bin.sh uninstall [options] --all
 
 Options:
-  -l, --local   Uninstall for the current user (default).
-  -g, --global  Uninstall system-wide.
+  -l, --local   Uninstall from ~/.local/bin (default).
+  -g, --global  Uninstall from /usr/local/bin.
+  -a, --all     Uninstall every available SysKit executable.
 
 Description:
-  Removes installed SysKit binaries from the designated location for the
-  selected scope.
-EOF
-}
-
-__enable_help() {
-    cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
-
-Usage:
-  syskit-bin.sh enable [args...]
-
-Options:
-  -l, --local   Enable the current user's integration (default).
-  -g, --global  Enable the system-wide integration.
-
-Description:
-  Enables the installed binary integration for the selected scope. Installing
-  the integration alone has no effect until it is enabled.
-EOF
-}
-
-__disable_help() {
-    cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
-
-Usage:
-  syskit-bin.sh disable [args...]
-
-Options:
-  -l, --local   Disable the current user's integration (default).
-  -g, --global  Disable the system-wide integration.
-
-Description:
-  Disables the binary integration for the selected scope without removing the
-  installed binaries.
+  Removes exact executable names from the selected installation directory.
+  A checksum difference is assumed to mean that an update is available and
+  does not prevent removal.
 EOF
 }
 
 __status_help() {
     cat <<'EOF'
-System Toolkit Binary Integration
----------------------------------
+System Toolkit Executable Integration
+-------------------------------------
 
 Usage:
-  syskit-bin.sh status [args...]
+  syskit-bin.sh status
 
 Options:
   No command-specific options.
 
 Description:
-  Shows whether the binary integration is installed and enabled.
+  Shows whether each installation directory is in PATH, then lists every
+  available executable and its local and global installation state. [v] means
+  installed, [x] means not installed, and [↑] means update available.
 EOF
 }
 
@@ -145,17 +116,11 @@ main() {
         uninstall)
             __uninstall_help
             ;;
-        enable)
-            __enable_help
-            ;;
-        disable)
-            __disable_help
-            ;;
         status)
             __status_help
             ;;
         *)
-            printf 'Unknown binary help topic: %s\n\n' "$help_type" >&2
+            printf 'Unknown executable help topic: %s\n\n' "$help_type" >&2
             __basic_help >&2
 
             return 1

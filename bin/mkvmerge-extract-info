@@ -1,0 +1,296 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_GREEN=$'\033[0;32m'
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_GREEN=""
+    readonly COLOR_RED=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' "$COLOR_RED" "$COLOR_RESET" "$*" >&2
+}
+
+__boolean_to_icon() {
+    local value="${1:-}"
+
+    if [[ "$value" == "true" ]]; then
+        printf '%s✓%s' "$COLOR_GREEN" "$COLOR_RESET"
+    else
+        printf '%s✗%s' "$COLOR_RED" "$COLOR_RESET"
+    fi
+}
+
+__usage() {
+    cat <<'EOF'
+Usage:
+  mkvmerge-extract-info [OPTIONS]
+
+Description:
+  Prints track information for one media file or all matching files in a
+  directory using mkvmerge -J help.
+
+Options:
+  -i, --input FILE|DIR  Input file or directory. Default: current directory.
+  -e, --extension EXT   Extension to include when input is a directory.
+                        Repeat this option to include multiple extensions.
+                        Default: mkv.
+  -h, --help            Show this help message.
+
+Environment:
+  NO_COLOR              Disable colored status icons.
+  FORCE_COLOR           Enable colors even when output is not a terminal.
+
+Examples:
+  mkvmerge-extract-info
+  mkvmerge-extract-info --input movie.mkv
+  mkvmerge-extract-info --input movies --extension mkv --extension mp4
+EOF
+}
+
+__parse_args() {
+    local options_name="$1"
+    local extensions_name="$2"
+    shift 2
+
+    local -n options_ref="$options_name"
+    local -n extensions_ref="$extensions_name"
+
+    options_ref=(
+        [HELP]=0
+        [INPUT]="."
+    )
+    extensions_ref=()
+
+    while (( $# > 0 )); do
+        case "$1" in
+            -i | --input)
+                if (( $# < 2 )); then
+                    __log_error "Missing value for $1"
+
+                    return 1
+                fi
+
+                options_ref[INPUT]="$2"
+                shift 2
+                ;;
+            -e | --extension)
+                if (( $# < 2 )); then
+                    __log_error "Missing value for $1"
+
+                    return 1
+                fi
+
+                extensions_ref+=("${2#.}")
+                shift 2
+                ;;
+            -h | --help)
+                options_ref[HELP]=1
+                shift
+                ;;
+            --)
+                shift
+
+                if (( $# > 0 )); then
+                    __log_error "Unexpected positional argument: $1"
+
+                    return 1
+                fi
+                ;;
+            -*)
+                __log_error "Unknown option: $1"
+
+                return 1
+                ;;
+            *)
+                __log_error "Unexpected positional argument: $1"
+
+                return 1
+                ;;
+        esac
+    done
+}
+
+__require_command() {
+    local command_name="$1"
+
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+        __log_error "$command_name is required but is not installed"
+
+        return 1
+    fi
+}
+
+__extract_info() {
+    local file="$1"
+
+    printf 'Filename: %s\n\n' "$(basename -- "$file")"
+    printf '%-3s | %-15s | %-5s | %s\n' \
+        'ID' \
+        'Type' \
+        'E|D|F' \
+        'Name'
+    printf '%s\n' \
+        '----+-----------------+-----------+----------------------------------------'
+
+    local id
+    local type
+    local language
+    local enabled
+    local default
+    local forced
+    local name
+    local type_label
+    local enabled_icon
+    local default_icon
+    local forced_icon
+
+    local tracks
+
+    if ! tracks="$(
+        mkvmerge -J "$file" |
+            jq -r '
+                .tracks[]
+                | [
+                    .id,
+                    .type,
+                    (.properties.language // ""),
+                    (.properties.enabled_track // false),
+                    (.properties.default_track // false),
+                    (.properties.forced_track // false),
+                    (.properties.track_name // "")
+                ]
+                | map(tostring)
+                | join("\u001f")
+            '
+    )"; then
+        __log_error "Failed to extract track information from: $file"
+
+        return 1
+    fi
+
+    if [[ -n "$tracks" ]]; then
+        while IFS=$'\x1f' read -r id type language enabled default forced name; do
+            type_label="$type"
+
+            if [[ -n "$language" ]]; then
+                type_label+=":$language"
+            fi
+
+            enabled_icon="$(__boolean_to_icon "$enabled")"
+            default_icon="$(__boolean_to_icon "$default")"
+            forced_icon="$(__boolean_to_icon "$forced")"
+
+            printf '%3s | %-15s | %s|%s|%s | %s\n' \
+                "$id" \
+                "$type_label" \
+                "$enabled_icon" \
+                "$default_icon" \
+                "$forced_icon" \
+                "$name"
+        done <<< "$tracks"
+    fi
+
+    printf '\nLegends: [E] = Enabled Flag, [D] = Default Flag, [F] = Forced Flag\n'
+}
+
+__extract_folder() {
+    local input_folder="$1"
+    shift
+
+    local -a files=()
+    local file
+    local extension
+    local filename_extension
+
+    while IFS= read -r -d '' file; do
+        filename_extension="${file##*.}"
+        filename_extension="${filename_extension,,}"
+
+        for extension in "$@"; do
+            if [[ "$filename_extension" == "$extension" ]]; then
+                files+=("$file")
+                break
+            fi
+        done
+    done < <(find "$input_folder" -maxdepth 1 -type f -print0)
+
+    if (( ${#files[@]} == 0 )); then
+        printf 'No matching files found.\n'
+
+        return 0
+    fi
+
+    local index=0
+
+    for file in "${files[@]}"; do
+        (( ++index ))
+
+        printf '[%d/%d] ' "$index" "${#files[@]}"
+        __extract_info "$file" || return $?
+        printf '\n'
+    done
+}
+
+main() {
+    local -A options
+    local -a extensions
+
+    if ! __parse_args options extensions "$@"; then
+        printf '\n' >&2
+        __usage >&2
+
+        return 1
+    fi
+
+    if (( options[HELP] )); then
+        __usage
+
+        return 0
+    fi
+
+    __require_command mkvmerge || return $?
+    __require_command jq || return $?
+
+    local input="${options[INPUT]}"
+    if [[ ! -e "$input" ]]; then
+        __log_error "Input does not exist: $input"
+
+        return 1
+    fi
+
+    if (( ${#extensions[@]} == 0 )); then
+        extensions=("mkv")
+    fi
+
+    local -a normalized_extensions=()
+    local extension
+
+    for extension in "${extensions[@]}"; do
+        extension="${extension#.}"
+        normalized_extensions+=("${extension,,}")
+    done
+
+    extensions=("${normalized_extensions[@]}")
+    input="$(realpath -- "$input")"
+
+    if [[ -f "$input" ]]; then
+        __extract_info "$input"
+        printf '\n'
+    elif [[ -d "$input" ]]; then
+        __extract_folder "$input" "${extensions[@]}"
+    else
+        __log_error "Unsupported input type: $input"
+
+        return 1
+    fi
+
+    printf 'mkvmerge-extract-info completed\n'
+}
+
+main "$@"

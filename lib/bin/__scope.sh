@@ -1,70 +1,60 @@
 ##
-# parse_bin_scope <options_name> <args_name> [arguments...]
+# local_install_dir
 #
-# Resolves local or global binary scope and preserves positional arguments.
+# Resolves the directory used for current-user executable installations.
 #
-# Parameters:
-#   options_name    Name of the associative array that receives scope state.
-#   args_name       Name of the indexed array that receives other arguments.
-#   arguments       Command arguments to parse.
+# Output:
+#   Prints the local installation directory.
 #
 # Returns:
-#   1 when a scope option is unknown or conflicts with an earlier scope.
+#   1 when HOME is unavailable.
 #
-parse_bin_scope() {
-    local options_name="$1"
-    local args_name="$2"
-    shift 2
+local_install_dir() {
+    if [[ -z "${HOME:-}" ]]; then
+        printf 'HOME is required to resolve the local installation directory\n' >&2
 
-    local -n options_ref="$options_name"
-    local -n args_ref="$args_name"
-    local scope_was_set="false"
+        return 1
+    fi
 
-    options_ref=(
-        [SCOPE]="local"
-    )
-    args_ref=()
+    printf '%s\n' "$HOME/.local/bin"
+}
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -l | --local)
-                if [[ "$scope_was_set" == "true" ]] &&
-                    [[ "${options_ref[SCOPE]}" != "local" ]]; then
-                    log_error "Cannot combine local and global scope options"
+##
+# global_install_dir
+#
+# Resolves the directory used for system-wide executable installations.
+#
+# Output:
+#   Prints the global installation directory.
+#
+global_install_dir() {
+    printf '%s\n' '/usr/local/bin'
+}
 
-                    return 1
-                fi
+##
+# install_dir_in_path <install_dir>
+#
+# Checks whether an installation directory is present in PATH.
+#
+# Parameters:
+#   install_dir    Installation directory to find.
+#
+# Returns:
+#   1 when the directory is absent from PATH.
+#
+install_dir_in_path() {
+    local install_dir="$1"
+    local -a path_entries
+    local path_entry
+    local IFS=':'
 
-                options_ref[SCOPE]="local"
-                scope_was_set="true"
-                ;;
-            -g | --global)
-                if [[ "$scope_was_set" == "true" ]] &&
-                    [[ "${options_ref[SCOPE]}" != "global" ]]; then
-                    log_error "Cannot combine local and global scope options"
+    read -r -a path_entries <<<"${PATH:-}"
 
-                    return 1
-                fi
-
-                options_ref[SCOPE]="global"
-                scope_was_set="true"
-                ;;
-            --)
-                shift
-                args_ref+=("$@")
-
-                return 0
-                ;;
-            -*)
-                log_error "Unknown scope option: $1"
-
-                return 1
-                ;;
-            *)
-                args_ref+=("$1")
-                ;;
-        esac
-
-        shift
+    for path_entry in "${path_entries[@]}"; do
+        if [[ "$path_entry" == "$install_dir" ]]; then
+            return 0
+        fi
     done
+
+    return 1
 }
