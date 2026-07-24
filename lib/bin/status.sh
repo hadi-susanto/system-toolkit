@@ -5,14 +5,6 @@ source "$COMMON_LIB/common.sh"
 source "$BIN_LIB/__executables.sh"
 source "$BIN_LIB/__scope.sh"
 
-__table_rule() {
-    local width="$1"
-    local rule
-
-    printf -v rule '%*s' "$width" ''
-    printf '%s' "${rule// /-}"
-}
-
 __install_dir_status() {
     local install_dir="$1"
 
