@@ -1,0 +1,25 @@
+lib/shell/install.sh
+  6ea164b424618fac 7-117,128-136,140-168,170
+lib/shell/main.sh
+  6ea164b424618fac 5,41-42,68-76,84,96-97,99-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "d4dc54270453994b7dbf142f19a6facbe8a3becd",
+  "prompts": {
+    "6ea164b424618fac": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f923a-05cd-7440-aa65-e05112cc04f7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 187,
+      "total_deletions": 38,
+      "accepted_lines": 169,
+      "overriden_lines": 0
+    }
+  }
+}
