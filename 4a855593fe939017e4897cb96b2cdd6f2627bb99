@@ -1,0 +1,36 @@
+lib/shell/install.sh
+  99f9baca493e3493 5-6,10,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "4a855593fe939017e4897cb96b2cdd6f2627bb99",
+  "prompts": {
+    "6ea164b424618fac": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f923a-05cd-7440-aa65-e05112cc04f7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 11
+    },
+    "99f9baca493e3493": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f939d-2ffc-7b42-8789-5008f5cdd155",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 28,
+      "total_deletions": 171,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    }
+  }
+}
