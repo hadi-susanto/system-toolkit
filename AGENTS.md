@@ -136,9 +136,22 @@ load_states "$CANONICAL_ID" || exit $?
 
 Prefer guard clauses to reduce nesting and keep the main execution path easy to follow.
 
-Use an early `return`, `exit`, or `continue` when handling an exceptional, invalid, or skip condition before continuing with the main logic.
+Use the || operator only for simple control-flow guard clauses that immediately execute return, continue, break, or exit.
+
+If additional work is required (for example logging, cleanup, notifications, or any other statements), use an explicit if statement.
 
 Example:
+
+Allowed
+
+```bash
+load_states "$CANONICAL_ID" || return $?
+[[ -f "$file" ]] || continue
+parse_args options args "$@" || return $?
+mkdir -p "$dir" || exit $?
+```
+
+Prefer
 
 ```bash
 if [[ "${SKIP_CONFIGURATION:-false}" == "true" ]]; then

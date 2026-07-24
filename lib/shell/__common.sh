@@ -1,4 +1,4 @@
-##
+## deprecated will be removed when no one reference it, rename to __modules.sh
 # shell_display_name <shell>
 #
 # Formats a supported shell name for user-facing output.

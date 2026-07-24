@@ -185,17 +185,8 @@ main() {
     local name
     local failed=0
 
-    if ! __parse_args options args "$@"; then
-        bash "$BIN_LIB/help.sh" uninstall >&2
-
-        return 1
-    fi
-
-    if ! __validate_options options args; then
-        bash "$BIN_LIB/help.sh" uninstall >&2
-
-        return 1
-    fi
+    __parse_args options args "$@"
+    __validate_options options args || return $?
 
     if (( options[ALL] )); then
         list_bin_executables executables

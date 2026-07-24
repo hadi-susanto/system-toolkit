@@ -52,14 +52,16 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh install [args...]
+  syskit-${shell_name}.sh install [--force] <module...>
+  syskit-${shell_name}.sh install [--force] --all
 
 Options:
-  No command-specific options.
+  -a, --all    Install every available shell module.
+  -f, --force  Reinstall modules that are already installed.
 
 Description:
-  Installs the SysKit ${display_name} integration into its designated location.
-  Run the enable command afterward to make the integration take effect.
+  Installs one or more SysKit modules for ${display_name} into their designated
+  location. Use --all instead of naming individual modules.
 EOF
 }
 
