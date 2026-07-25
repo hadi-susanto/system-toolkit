@@ -62,3 +62,17 @@ load_shell_interface() {
         return 1
     done
 }
+
+##
+# current_user_shell
+#
+# Returns the user's configured login shell.
+# The returned value is the full path to the shell
+# as configured in the user account database.
+#
+# Output:
+#   Full path to the user's configured login shell.
+#
+current_user_shell() {
+    printf '%s\n' "$(getent passwd "$USER" | cut -d: -f7)"
+}

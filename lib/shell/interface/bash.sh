@@ -1,3 +1,46 @@
+readonly BASH_BASE_DIR="$HOME/.local/share/syskit/bash"
+
+##
+# shell_display_name
+#
+# Return 'Bash' since this is Bash interface.
+#
+shell_display_name() {
+    printf 'Bash'
+}
+
+##
+# shell_installed
+#
+# Checks whether Bash is installed on the current system.
+# This function does not check whether Bash is the user's
+# default login shell.
+#
+# Returns:
+#   1 when Bash is not installed.
+#
+shell_installed() {
+    command -v bash >/dev/null 2>&1
+}
+
+##
+# default_shell
+#
+# Checks whether Bash is the user's configured default
+# login shell.
+# This function does not check whether Bash is currently
+# running.
+#
+# Returns:
+#   1 when Bash is not the user's default login shell.
+#
+default_shell() {
+    local default_shell="$(getent passwd "$USER" | cut -d: -f7)"
+    default_shell="${default_shell##*/}"
+
+    [[ "bash" == "$default_shell" ]]
+}
+
 ##
 # support_module <module>
 #
@@ -33,11 +76,11 @@ support_module() {
 module_installed() {
     local module="$1"
 
-    if [[ -f "$HOME/.local/share/syskit/bash/module.d/$module.bash" ]]; then
+    if [[ -f "$BASH_BASE_DIR/module.d/$module.bash" ]]; then
         return 0
     fi
 
-    [[ -f "$HOME/.local/share/syskit/bash/module.d/$module.sh" ]]
+    [[ -f "$BASH_BASE_DIR/module.d/$module.sh" ]]
 }
 
 ##
@@ -54,7 +97,7 @@ module_installed() {
 install_module() {
     local module="$1"
     local source="$SHELL_DIR/$module/$module.bash"
-    local install_dir="$HOME/.local/share/syskit/bash/module.d"
+    local install_dir="$BASH_BASE_DIR/module.d"
 
     if [[ ! -f "$source" ]]; then
         source="$SHELL_DIR/$module/$module.sh"
@@ -80,6 +123,44 @@ install_module() {
 }
 
 ##
+# installed_module_path <module>
+#
+# Returns the path to the installed Bash module source file.
+# This function behaves similarly to `installed_module`, except
+# that it prints the resolved module path instead of returning
+# only an exit status.
+#
+# Parameters:
+#   module    Module name.
+#
+# Output:
+#   Full path to the installed Bash module source file.
+#
+# Returns:
+#   1 when the module is not installed.
+#
+installed_module_path() {
+    local module="$1"
+    local path="$BASH_BASE_DIR/module.d/$module.bash"
+
+    if [[ -f "$path" ]]; then
+        printf '%s\n' "$path"
+
+        return 0
+    fi
+
+    path="$BASH_BASE_DIR/module.d/$module.sh"
+
+    if [[ -f "$path" ]]; then
+        printf '%s\n' "$path"
+
+        return 0
+    fi
+
+    return 1
+}
+
+##
 # uninstall_module <module>
 #
 # Removes every installed Bash-compatible file for a module.
@@ -92,7 +173,7 @@ install_module() {
 #
 uninstall_module() {
     local module="$1"
-    local module_dir="$HOME/.local/share/syskit/bash/module.d"
+    local module_dir="$BASH_BASE_DIR/module.d"
     local extension
     local file
     local failed=0
@@ -122,7 +203,7 @@ uninstall_module() {
 #   1 when the loader, ~/.bashrc, or both managed markers are absent.
 #
 loader_active() {
-    local loader="$HOME/.local/share/syskit/bash/loader.sh"
+    local loader="$BASH_BASE_DIR/loader.sh"
     local startup_file="$HOME/.bashrc"
     local start_marker="# >>> syskit bash loader >>>"
     local end_marker="# <<< syskit bash loader <<<"
@@ -164,8 +245,7 @@ loader_active() {
 #   managed block prevents a safe update.
 #
 activate_loader() {
-    local loader_dir="$HOME/.local/share/syskit/bash"
-    local loader="$loader_dir/loader.sh"
+    local loader="$BASH_BASE_DIR/loader.sh"
     local startup_file="$HOME/.bashrc"
     local start_marker="# >>> syskit bash loader >>>"
     local end_marker="# <<< syskit bash loader <<<"
@@ -199,8 +279,8 @@ activate_loader() {
         return 1
     fi
 
-    if ! install -d -m 0755 -- "$loader_dir"; then
-        log_error "Failed to create Bash loader directory: $loader_dir"
+    if ! install -d -m 0755 -- "$BASH_BASE_DIR"; then
+        log_error "Failed to create Bash loader directory: $BASH_BASE_DIR"
 
         return 1
     fi
@@ -348,7 +428,7 @@ EOF
 #   1 when cleanup fails or only one managed marker exists.
 #
 deactivate_loader() {
-    local loader="$HOME/.local/share/syskit/bash/loader.sh"
+    local loader="$BASH_BASE_DIR/loader.sh"
     local startup_file="$HOME/.bashrc"
     local start_marker="# >>> syskit bash loader >>>"
     local end_marker="# <<< syskit bash loader <<<"

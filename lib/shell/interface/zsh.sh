@@ -1,3 +1,46 @@
+readonly ZSH_BASE_DIR="$HOME/.local/share/syskit/zsh"
+
+##
+# shell_display_name
+#
+# Return 'Zsh' since this is Zsh interface.
+#
+shell_display_name() {
+    printf 'Zsh'
+}
+
+##
+# shell_installed
+#
+# Checks whether Zsh is installed on the current system.
+# This function does not check whether Zsh is the user's
+# default login shell.
+#
+# Returns:
+#   1 when Bash is not installed.
+#
+shell_installed() {
+    command -v zsh >/dev/null 2>&1
+}
+
+##
+# default_shell
+#
+# Checks whether Zsh is the user's configured default
+# login shell.
+# This function does not check whether Zsh is currently
+# running.
+#
+# Returns:
+#   1 when Bash is not the user's default login shell.
+#
+default_shell() {
+    local default_shell="$(getent passwd "$USER" | cut -d: -f7)"
+    default_shell="${default_shell##*/}"
+
+    [[ "zsh" == "$default_shell" ]]
+}
+
 ##
 # support_module <module>
 #
@@ -33,11 +76,11 @@ support_module() {
 module_installed() {
     local module="$1"
 
-    if [[ -f "$HOME/.local/share/syskit/zsh/module.d/$module.zsh" ]]; then
+    if [[ -f "$ZSH_BASE_DIR/module.d/$module.zsh" ]]; then
         return 0
     fi
 
-    [[ -f "$HOME/.local/share/syskit/zsh/module.d/$module.sh" ]]
+    [[ -f "$ZSH_BASE_DIR/module.d/$module.sh" ]]
 }
 
 ##
@@ -54,7 +97,7 @@ module_installed() {
 install_module() {
     local module="$1"
     local source="$SHELL_DIR/$module/$module.zsh"
-    local install_dir="$HOME/.local/share/syskit/zsh/module.d"
+    local install_dir="$ZSH_BASE_DIR/module.d"
 
     if [[ ! -f "$source" ]]; then
         source="$SHELL_DIR/$module/$module.sh"
@@ -80,6 +123,44 @@ install_module() {
 }
 
 ##
+# installed_module_path <module>
+#
+# Returns the path to the installed Zsh module source file.
+# This function behaves similarly to `installed_module`, except
+# that it prints the resolved module path instead of returning
+# only an exit status.
+#
+# Parameters:
+#   module    Module name.
+#
+# Output:
+#   Full path to the installed Bash module source file.
+#
+# Returns:
+#   1 when the module is not installed.
+#
+installed_module_path() {
+    local module="$1"
+    local path="$ZSH_BASE_DIR/module.d/$module.bash"
+
+    if [[ -f "$path" ]]; then
+        printf '%s\n' "$path"
+
+        return 0
+    fi
+
+    path="$ZSH_BASE_DIR/module.d/$module.sh"
+
+    if [[ -f "$path" ]]; then
+        printf '%s\n' "$path"
+
+        return 0
+    fi
+
+    return 1
+}
+
+##
 # uninstall_module <module>
 #
 # Removes every installed Zsh-compatible file for a module.
@@ -92,7 +173,7 @@ install_module() {
 #
 uninstall_module() {
     local module="$1"
-    local module_dir="$HOME/.local/share/syskit/zsh/module.d"
+    local module_dir="$ZSH_BASE_DIR/module.d"
     local extension
     local file
     local failed=0
@@ -122,7 +203,7 @@ uninstall_module() {
 #   1 when the loader, ~/.zshrc, or both managed markers are absent.
 #
 loader_active() {
-    local loader="$HOME/.local/share/syskit/zsh/loader.sh"
+    local loader="$ZSH_BASE_DIR/loader.sh"
     local startup_file="$HOME/.zshrc"
     local start_marker="# >>> syskit zsh loader >>>"
     local end_marker="# <<< syskit zsh loader <<<"
@@ -164,8 +245,7 @@ loader_active() {
 #   managed block prevents a safe update.
 #
 activate_loader() {
-    local loader_dir="$HOME/.local/share/syskit/zsh"
-    local loader="$loader_dir/loader.sh"
+    local loader="$ZSH_BASE_DIR/loader.sh"
     local startup_file="$HOME/.zshrc"
     local start_marker="# >>> syskit zsh loader >>>"
     local end_marker="# <<< syskit zsh loader <<<"
@@ -199,8 +279,8 @@ activate_loader() {
         return 1
     fi
 
-    if ! install -d -m 0755 -- "$loader_dir"; then
-        log_error "Failed to create Zsh loader directory: $loader_dir"
+    if ! install -d -m 0755 -- "$ZSH_BASE_DIR"; then
+        log_error "Failed to create Zsh loader directory: $ZSH_BASE_DIR"
 
         return 1
     fi
