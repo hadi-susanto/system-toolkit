@@ -16,9 +16,9 @@ Commands:
   help [command]  Show basic help or details for a command.
   install         Install the ${display_name} integration.
   uninstall       Remove the installed ${display_name} integration.
-  enable          Enable the installed ${display_name} integration.
+  activate        Activate the installed ${display_name} module loader.
   disable         Disable the ${display_name} integration without removing it.
-  status          Show whether the integration is installed and enabled.
+  status          Show whether the integration is installed and active.
 
 Supported shells: Bash and Zsh.
 EOF
@@ -85,7 +85,7 @@ Description:
 EOF
 }
 
-__enable_help() {
+__activate_help() {
     local shell_name="$1"
     local display_name="$2"
 
@@ -94,14 +94,15 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh enable [args...]
+  syskit-${shell_name}.sh activate [--force]
 
 Options:
-  No command-specific options.
+  -f, --force  Recreate an active loader and refresh its startup-file block.
 
 Description:
-  Enables the installed SysKit ${display_name} integration. Installing the
-  integration alone has no effect until it is enabled.
+  Creates the SysKit ${display_name} module loader and adds a managed source
+  block to the shell startup file. Installed modules take effect in new shell
+  sessions after activation.
 EOF
 }
 
@@ -139,7 +140,7 @@ Options:
   No command-specific options.
 
 Description:
-  Shows whether the SysKit ${display_name} integration is installed and enabled.
+  Shows whether the SysKit ${display_name} integration is installed and active.
 EOF
 }
 
@@ -170,8 +171,8 @@ main() {
         uninstall)
             __uninstall_help "$shell_name" "$display_name"
             ;;
-        enable)
-            __enable_help "$shell_name" "$display_name"
+        activate)
+            __activate_help "$shell_name" "$display_name"
             ;;
         disable)
             __disable_help "$shell_name" "$display_name"

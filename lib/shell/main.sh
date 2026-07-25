@@ -68,7 +68,7 @@ main() {
     local -A options
     local -a args
 
-    __parse_args options args $@" || return $?
+    __parse_args options args "$@" || return $?
 
     case "${options[CMD]}" in
         help)
@@ -80,8 +80,8 @@ main() {
         uninstall)
             exec bash "$SHELL_LIB/uninstall.sh" "$shell" "${args[@]}"
             ;;
-        enable)
-            exec bash "$SHELL_LIB/enable.sh" "$shell" "${args[@]}"
+        activate)
+            exec bash "$SHELL_LIB/activate.sh" "$shell" "${args[@]}"
             ;;
         disable)
             exec bash "$SHELL_LIB/disable.sh" "$shell" "${args[@]}"

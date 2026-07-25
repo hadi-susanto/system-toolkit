@@ -47,7 +47,7 @@ Pass a command name to `help` for command-specific usage and behavior:
 ```bash
 bash ./syskit-bin.sh help install
 bash ./syskit-bin.sh status
-bash ./syskit-bash.sh help enable
+bash ./syskit-bash.sh help activate
 bash ./syskit-zsh.sh help status
 bash ./syskit-cfg.sh help install
 ```
@@ -88,7 +88,7 @@ syskit-cfg.sh [command] [args...]
 
 An entrypoint initializes the SysKit paths and invokes its toolkit controller.
 The controller parses the first argument as a command and explicitly routes it
-to a dedicated script such as `install.sh`, `enable.sh`, or `status.sh`.
+to a dedicated script such as `install.sh`, `activate.sh`, or `status.sh`.
 
 Bash and Zsh share the `lib/shell/` controller. Their entrypoints pass the
 selected shell as the controller's first internal parameter, allowing
@@ -111,7 +111,7 @@ command compares SHA-256 checksums to report local and global state.
 
 The shell toolkit manages Bash and Zsh integrations sourced from the `shell/`
 directory. Installation places the integration in its designated location,
-while enabling it makes the installed integration take effect.
+while activation makes the installed integration take effect.
 
 **Configuration toolkit**
 
