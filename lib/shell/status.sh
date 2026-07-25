@@ -69,8 +69,7 @@ main() {
     fi
 
     load_shell_interface \
-        "$shell" "shell_display_name" \
-        "support_module" "module_installed" "loader_active" || return 1
+        "$shell" "support_module" "module_installed" "loader_active" || return 1
 
     if [[ $# -gt 0 ]]; then
         log_error "The status command does not accept arguments"
@@ -102,7 +101,7 @@ main() {
     done
 
     printf '\n%s status:\n  installed? %s, default? %s (current: %s), activated? %s\n' \
-        "$(shell_display_name)" \
+        "$shell" \
         "$(__boolean_to_icon shell_installed "$shell")" \
         "$(__boolean_to_icon __default_shell "$shell")" \
         "$(current_user_shell)" \

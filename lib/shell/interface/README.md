@@ -81,7 +81,6 @@ existing shell entry point. :contentReference[oaicite:0]{index=0}
 
 ## Table of Contents
 
-- [`shell_display_name`](#shell_display_name)
 - [`support_module`](#support_module)
 - [`module_installed`](#module_installed)
 - [`install_module`](#install_module)
@@ -90,24 +89,6 @@ existing shell entry point. :contentReference[oaicite:0]{index=0}
 - [`loader_active`](#loader_active)
 - [`activate_loader`](#activate_loader)
 - [`deactivate_loader`](#deactivate_loader)
-
----
-
-## `shell_display_name`
-
-Returns the human-readable name of the shell.
-
-### Parameters
-
-None.
-
-### Return Code
-
-Always returns `0`.
-
-### Output
-
-Prints the shell display name to standard output.
 
 ---
 

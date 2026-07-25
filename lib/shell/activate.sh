@@ -91,12 +91,12 @@ __activate_loader() {
 
     if ! shell_installed "$shell"; then
         if (( !force )); then
-            log_error "$(shell_display_name) is not installed on your system. Unable to proceed."
+            log_error "$shell is not installed on your system. Unable to proceed."
 
             return 1
         fi
 
-        log_warn "Forcing activation of the $(shell_display_name) shell loader even though it is not installed."
+        log_warn "Forcing activation of the $shell shell loader even though it is not installed."
     fi
 
     if loader_active; then
@@ -128,7 +128,7 @@ main() {
     fi
 
     load_shell_interface \
-        "$shell" "shell_display_name" "loader_active" "activate_loader" || return 1
+        "$shell" "loader_active" "activate_loader" || return 1
     __parse_args options args "$@"
     __validate_options options args || return $?
 

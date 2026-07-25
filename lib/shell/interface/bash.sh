@@ -1,15 +1,6 @@
 readonly BASH_BASE_DIR="$HOME/.local/share/syskit/bash"
 
 ##
-# shell_display_name
-#
-# Return 'Bash' since this is Bash interface.
-#
-shell_display_name() {
-    printf 'Bash'
-}
-
-##
 # support_module <module>
 #
 # Checks whether a module provides a Bash-specific or generic source file.

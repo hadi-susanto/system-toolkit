@@ -1,15 +1,6 @@
 readonly ZSH_BASE_DIR="$HOME/.local/share/syskit/zsh"
 
 ##
-# shell_display_name
-#
-# Return 'Zsh' since this is Zsh interface.
-#
-shell_display_name() {
-    printf 'Zsh'
-}
-
-##
 # support_module <module>
 #
 # Checks whether a module provides a Zsh-specific or generic source file.
