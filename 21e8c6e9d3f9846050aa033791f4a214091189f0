@@ -1,0 +1,93 @@
+lib/shell/__interface_loader.sh
+  ca1eacd3210cae3e 3-13,15-21,24-35,37-64
+lib/shell/main.sh
+  ca1eacd3210cae3e 56-58,60-61,63-65,67
+  f167686a018875e0 78
+  76f381841a35d0b7 81,87,90,93-94
+lib/shell/interface/bash.sh
+  ca1eacd3210cae3e 1-11,14-16,19-29,32-34,37-47,50-74
+lib/shell/__modules.sh
+  ca1eacd3210cae3e 1-31
+lib/bin/install.sh
+  76f381841a35d0b7 192,207-208
+lib/shell/help.sh
+  ca1eacd3210cae3e 55-56,59-60,63-64
+lib/shell/install.sh
+  99f9baca493e3493 5,22,25
+  ca1eacd3210cae3e 6,8-11,13-21,23-24,26-76,81-82,87,90-92,94-98,100-104,106-108,111-113,118-119,123-128,130,132-136,141-142,146-152,154,156-159,165-170,175-183,185
+  76f381841a35d0b7 137-140,155,162-163
+lib/shell/interface/zsh.sh
+  ca1eacd3210cae3e 1-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "21e8c6e9d3f9846050aa033791f4a214091189f0",
+  "prompts": {
+    "76f381841a35d0b7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a4-bb9a-72c1-a145-7d34a9b897fc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 204,
+      "overriden_lines": 0
+    },
+    "99f9baca493e3493": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f939d-2ffc-7b42-8789-5008f5cdd155",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 28,
+      "total_deletions": 171,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "ca1eacd3210cae3e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9419-e292-7181-9175-75e41c2a23bd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    },
+    "dfe1c06ca6d295ed": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f88e5-1a00-76d2-9072-695fd475955d",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "f167686a018875e0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a5-1e8d-7402-9e5d-b9af6d6c2d3a",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 55,
+      "overriden_lines": 0
+    }
+  }
+}
