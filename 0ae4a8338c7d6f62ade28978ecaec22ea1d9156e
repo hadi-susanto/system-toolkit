@@ -1,0 +1,66 @@
+lib/shell/interface/bash.sh
+  ca1eacd3210cae3e 75-89,91-92,100-103
+lib/shell/install.sh
+  ca1eacd3210cae3e 156-157
+README.md
+  ca1eacd3210cae3e 50,91,114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "0ae4a8338c7d6f62ade28978ecaec22ea1d9156e",
+  "prompts": {
+    "76f381841a35d0b7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a4-bb9a-72c1-a145-7d34a9b897fc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 227,
+      "overriden_lines": 0
+    },
+    "99f9baca493e3493": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f939d-2ffc-7b42-8789-5008f5cdd155",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 28,
+      "total_deletions": 171,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "ca1eacd3210cae3e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9419-e292-7181-9175-75e41c2a23bd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 1281,
+      "total_deletions": 177,
+      "accepted_lines": 1091,
+      "overriden_lines": 0
+    },
+    "f167686a018875e0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a5-1e8d-7402-9e5d-b9af6d6c2d3a",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 55,
+      "overriden_lines": 0
+    }
+  }
+}
