@@ -89,7 +89,7 @@ __deactivate_loader() {
     local shell="$1"
     local force="$2"
 
-    if ! shell_installed; then
+    if ! shell_installed "$shell"; then
         if (( !force )); then
             log_error "$(shell_display_name) is not installed on your system. Unable to proceed."
 
@@ -128,7 +128,7 @@ main() {
     fi
 
     load_shell_interface \
-        "$shell" "shell_installed" "shell_display_name" "loader_active" "deactivate_loader" || return 1
+        "$shell" "shell_display_name" "loader_active" "deactivate_loader" || return 1
     __parse_args options args "$@"
     __validate_options options args || return $?
 

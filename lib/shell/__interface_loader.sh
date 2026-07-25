@@ -64,6 +64,24 @@ load_shell_interface() {
 }
 
 ##
+# shell_installed <shell>
+#
+# Checks whether the specified shell is installed on the
+# current system.
+#
+# Parameters:
+#   shell     Shell executable name.
+#
+# Returns:
+#   1 when the specified shell is not installed.
+#
+shell_installed() {
+    local shell="$1"
+
+    command -v "$shell" >/dev/null 2>&1
+}
+
+##
 # current_user_shell
 #
 # Returns the user's configured login shell.

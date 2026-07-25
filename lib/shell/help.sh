@@ -156,9 +156,9 @@ main() {
     local help_type="${2:-basic}"
 
     load_shell_interface \
-        "$shell" "shell_installed" "shell_display_name" || return 1
+        "$shell" "shell_display_name" || return 1
 
-    if (( $# > 0 )); then
+    if (( $# > 2 )); then
         log_error "The help command only accept zero or one argument"
 
         return 1

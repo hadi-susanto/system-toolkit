@@ -10,38 +10,6 @@ shell_display_name() {
 }
 
 ##
-# shell_installed
-#
-# Checks whether Bash is installed on the current system.
-# This function does not check whether Bash is the user's
-# default login shell.
-#
-# Returns:
-#   1 when Bash is not installed.
-#
-shell_installed() {
-    command -v bash >/dev/null 2>&1
-}
-
-##
-# default_shell
-#
-# Checks whether Bash is the user's configured default
-# login shell.
-# This function does not check whether Bash is currently
-# running.
-#
-# Returns:
-#   1 when Bash is not the user's default login shell.
-#
-default_shell() {
-    local default_shell="$(getent passwd "$USER" | cut -d: -f7)"
-    default_shell="${default_shell##*/}"
-
-    [[ "bash" == "$default_shell" ]]
-}
-
-##
 # support_module <module>
 #
 # Checks whether a module provides a Bash-specific or generic source file.

@@ -49,6 +49,15 @@ __resolve_install_icon() {
     fi
 }
 
+__default_shell() {
+    local shell="${1:-}"
+
+    local default_shell="$(current_user_shell)"
+    default_shell="${default_shell##*/}"
+
+    [[ "$shell" == "$default_shell" ]]
+}
+
 main() {
     local shell="${1:-}"
     local -a modules
@@ -60,7 +69,7 @@ main() {
     fi
 
     load_shell_interface \
-        "$shell" "shell_display_name" "shell_installed" "default_shell" \
+        "$shell" "shell_display_name" \
         "support_module" "module_installed" "loader_active" || return 1
 
     if [[ $# -gt 0 ]]; then
@@ -95,7 +104,7 @@ main() {
     printf '\n%s status:\n  installed? %s, default? %s (current: %s), activated? %s\n' \
         "$(shell_display_name)" \
         "$(__boolean_to_icon shell_installed "$shell")" \
-        "$(__boolean_to_icon default_shell "$shell")" \
+        "$(__boolean_to_icon __default_shell "$shell")" \
         "$(current_user_shell)" \
         "$(__boolean_to_icon loader_active)"
 

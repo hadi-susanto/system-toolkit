@@ -82,8 +82,6 @@ existing shell entry point. :contentReference[oaicite:0]{index=0}
 ## Table of Contents
 
 - [`shell_display_name`](#shell_display_name)
-- [`shell_installed`](#shell_installed)
-- [`default_shell`](#default_shell)
 - [`support_module`](#support_module)
 - [`module_installed`](#module_installed)
 - [`install_module`](#install_module)
@@ -110,40 +108,6 @@ Always returns `0`.
 ### Output
 
 Prints the shell display name to standard output.
-
----
-
-## `shell_installed`
-
-Checks whether the shell is installed on the current system.
-
-### Parameters
-
-None.
-
-### Return Code
-
-| Code     | Description             |
-|----------|-------------------------|
-| `0`      | Shell is installed.     |
-| Non-zero | Shell is not installed. |
-
----
-
-## `default_shell`
-
-Checks whether the shell is the user's configured default login shell.
-
-### Parameters
-
-None.
-
-### Return Code
-
-| Code     | Description                              |
-|----------|------------------------------------------|
-| `0`      | Shell is the user's default login shell. |
-| Non-zero | Shell is not the default login shell.    |
 
 ---
 
