@@ -83,8 +83,8 @@ main() {
         activate)
             exec bash "$SHELL_LIB/activate.sh" "$shell" "${args[@]}"
             ;;
-        disable)
-            exec bash "$SHELL_LIB/disable.sh" "$shell" "${args[@]}"
+        deactivate)
+            exec bash "$SHELL_LIB/deactivate.sh" "$shell" "${args[@]}"
             ;;
         status)
             exec bash "$SHELL_LIB/status.sh" "$shell" "${args[@]}"
