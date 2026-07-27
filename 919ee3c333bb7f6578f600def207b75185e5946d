@@ -1,0 +1,29 @@
+command/README.md
+  d684cd2b6ee53d60 46,68-72
+README.md
+  d684cd2b6ee53d60 129-131
+command/config/status.sh
+  d684cd2b6ee53d60 5-108,111-121,124-157,159
+command/config/help.sh
+  d684cd2b6ee53d60 17,97-98,101,104-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "919ee3c333bb7f6578f600def207b75185e5946d",
+  "prompts": {
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 705,
+      "total_deletions": 238,
+      "accepted_lines": 505,
+      "overriden_lines": 0
+    }
+  }
+}
