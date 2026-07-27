@@ -1,0 +1,9 @@
+if (( ${__SYSKIT_CONFIG_CHECKS_LOADED:-0} )); then
+    return 0
+fi
+
+readonly __SYSKIT_CONFIG_CHECKS_LOADED=1
+
+readonly CONFIG_CHECK_PROCEED=0
+readonly CONFIG_CHECK_SKIP=10
+readonly CONFIG_CHECK_BLOCK=20

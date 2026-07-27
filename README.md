@@ -124,9 +124,10 @@ effect.
 
 **Configuration toolkit**
 
-The configuration toolkit manages configuration and preference files sourced
-from the `payload/config/` directory. It installs, removes, and reports the
-status of managed configuration files.
+The configuration toolkit discovers configuration modules and orchestrates
+their interactive installation and safe uninstallation one module at a time.
+Each module owns its target handling and may use source files from the
+`payload/config/` directory.
 
 # 🔗 Relationship with Mint Provisioner
 
