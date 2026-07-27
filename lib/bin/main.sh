@@ -39,7 +39,6 @@ __parse_args() {
             ;;
         -*)
             log_error "The first parameter should be a command; options must follow a command: $1"
-            bash "$BIN_LIB/help.sh" >&2
 
             return 1
             ;;

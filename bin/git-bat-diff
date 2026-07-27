@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=""
+    readonly COLOR_CYAN=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$*" >&2
+}
+
+__usage() {
+    cat <<EOF
+${COLOR_CYAN}Usage:${COLOR_RESET}
+  git-bat-diff [OPTIONS]
+
+Preview modified tracked files in the current Git repository using bat.
+
+Deleted files are excluded. File paths are kept relative to the current
+working directory.
+
+${COLOR_CYAN}Options:${COLOR_RESET}
+  -h, --help  Display this help message
+
+${COLOR_CYAN}Examples:${COLOR_RESET}
+  git-bat-diff
+EOF
+}
+
+__parse_args() {
+    while (($# > 0)); do
+        case "$1" in
+            -h | --help)
+                __usage
+
+                exit 0
+                ;;
+
+            --)
+                shift
+
+                if (($# > 0)); then
+                    __log_error "Unexpected argument: $1"
+                    printf "Run 'git-bat-diff --help' for usage information.\n" >&2
+
+                    return 2
+                fi
+
+                return 0
+                ;;
+
+            -*)
+                __log_error "Unknown option: $1"
+                printf "Run 'git-bat-diff --help' for usage information.\n" >&2
+
+                return 2
+                ;;
+
+            *)
+                __log_error "Unexpected argument: $1"
+                printf "Run 'git-bat-diff --help' for usage information.\n" >&2
+
+                return 2
+                ;;
+        esac
+    done
+}
+
+main() {
+    __parse_args "$@"
+
+    if ! command -v git >/dev/null 2>&1; then
+        __log_error "git is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! command -v bat >/dev/null 2>&1; then
+        __log_error "bat is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! command -v xargs >/dev/null 2>&1; then
+        __log_error "xargs is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        __log_error "The current directory is not inside a Git repository."
+
+        return 1
+    fi
+
+    git diff --name-only --relative --diff-filter=d -z |
+        xargs -0 -r bat --diff
+}
+
+main "$@"

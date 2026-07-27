@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=""
+    readonly COLOR_CYAN=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$*" >&2
+}
+
+__usage() {
+    cat <<EOF
+${COLOR_CYAN}Usage:${COLOR_RESET}
+  bat-help [OPTIONS]
+  bat-help [OPTIONS] COMMAND [ARGS...]
+  COMMAND --help | bat-help
+
+Display command help output with bat syntax highlighting.
+
+When COMMAND is provided, bat-help runs:
+
+  COMMAND [ARGS...] --help
+
+When COMMAND is omitted, bat-help reads help text from standard input.
+
+${COLOR_CYAN}Options:${COLOR_RESET}
+  -h, --help  Display this help message
+  --          Stop parsing bat-help options
+
+${COLOR_CYAN}Examples:${COLOR_RESET}
+  git --help | bat-help
+  bat-help git
+  bat-help docker run
+  bat-help cargo build
+EOF
+}
+
+__parse_args() {
+    local command_args_name="$1"
+    shift
+
+    local -n command_args_ref="$command_args_name"
+
+    command_args_ref=()
+
+    while (($# > 0)); do
+        case "$1" in
+            -h | --help)
+                __usage
+                exit 0
+                ;;
+
+            --)
+                shift
+                command_args_ref=("$@")
+
+                return 0
+                ;;
+
+            -*)
+                __log_error "Unknown option: $1"
+                printf "Run 'bat-help --help' for usage information.\n" >&2
+
+                return 2
+                ;;
+
+            *)
+                command_args_ref=("$@")
+
+                return 0
+                ;;
+        esac
+    done
+}
+
+main() {
+    local -a command_args=()
+
+    __parse_args command_args "$@"
+
+    if ! command -v bat >/dev/null 2>&1; then
+        __log_error "bat is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ((${#command_args[@]} == 0)); then
+        bat --plain --language=help
+    else
+        "${command_args[@]}" --help 2>&1 |
+            bat --plain --language=help
+    fi
+}
+
+main "$@"

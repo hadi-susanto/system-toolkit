@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "$COMMON_LIB/common.sh"
+
 __basic_help() {
     local shell_name="$1"
-    local display_name="$2"
 
     cat <<EOF
 System Toolkit Shell Integration (Shell-Dependent)
@@ -13,12 +14,12 @@ Usage:
   syskit-${shell_name}.sh [command] [args...]
 
 Commands:
-  help [command]  Show basic help or details for a command.
-  install         Install the ${display_name} integration.
-  uninstall       Remove the installed ${display_name} integration.
-  enable          Enable the installed ${display_name} integration.
-  disable         Disable the ${display_name} integration without removing it.
-  status          Show whether the integration is installed and enabled.
+  help [command]     Show basic help or details for a command.
+  install <module>   Install [module] for ${shell_name}.
+  uninstall <module> Remove installed [module] from ${shell_name}.
+  activate           Activate ${shell_name} module loader.
+  deactivate         Deactivate ${shell_name} module loader.
+  status             Show whether the integration is installed and active.
 
 Supported shells: Bash and Zsh.
 EOF
@@ -45,86 +46,88 @@ EOF
 
 __install_help() {
     local shell_name="$1"
-    local display_name="$2"
 
     cat <<EOF
 System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh install [args...]
+  syskit-${shell_name}.sh install [--force] <module...>
+  syskit-${shell_name}.sh install [--force] --all
 
 Options:
-  No command-specific options.
+  -a, --all    Install every available shell module.
+  -f, --force  Reinstall modules that are already installed.
 
 Description:
-  Installs the SysKit ${display_name} integration into its designated location.
-  Run the enable command afterward to make the integration take effect.
+  Installs one or more SysKit modules for ${shell_name} into their designated
+  location. Use --all instead of naming individual modules.
 EOF
 }
 
 __uninstall_help() {
     local shell_name="$1"
-    local display_name="$2"
 
     cat <<EOF
 System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh uninstall [args...]
+  syskit-${shell_name}.sh uninstall [--force] <module...>
+  syskit-${shell_name}.sh uninstall [--force] --all
 
 Options:
-  No command-specific options.
+  -a, --all    Uninstall every available shell module.
+  -f, --force  Force uninstall modules even its state is uninstalled.
 
 Description:
-  Removes the installed SysKit ${display_name} integration from its designated
-  location.
+  Unnstalls one or more SysKit modules for ${shell_name} from their designated
+  location. Use --all instead of naming individual modules.
 EOF
 }
 
-__enable_help() {
+__activate_help() {
     local shell_name="$1"
-    local display_name="$2"
 
     cat <<EOF
 System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh enable [args...]
+  syskit-${shell_name}.sh activate [--force]
 
 Options:
-  No command-specific options.
+  -f, --force  Recreate an active loader and refresh its startup-file block.
 
 Description:
-  Enables the installed SysKit ${display_name} integration. Installing the
-  integration alone has no effect until it is enabled.
+  Creates the SysKit ${shell_name} module loader and adds a managed source
+  block to the shell startup file. Installed modules take effect in new shell
+  sessions after activation.
 EOF
 }
 
-__disable_help() {
+__deactivate_help() {
     local shell_name="$1"
-    local display_name="$2"
 
     cat <<EOF
 System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh disable [args...]
+  syskit-${shell_name}.sh deactivate [--force]
 
 Options:
-  No command-specific options.
+  -f, --force  Force removal even loader status is deactivated.
 
 Description:
-  Disables the SysKit ${display_name} integration without removing its files.
+  Remove the SysKit ${shell_name} module loader and remove the managed source
+  block to the shell startup file. Installed modules will not removed, once
+  re-activated all previous installed modules will be loaded automatically.
 EOF
 }
 
 __status_help() {
     local shell_name="$1"
-    local display_name="$2"
 
     cat <<EOF
 System Toolkit Shell Integration (Shell-Dependent)
@@ -137,49 +140,46 @@ Options:
   No command-specific options.
 
 Description:
-  Shows whether the SysKit ${display_name} integration is installed and enabled.
+  Shows whether the SysKit ${shell_name} integration is installed and active.
 EOF
 }
 
 main() {
-    local shell_name="${1:-shell}"
+    local shell="${1:-}"
     local help_type="${2:-basic}"
-    local display_name="Shell"
 
-    case "$shell_name" in
-        bash)
-            display_name="Bash"
-            ;;
-        zsh)
-            display_name="Zsh"
-            ;;
-    esac
+    if (( $# > 2 )); then
+        log_error "The help command only accept zero or one argument"
+
+        return 1
+    fi
 
     case "$help_type" in
         basic | -h | --help)
-            __basic_help "$shell_name" "$display_name"
+            __basic_help "$shell"
             ;;
         help)
-            __help_help "$shell_name"
+            __help_help "$shell"
             ;;
         install)
-            __install_help "$shell_name" "$display_name"
+            __install_help "$shell"
             ;;
         uninstall)
-            __uninstall_help "$shell_name" "$display_name"
+            __uninstall_help "$shell"
             ;;
-        enable)
-            __enable_help "$shell_name" "$display_name"
+        activate)
+            __activate_help "$shell"
             ;;
-        disable)
-            __disable_help "$shell_name" "$display_name"
+        deactivate)
+            __deactivate_help "$shell"
             ;;
         status)
-            __status_help "$shell_name" "$display_name"
+            __status_help "$shell"
             ;;
         *)
-            printf 'Unknown shell help topic: %s\n\n' "$help_type" >&2
-            __basic_help "$shell_name" "$display_name" >&2
+            log_error "Unknown shell help topic: $help_type"
+            printf '\n' "$help_type" >&2
+            __basic_help "$shell" >&2
 
             return 1
             ;;

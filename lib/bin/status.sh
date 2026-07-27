@@ -27,7 +27,6 @@ main() {
 
     if [[ $# -gt 0 ]]; then
         log_error "The status command does not accept arguments"
-        bash "$BIN_LIB/help.sh" status >&2
 
         return 1
     fi

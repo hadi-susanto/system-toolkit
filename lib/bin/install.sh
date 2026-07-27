@@ -30,7 +30,6 @@ __parse_args() {
 
     options_ref=(
         [ALL]=0
-        [CMD]="install"
         [FORCE]=0
         [GLOBAL]=0
         [INSTALL_DIR]="$local_dir"
@@ -84,6 +83,7 @@ __validate_options() {
     local args_name="$2"
     local -n options_ref="$options_name"
     local -n args_ref="$args_name"
+    local executable
 
     if [[ -n "${options_ref[INVALID_OPTION]}" ]]; then
         log_error "Unknown install option: ${options_ref[INVALID_OPTION]}"
@@ -107,10 +107,6 @@ __validate_options() {
         log_error "At least one executable name or --all is required"
 
         return 1
-    fi
-
-    if (( options_ref[FORCE] )); then
-        log_warn "Force installation is enabled"
     fi
 
     if [[ "${options_ref[SCOPE]}" == "global" ]] && (( EUID != 0 )); then
@@ -138,9 +134,15 @@ __validate_options() {
         log_warn "${options_ref[INSTALL_DIR]} is not present in PATH"
         log_warn "Installed executables may not be available until PATH is configured"
     fi
+
+    for executable in "${args_ref[@]}"; do
+        if ! resolve_bin_executable "$executable" >/dev/null; then
+            return 1
+        fi
+    done
 }
 
-__resolve_args_to_executables() {
+__deduplicate_executables() {
     local args_name="$1"
     local executables_name="$2"
     local -n args_ref="$args_name"
@@ -151,8 +153,6 @@ __resolve_args_to_executables() {
     executables_ref=()
 
     for name in "${args_ref[@]}"; do
-        resolve_bin_executable "$name" >/dev/null || return $?
-
         if (( seen["$name"] )); then
             continue
         fi
@@ -185,7 +185,11 @@ __install_executable() {
         log_warn "Overwriting existing executable: $target"
     fi
 
-    install -m 0755 -- "$source" "$target" || return $?
+    if ! install -m 0755 -- "$source" "$target"; then
+        log_error "Fail to install executable: $name"
+
+        return 1
+    fi
 
     log_info "Installed executable: $name"
 }
@@ -198,10 +202,10 @@ main() {
     local failed=0
 
     __parse_args options args "$@"
-    if ! __validate_options options args; then
-        bash "$BIN_LIB/help.sh" install >&2
+    __validate_options options args || return $?
 
-        return 1
+    if (( options[FORCE] )); then
+        log_warn "Force installation is enabled"
     fi
 
     if (( options[ALL] )); then
@@ -213,7 +217,7 @@ main() {
             return 1
         fi
     else
-        __resolve_args_to_executables args executables || return $?
+        __deduplicate_executables args executables
     fi
 
     for name in "${executables[@]}"; do

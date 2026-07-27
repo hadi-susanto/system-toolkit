@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$SHELL_LIB/__interface_loader.sh"
 
 ##
 # __parse_args <options_name> <args_name> <shell> [arguments...]
@@ -11,7 +12,6 @@ source "$COMMON_LIB/common.sh"
 # Parameters:
 #   options_name    Name of the associative array that receives command state.
 #   args_name       Name of the indexed array that receives command arguments.
-#   shell           Shell implementation selected by the entrypoint.
 #   arguments       Command-line arguments to parse.
 #
 # Returns:
@@ -27,28 +27,8 @@ __parse_args() {
 
     options_ref=(
         [CMD]="help"
-        [SHELL]=""
     )
     args_ref=()
-
-    if [[ $# -eq 0 ]]; then
-        log_error "A shell implementation is required"
-
-        return 1
-    fi
-
-    case "$1" in
-        bash | zsh)
-            options_ref[SHELL]="$1"
-            ;;
-        *)
-            log_error "Unsupported shell: $1"
-
-            return 1
-            ;;
-    esac
-
-    shift
 
     if [[ $# -eq 0 ]]; then
         return 0
@@ -60,7 +40,6 @@ __parse_args() {
             ;;
         -*)
             log_error "The first parameter should be a command; options must follow a command: $1"
-            bash "$SHELL_LIB/help.sh" "${options_ref[SHELL]}" >&2
 
             return 1
             ;;
@@ -74,6 +53,18 @@ __parse_args() {
 }
 
 main() {
+    local shell="${1:-}"
+
+    if (( $# > 0 )); then
+        shift
+    fi
+
+    if ! exists_shell_interface "$shell"; then
+        log_error "Unsupported shell: ${shell:-<missing>}"
+
+        return 1
+    fi
+
     local -A options
     local -a args
 
@@ -81,26 +72,26 @@ main() {
 
     case "${options[CMD]}" in
         help)
-            exec bash "$SHELL_LIB/help.sh" "${options[SHELL]}" "${args[@]}"
+            exec bash "$SHELL_LIB/help.sh" "$shell" "${args[@]}"
             ;;
         install)
-            exec bash "$SHELL_LIB/install.sh" "${options[SHELL]}" "${args[@]}"
+            exec bash "$SHELL_LIB/install.sh" "$shell" "${args[@]}"
             ;;
         uninstall)
-            exec bash "$SHELL_LIB/uninstall.sh" "${options[SHELL]}" "${args[@]}"
+            exec bash "$SHELL_LIB/uninstall.sh" "$shell" "${args[@]}"
             ;;
-        enable)
-            exec bash "$SHELL_LIB/enable.sh" "${options[SHELL]}" "${args[@]}"
+        activate)
+            exec bash "$SHELL_LIB/activate.sh" "$shell" "${args[@]}"
             ;;
-        disable)
-            exec bash "$SHELL_LIB/disable.sh" "${options[SHELL]}" "${args[@]}"
+        deactivate)
+            exec bash "$SHELL_LIB/deactivate.sh" "$shell" "${args[@]}"
             ;;
         status)
-            exec bash "$SHELL_LIB/status.sh" "${options[SHELL]}" "${args[@]}"
+            exec bash "$SHELL_LIB/status.sh" "$shell" "${args[@]}"
             ;;
         *)
-            log_error "Unsupported ${options[SHELL]} toolkit command: ${options[CMD]}"
-            bash "$SHELL_LIB/help.sh" "${options[SHELL]}" >&2
+            log_error "Unsupported $shell toolkit command: ${options[CMD]}"
+            bash "$SHELL_LIB/help.sh" "$shell" >&2
 
             return 1
             ;;

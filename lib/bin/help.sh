@@ -95,8 +95,8 @@ Options:
 
 Description:
   Shows whether each installation directory is in PATH, then lists every
-  available executable and its local and global installation state. [v] means
-  installed, [x] means not installed, and [↑] means update available.
+  available executable and its local and global installation state. [✓] means
+  installed, [✗] means not installed, and [↑] means update available.
 EOF
 }
 
