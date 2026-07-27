@@ -19,7 +19,7 @@ __resolve_install_icon() {
     local target
 
     if ! target="$(installed_module_path "$module")"; then
-        printf '%s[✗]%s\n' "$COLOR_RED" "$COLOR_RESET"
+        printf '%s[✗]%s (not installed)\n' "$COLOR_RED" "$COLOR_RESET"
 
         return 0
     fi
@@ -27,7 +27,7 @@ __resolve_install_icon() {
     if ! source="$(module_source_path "$module")"; then
         # Inconsistency detected...
         log_error "$module was installed, but we can't determine its source file"
-        printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+        printf '%s[?]%s (source-file missing)\n' "$COLOR_YELLOW" "$COLOR_RESET"
 
         return 0
     fi
@@ -37,13 +37,13 @@ __resolve_install_icon() {
     local target_checksum
 
     if ! source_checksum="$(sha256sum -- "$source" 2>/dev/null)"; then
-        printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+        printf '%s[?]%s (source-checksum fail)\n' "$COLOR_YELLOW" "$COLOR_RESET"
 
         return 0
     fi
 
     if ! target_checksum="$(sha256sum -- "$target" 2>/dev/null)"; then
-        printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+        printf '%s[?]%s (target-checksum fail)\n' "$COLOR_YELLOW" "$COLOR_RESET"
 
         return 0
     fi
@@ -51,11 +51,14 @@ __resolve_install_icon() {
     source_checksum="${source_checksum%% *}"
     target_checksum="${target_checksum%% *}"
 
-    if [[ "${source##*/}" == "${target##*/}" ]] &&
-        [[ "$source_checksum" == "$target_checksum" ]]; then
-        printf '%s[✓]%s\n' "$COLOR_GREEN" "$COLOR_RESET"
+    if [[ "$source_checksum" == "$target_checksum" ]]; then
+        if [[ "${source##*/}" == "${target##*/}" ]]; then
+            printf '%s[✓]%s (installed)\n' "$COLOR_GREEN" "$COLOR_RESET"
+        else
+            printf '%s[↑]%s (source-filename mismatch)' "$COLOR_YELLOW" "$COLOR_RESET"
+        fi
     else
-        printf '%s[↑]%s' "$COLOR_YELLOW" "$COLOR_RESET"
+        printf '%s[↑]%s (checksum mismatch)' "$COLOR_YELLOW" "$COLOR_RESET"
     fi
 }
 
@@ -120,10 +123,6 @@ main() {
     printf 'Legend:\n'
     printf '  [S]: Indicates whether the current module supports the current shell.\n'
     printf '  [I]: Indicates whether the current module is installed for the current shell.\n'
-    printf '  %s[✓]%s: Installed and up to date.\n' "$COLOR_GREEN" "$COLOR_RESET"
-    printf '  %s[✗]%s: Not installed.\n' "$COLOR_RED" "$COLOR_RESET"
-    printf '  %s[↑]%s: Installed; update available (checksum mismatch).\n' "$COLOR_YELLOW" "$COLOR_RESET"
-    printf '  %s[?]%s: Installed; unable to verify version.\n' "$COLOR_YELLOW" "$COLOR_RESET"
 }
 
 main "$@"
