@@ -2,11 +2,12 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$SHELL_LIB/interface_loader.sh"
 
 ##
-# __parse_args <options_name> <args_name> [arguments...]
+# __parse_args <options_name> <args_name> <shell> [arguments...]
 #
-# Parses the binary toolkit command and preserves its arguments.
+# Parses the shell toolkit command and preserves its arguments.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives command state.
@@ -14,7 +15,7 @@ source "$COMMON_LIB/common.sh"
 #   arguments       Command-line arguments to parse.
 #
 # Returns:
-#   1 when the first parameter is an option instead of a command.
+#   1 when the shell is unsupported or the first parameter is an option.
 #
 __parse_args() {
     local options_name="$1"
@@ -52,6 +53,18 @@ __parse_args() {
 }
 
 main() {
+    local shell="${1:-}"
+
+    if (( $# > 0 )); then
+        shift
+    fi
+
+    if ! exists_shell_interface "$shell"; then
+        log_error "Unsupported shell: ${shell:-<missing>}"
+
+        return 1
+    fi
+
     local -A options
     local -a args
 
@@ -59,20 +72,26 @@ main() {
 
     case "${options[CMD]}" in
         help)
-            exec bash "$BIN_LIB/help.sh" "${args[@]}"
+            exec bash "$SHELL_COMMAND/help.sh" "$shell" "${args[@]}"
             ;;
         install)
-            exec bash "$BIN_LIB/install.sh" "${args[@]}"
+            exec bash "$SHELL_COMMAND/install.sh" "$shell" "${args[@]}"
             ;;
         uninstall)
-            exec bash "$BIN_LIB/uninstall.sh" "${args[@]}"
+            exec bash "$SHELL_COMMAND/uninstall.sh" "$shell" "${args[@]}"
+            ;;
+        activate)
+            exec bash "$SHELL_COMMAND/activate.sh" "$shell" "${args[@]}"
+            ;;
+        deactivate)
+            exec bash "$SHELL_COMMAND/deactivate.sh" "$shell" "${args[@]}"
             ;;
         status)
-            exec bash "$BIN_LIB/status.sh" "${args[@]}"
+            exec bash "$SHELL_COMMAND/status.sh" "$shell" "${args[@]}"
             ;;
         *)
-            log_error "Unsupported binary toolkit command: ${options[CMD]}"
-            bash "$BIN_LIB/help.sh" >&2
+            log_error "Unsupported $shell toolkit command: ${options[CMD]}"
+            bash "$SHELL_COMMAND/help.sh" "$shell" >&2
 
             return 1
             ;;

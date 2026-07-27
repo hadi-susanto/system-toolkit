@@ -2,8 +2,8 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$SHELL_LIB/__interface_loader.sh"
-source "$SHELL_LIB/__modules.sh"
+source "$SHELL_LIB/interface_loader.sh"
+source "$SHELL_LIB/modules.sh"
 
 ##
 # __parse_args <options_name> <args_name> [arguments...]
@@ -80,7 +80,6 @@ __validate_options() {
 
     if (( ! options_ref[ALL] && ${#args_ref[@]} == 0 )); then
         log_error "At least one module name or --all is required"
-        log_warn "Use --all with cautions, it will uninstall all installed modules"
 
         return 1
     fi
@@ -112,7 +111,7 @@ __deduplicate_modules() {
     done
 }
 
-__uninstall_module() {
+__install_module() {
     local shell="$1"
     local module="$2"
     local force="$3"
@@ -123,23 +122,23 @@ __uninstall_module() {
         return 1
     fi
 
-    if ! module_installed "$module"; then
+    if module_installed "$module"; then
         if (( ! force )); then
-            log_warn "Shell module is not installed; skipping: $module"
+            log_warn "Shell module is already installed; skipping: $module"
 
             return 0
         fi
 
-        log_warn "Force uninstallation shell module: $module"
+        log_warn "Reinstalling shell module: $module"
     fi
 
-    if ! uninstall_module "$module"; then
-        log_error "Failed to uninstall shell module: $module"
+    if ! install_module "$module"; then
+        log_error "Failed to install shell module: $module"
 
         return 1
     fi
 
-    log_info "Uninstalled shell module: $module"
+    log_info "Installed shell module: $module"
 }
 
 main() {
@@ -155,19 +154,19 @@ main() {
     fi
 
     load_shell_interface \
-        "$shell" "support_module" "module_installed" "uninstall_module" || return 1
+        "$shell" "support_module" "module_installed" "install_module" || return 1
     __parse_args options args "$@"
     __validate_options options args || return $?
 
     if (( options[FORCE] )); then
-        log_warn "Force uninstallation is enabled"
+        log_warn "Force installation is enabled"
     fi
 
     if (( options[ALL] )); then
         list_shell_modules modules
 
         if (( ${#modules[@]} == 0 )); then
-            log_error "No SysKit shell modules are available for uninstallation"
+            log_error "No SysKit shell modules are available to install"
 
             return 1
         fi
@@ -176,7 +175,7 @@ main() {
     fi
 
     for module in "${modules[@]}"; do
-        if __uninstall_module "$shell" "$module" "${options[FORCE]}"; then
+        if __install_module "$shell" "$module" "${options[FORCE]}"; then
             continue
         fi
 

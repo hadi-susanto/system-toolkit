@@ -2,8 +2,8 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$BIN_LIB/__executables.sh"
-source "$BIN_LIB/__scope.sh"
+source "$BIN_LIB/executables.sh"
+source "$BIN_LIB/scope.sh"
 
 __install_dir_status() {
     local install_dir="$1"
@@ -47,15 +47,12 @@ main() {
         '----+--------------------------------+-----+-----'
 
     for name in "${executables[@]}"; do
-        source="$SYSKIT_ROOT/bin/$name"
+        source="${BIN_PAYLOAD}/${name}"
         local_marker="$(bin_status_marker "$source" "$local_dir/$name")"
         global_marker="$(bin_status_marker "$source" "$global_dir/$name")"
 
         printf '%3d | %-30s | %-6s | %-6s\n' \
-            "$index" \
-            "$name" \
-            "$local_marker" \
-            "$global_marker"
+            "$index" "$name" "$local_marker" "$global_marker"
 
         ((index += 1))
     done

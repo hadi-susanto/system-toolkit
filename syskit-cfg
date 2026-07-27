@@ -5,9 +5,11 @@ __script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 export SYSKIT_ROOT="$__script_dir"
 export COMMON_LIB="$SYSKIT_ROOT/lib/common"
 export CONFIG_LIB="$SYSKIT_ROOT/lib/config"
+export CONFIG_COMMAND="$SYSKIT_ROOT/command/config"
+export CONFIG_PAYLOAD="$SYSKIT_ROOT/payload/config"
 
 main() {
-    exec bash "$CONFIG_LIB/main.sh" "$@"
+    exec bash "$CONFIG_COMMAND/main.sh" "$@"
 }
 
 main "$@"

@@ -7,7 +7,7 @@ System Toolkit Executable Integration
 -------------------------------------
 
 Usage:
-  syskit-bin.sh [command] [args...]
+  syskit-bin [command] [args...]
 
 Commands:
   help [command]  Show basic help or details for a command.
@@ -27,7 +27,7 @@ System Toolkit Executable Integration
 -------------------------------------
 
 Usage:
-  syskit-bin.sh help [command]
+  syskit-bin help [command]
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
@@ -44,8 +44,8 @@ System Toolkit Executable Integration
 -------------------------------------
 
 Usage:
-  syskit-bin.sh install [options] <name...>
-  syskit-bin.sh install [options] all
+  syskit-bin install [options] <name...>
+  syskit-bin install [options] all
 
 Options:
   -l, --local   Install into ~/.local/bin (default).
@@ -67,8 +67,8 @@ System Toolkit Executable Integration
 -------------------------------------
 
 Usage:
-  syskit-bin.sh uninstall [options] <name...>
-  syskit-bin.sh uninstall [options] --all
+  syskit-bin uninstall [options] <name...>
+  syskit-bin uninstall [options] --all
 
 Options:
   -l, --local   Uninstall from ~/.local/bin (default).
@@ -88,15 +88,14 @@ System Toolkit Executable Integration
 -------------------------------------
 
 Usage:
-  syskit-bin.sh status
+  syskit-bin status
 
 Options:
   No command-specific options.
 
 Description:
   Shows whether each installation directory is in PATH, then lists every
-  available executable and its local and global installation state. [✓] means
-  installed, [✗] means not installed, and [↑] means update available.
+  available executable and its local and global installation state.
 EOF
 }
 

@@ -9,7 +9,8 @@ installation always sets mode `0755`. Subdirectories and companion payloads are
 not supported. The executable name `all` is reserved by the install command.
 
 Local installation uses `~/.local/bin`, while global installation uses
-`/usr/local/bin`. Command routing and implementation live under `lib/bin/`.
+`/usr/local/bin`. Command routing and implementation live under
+`command/bin/`, while reusable helpers live under `lib/bin/`.
 
 # Table of Content
 

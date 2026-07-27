@@ -5,7 +5,7 @@ source "$COMMON_LIB/common.sh"
 
 main() {
     validate_no_options install "$@" || {
-        bash "$CONFIG_LIB/help.sh" install >&2
+        bash "$CONFIG_COMMAND/help.sh" install >&2
 
         return 1
     }

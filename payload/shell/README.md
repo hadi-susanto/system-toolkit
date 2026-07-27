@@ -15,7 +15,8 @@ dedicated integration files. As a result, the user experience and available
 features may vary between shells depending on the capabilities of the shell and
 its adapter implementation.
 
-Shared command routing and implementation live under `lib/shell/`, while this
+Shared command routing and implementation live under `command/shell/`.
+Reusable shell libraries and interfaces live under `lib/shell/`, while this
 directory contains only the shell-specific integration assets.
 
 ## Directory Layout
@@ -23,7 +24,7 @@ directory contains only the shell-specific integration assets.
 Each shell integration module is stored under:
 
 ```text
-shell/[module]/[files]
+payload/shell/[module]/[files]
 ```
 
 where `[module]` contains all integration assets for a single SysKit module.
@@ -32,25 +33,25 @@ The internal file layout depends on the shell adapter implementation.
 ### Bash
 
 ```text
-shell/[module]/[module.bash]
+payload/shell/[module]/[module.bash]
 ```
 
 or
 
 ```text
-shell/[module]/[module.sh]
+payload/shell/[module]/[module.sh]
 ```
 
 ### Zsh
 
 ```text
-shell/[module]/[module.zsh]
+payload/shell/[module]/[module.zsh]
 ```
 
 or
 
 ```text
-shell/[module]/[module.sh]
+payload/shell/[module]/[module.sh]
 ```
 
 Future shell adapters (such as Fish or Nushell) may define their own directory
