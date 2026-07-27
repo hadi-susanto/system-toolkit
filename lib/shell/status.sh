@@ -52,13 +52,9 @@ __resolve_install_icon() {
     target_checksum="${target_checksum%% *}"
 
     if [[ "$source_checksum" == "$target_checksum" ]]; then
-        if [[ "${source##*/}" == "${target##*/}" ]]; then
-            printf '%s[✓]%s (installed)\n' "$COLOR_GREEN" "$COLOR_RESET"
-        else
-            printf '%s[↑]%s (source-filename mismatch)' "$COLOR_YELLOW" "$COLOR_RESET"
-        fi
+        printf '%s[✓]%s (installed)\n' "$COLOR_GREEN" "$COLOR_RESET"
     else
-        printf '%s[↑]%s (checksum mismatch)' "$COLOR_YELLOW" "$COLOR_RESET"
+        printf '%s[↑]%s (update available)' "$COLOR_YELLOW" "$COLOR_RESET"
     fi
 }
 
