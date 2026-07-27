@@ -40,6 +40,7 @@ bash ./syskit-bin help
 bash ./syskit-bash help
 bash ./syskit-zsh help
 bash ./syskit-cfg help
+bash ./syskit-cfg list
 ```
 
 Pass a command name to `help` for command-specific usage and behavior:
@@ -67,6 +68,7 @@ system-toolkit/
 ├── lib/
 │   ├── common/            Shared logging and argument helpers
 │   ├── bin/               Reusable binary toolkit libraries
+│   ├── config/            Configuration metadata and module helpers
 │   └── shell/             Reusable shell toolkit libraries and interfaces
 └── payload/
     ├── bin/               Standalone executable scripts

@@ -7,10 +7,11 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh [command] [args...]
+  syskit-cfg [command] [args...]
 
 Commands:
   help [command]  Show basic help or details for a command.
+  list            List available configuration modules.
   install         Install SysKit configuration files.
   uninstall       Remove installed SysKit configuration files.
   status          Show the status of installed configuration files.
@@ -23,7 +24,7 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh help [command]
+  syskit-cfg help [command]
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
@@ -34,13 +35,30 @@ Description:
 EOF
 }
 
+__list_help() {
+    cat <<'EOF'
+System Toolkit Configuration Integration
+----------------------------------------
+
+Usage:
+  syskit-cfg list
+
+Options:
+  No command-specific options.
+
+Description:
+  Lists each available configuration module using its canonical ID, name, and
+  description from metadata.conf.
+EOF
+}
+
 __install_help() {
     cat <<'EOF'
 System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh install [args...]
+  syskit-cfg install [args...]
 
 Options:
   No command-specific options.
@@ -57,7 +75,7 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh uninstall [args...]
+  syskit-cfg uninstall [args...]
 
 Options:
   No command-specific options.
@@ -73,7 +91,7 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh status [args...]
+  syskit-cfg status [args...]
 
 Options:
   No command-specific options.
@@ -92,6 +110,9 @@ main() {
             ;;
         help)
             __help_help
+            ;;
+        list)
+            __list_help
             ;;
         install)
             __install_help

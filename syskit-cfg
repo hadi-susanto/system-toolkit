@@ -6,6 +6,7 @@ export SYSKIT_ROOT="$__script_dir"
 export COMMON_LIB="$SYSKIT_ROOT/lib/common"
 export CONFIG_LIB="$SYSKIT_ROOT/lib/config"
 export CONFIG_COMMAND="$SYSKIT_ROOT/command/config"
+export CONFIG_MODULES="$CONFIG_COMMAND/modules"
 export CONFIG_PAYLOAD="$SYSKIT_ROOT/payload/config"
 
 main() {
