@@ -1,0 +1,33 @@
+command/config/main.sh
+  d684cd2b6ee53d60 42,68-70
+README.md
+  d684cd2b6ee53d60 43,71
+command/config/help.sh
+  d684cd2b6ee53d60 10,14,27,38,44,50-51,61,78,94,114-115
+command/config/list.sh
+  d684cd2b6ee53d60 1-50
+syskit-cfg
+  d684cd2b6ee53d60 9
+command/README.md
+  d684cd2b6ee53d60 10,17-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "f201418a63e47784a38821770b8413f739fe44c3",
+  "prompts": {
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 413,
+      "total_deletions": 316,
+      "accepted_lines": 413,
+      "overriden_lines": 0
+    }
+  }
+}
