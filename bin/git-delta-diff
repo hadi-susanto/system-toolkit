@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=""
+    readonly COLOR_CYAN=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$*" >&2
+}
+
+__usage() {
+    cat <<EOF
+${COLOR_CYAN}Usage:${COLOR_RESET}
+  git-delta-diff [OPTIONS] [GIT_DIFF_ARGS...]
+
+Display Git differences using Delta.
+
+Arguments not recognized as git-delta-diff options are forwarded directly
+to git diff.
+
+${COLOR_CYAN}Options:${COLOR_RESET}
+  --dark          Use Delta's dark color mode
+  --side          Display differences side by side
+  --line-numbers  Display line numbers
+  -h, --help      Display this help message
+  --              Stop parsing git-delta-diff options
+
+${COLOR_CYAN}Examples:${COLOR_RESET}
+  git-delta-diff
+  git-delta-diff --dark --side
+  git-delta-diff --line-numbers --staged
+  git-delta-diff --dark HEAD~1
+  git-delta-diff --side main..feature
+  git-delta-diff --dark -- src/main.sh
+EOF
+}
+
+__parse_args() {
+    local options_name="$1"
+    local diff_args_name="$2"
+    shift 2
+
+    local -n options_ref="$options_name"
+    local -n diff_args_ref="$diff_args_name"
+
+    options_ref=(
+        [DARK]=0
+        [LINE_NUMBERS]=0
+        [SIDE]=0
+    )
+    diff_args_ref=()
+
+    while (($# > 0)); do
+        case "$1" in
+            --dark)
+                options_ref[DARK]=1
+                ;;
+
+            --line-numbers)
+                options_ref[LINE_NUMBERS]=1
+                ;;
+
+            --side)
+                options_ref[SIDE]=1
+                ;;
+
+            -h | --help)
+                __usage
+
+                exit 0
+                ;;
+
+            --)
+                shift
+                diff_args_ref+=("--" "$@")
+
+                return 0
+                ;;
+
+            *)
+                diff_args_ref+=("$1")
+                ;;
+        esac
+
+        shift
+    done
+}
+
+main() {
+    local -A options=()
+    local -a diff_args=()
+    local -a git_config_args=(
+        -c core.pager=delta
+        -c interactive.diffFilter='delta --color-only'
+        -c delta.navigate=true
+        -c merge.conflictStyle=zdiff3
+    )
+
+    __parse_args options diff_args "$@"
+
+    if ! command -v git >/dev/null 2>&1; then
+        __log_error "git is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! command -v delta >/dev/null 2>&1; then
+        __log_error "delta is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        __log_error "The current directory is not inside a Git repository."
+
+        return 1
+    fi
+
+    if ((options[DARK])); then
+        git_config_args+=(-c delta.dark=true)
+    fi
+
+    if ((options[SIDE])); then
+        git_config_args+=(-c delta.side-by-side=true)
+    fi
+
+    if ((options[LINE_NUMBERS])); then
+        git_config_args+=(-c delta.line-numbers=true)
+    fi
+
+    git \
+        "${git_config_args[@]}" \
+        diff "${diff_args[@]}"
+}
+
+main "$@"
