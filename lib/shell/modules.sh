@@ -15,7 +15,7 @@ list_shell_modules() {
 
     modules_ref=()
 
-    for source in "$SHELL_DIR"/*; do
+    for source in "$SHELL_PAYLOAD"/*; do
         if [[ ! -d "$source" ]] || [[ -L "$source" ]]; then
             continue
         fi
@@ -56,7 +56,7 @@ resolve_shell_module() {
         return 1
     fi
 
-    source="$SYSKIT_ROOT/shell/$name"
+    source="${SHELL_PAYLOAD}/${name}"
 
     if [[ ! -d "$source" ]] || [[ -L "$source" ]]; then
         log_error "Unknown shell module name: $name"

@@ -2,8 +2,8 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$BIN_LIB/__executables.sh"
-source "$BIN_LIB/__scope.sh"
+source "$BIN_LIB/executables.sh"
+source "$BIN_LIB/scope.sh"
 
 ##
 # __parse_args <options_name> <args_name> [arguments...]
@@ -166,7 +166,7 @@ __install_executable() {
     local name="$1"
     local options_name="$2"
     local -n options_ref="$options_name"
-    local source="$SYSKIT_ROOT/bin/$name"
+    local source="${BIN_PAYLOAD}/${name}"
     local target="${options_ref[INSTALL_DIR]}/$name"
 
     if [[ -d "$target" ]] && [[ ! -L "$target" ]]; then

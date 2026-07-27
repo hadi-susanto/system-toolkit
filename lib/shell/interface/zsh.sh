@@ -14,11 +14,11 @@ readonly ZSH_BASE_DIR="$HOME/.local/share/syskit/zsh"
 support_module() {
     local module="$1"
 
-    if [[ -f "$SHELL_DIR/$module/$module.zsh" ]]; then
+    if [[ -f "$SHELL_PAYLOAD/$module/$module.zsh" ]]; then
         return 0
     fi
 
-    [[ -f "$SHELL_DIR/$module/$module.sh" ]]
+    [[ -f "$SHELL_PAYLOAD/$module/$module.sh" ]]
 }
 
 ##
@@ -55,12 +55,12 @@ module_installed() {
 #
 install_module() {
     local module="$1"
-    local source="$SHELL_DIR/$module/$module.zsh"
+    local source="$SHELL_PAYLOAD/$module/$module.zsh"
     local install_dir="$ZSH_BASE_DIR/module.d"
     local target="$install_dir/$module.zsh"
 
     if [[ ! -f "$source" ]]; then
-        source="$SHELL_DIR/$module/$module.sh"
+        source="$SHELL_PAYLOAD/$module/$module.sh"
     fi
 
     if [[ ! -f "$source" ]]; then
@@ -137,7 +137,7 @@ installed_module_path() {
 #
 module_source_path() {
     local module="$1"
-    local path="$SHELL_DIR/$module/$module.zsh"
+    local path="$SHELL_PAYLOAD/$module/$module.zsh"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -145,7 +145,7 @@ module_source_path() {
         return 0
     fi
 
-    path="$SHELL_DIR/$module/$module.sh"
+    path="$SHELL_PAYLOAD/$module/$module.sh"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"

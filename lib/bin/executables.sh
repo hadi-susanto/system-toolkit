@@ -14,7 +14,7 @@ list_bin_executables() {
 
     names_ref=()
 
-    for source in "$SYSKIT_ROOT/bin"/*; do
+    for source in "$BIN_PAYLOAD"/*; do
         if [[ ! -f "$source" ]] || [[ -L "$source" ]]; then
             continue
         fi
@@ -54,7 +54,7 @@ resolve_bin_executable() {
         return 1
     fi
 
-    source="$SYSKIT_ROOT/bin/$name"
+    source="${BIN_PAYLOAD}/${name}"
 
     if [[ ! -f "$source" ]] || [[ -L "$source" ]]; then
         log_error "Unknown SysKit executable: $name"

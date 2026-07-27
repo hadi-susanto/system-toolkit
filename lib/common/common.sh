@@ -33,7 +33,7 @@ fi
 #   message    Message text to write.
 #
 log_info() {
-    printf '[INFO] %s\n' "$*" >&2
+    printf '%b[INFO]%b %s\n' "$COLOR_CYAN" "$COLOR_RESET" "$*" >&2
 }
 
 ##

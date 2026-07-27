@@ -2,8 +2,8 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$SHELL_LIB/__interface_loader.sh"
-source "$SHELL_LIB/__modules.sh"
+source "$SHELL_LIB/interface_loader.sh"
+source "$SHELL_LIB/modules.sh"
 
 __boolean_to_icon() {
     if "$@"; then

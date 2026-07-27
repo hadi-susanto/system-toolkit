@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$COMMON_LIB/common.sh"
-
 __basic_help() {
     local shell_name="$1"
 
@@ -11,7 +9,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh [command] [args...]
+  syskit-${shell_name} [command] [args...]
 
 Commands:
   help [command]     Show basic help or details for a command.
@@ -33,7 +31,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh help [command]
+  syskit-${shell_name} help [command]
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
@@ -52,8 +50,8 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh install [--force] <module...>
-  syskit-${shell_name}.sh install [--force] --all
+  syskit-${shell_name} install [--force] <module...>
+  syskit-${shell_name} install [--force] --all
 
 Options:
   -a, --all    Install every available shell module.
@@ -73,8 +71,8 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh uninstall [--force] <module...>
-  syskit-${shell_name}.sh uninstall [--force] --all
+  syskit-${shell_name} uninstall [--force] <module...>
+  syskit-${shell_name} uninstall [--force] --all
 
 Options:
   -a, --all    Uninstall every available shell module.
@@ -94,7 +92,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh activate [--force]
+  syskit-${shell_name} activate [--force]
 
 Options:
   -f, --force  Recreate an active loader and refresh its startup-file block.
@@ -114,7 +112,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh deactivate [--force]
+  syskit-${shell_name} deactivate [--force]
 
 Options:
   -f, --force  Force removal even loader status is deactivated.
@@ -134,7 +132,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name}.sh status [args...]
+  syskit-${shell_name} status [args...]
 
 Options:
   No command-specific options.
@@ -177,8 +175,7 @@ main() {
             __status_help "$shell"
             ;;
         *)
-            log_error "Unknown shell help topic: $help_type"
-            printf '\n' "$help_type" >&2
+            printf 'Unknown executable help topic: %s\n\n' "$help_type" >&2
             __basic_help "$shell" >&2
 
             return 1

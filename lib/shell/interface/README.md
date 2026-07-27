@@ -18,25 +18,25 @@ below. Once the interface file is present, SysKit automatically detects and uses
 it.
 
 Depending on the shell, additional shell-specific integration assets may also be
-required under the `shell/` directory. Some shells can reuse generic `.sh`
-modules, while others (such as Fish or Nushell) require dedicated integration
-files because they use different scripting languages.
+required under the `payload/shell/` directory. Some shells can reuse generic
+`.sh` modules, while others (such as Fish or Nushell) require dedicated
+integration files because they use different scripting languages.
 
 ## Entry Point Script
 
 Each supported shell **must** provide a dedicated entry point script named:
 
 ```text
-syskit-[shell].sh
+syskit-[shell]
 ```
 
 For example:
 
 ```text
-syskit-bash.sh
-syskit-zsh.sh
-syskit-fish.sh
-syskit-nu.sh
+syskit-bash
+syskit-zsh
+syskit-fish
+syskit-nu
 ```
 
 At present, SysKit does not generate a generic launcher automatically. Requiring
@@ -63,12 +63,13 @@ export SYSKIT_ROOT=...
 # Export shared library locations.
 export COMMON_LIB=...
 export SHELL_LIB=...
-export SHELL_DIR=...
+export SHELL_COMMAND=...
+export SHELL_PAYLOAD=...
 
 main() {
-    # Delegate to the shared shell framework,
+    # Delegate to the shared shell command dispatcher,
     # passing the shell identifier.
-    exec bash "$SHELL_LIB/main.sh" <shell-name> "$@"
+    exec bash "$SHELL_COMMAND/main.sh" <shell-name> "$@"
 }
 
 main "$@"

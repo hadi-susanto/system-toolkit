@@ -6,7 +6,7 @@ source "$COMMON_LIB/common.sh"
 ##
 # __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses the configuration toolkit command and preserves its arguments.
+# Parses the binary toolkit command and preserves its arguments.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives command state.
@@ -39,7 +39,6 @@ __parse_args() {
             ;;
         -*)
             log_error "The first parameter should be a command; options must follow a command: $1"
-            bash "$CONFIG_LIB/help.sh" >&2
 
             return 1
             ;;
@@ -60,20 +59,20 @@ main() {
 
     case "${options[CMD]}" in
         help)
-            exec bash "$CONFIG_LIB/help.sh" "${args[@]}"
+            exec bash "$BIN_COMMAND/help.sh" "${args[@]}"
             ;;
         install)
-            exec bash "$CONFIG_LIB/install.sh" "${args[@]}"
+            exec bash "$BIN_COMMAND/install.sh" "${args[@]}"
             ;;
         uninstall)
-            exec bash "$CONFIG_LIB/uninstall.sh" "${args[@]}"
+            exec bash "$BIN_COMMAND/uninstall.sh" "${args[@]}"
             ;;
         status)
-            exec bash "$CONFIG_LIB/status.sh" "${args[@]}"
+            exec bash "$BIN_COMMAND/status.sh" "${args[@]}"
             ;;
         *)
-            log_error "Unsupported configuration toolkit command: ${options[CMD]}"
-            bash "$CONFIG_LIB/help.sh" >&2
+            log_error "Unsupported binary toolkit command: ${options[CMD]}"
+            bash "$BIN_COMMAND/help.sh" >&2
 
             return 1
             ;;

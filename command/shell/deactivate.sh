@@ -2,7 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$SHELL_LIB/__interface_loader.sh"
+source "$SHELL_LIB/interface_loader.sh"
 
 ##
 # __parse_args <options_name> <args_name> [arguments...]

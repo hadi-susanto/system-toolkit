@@ -2,12 +2,11 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$SHELL_LIB/__interface_loader.sh"
 
 ##
-# __parse_args <options_name> <args_name> <shell> [arguments...]
+# __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses the shell toolkit command and preserves its arguments.
+# Parses the configuration toolkit command and preserves its arguments.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives command state.
@@ -15,7 +14,7 @@ source "$SHELL_LIB/__interface_loader.sh"
 #   arguments       Command-line arguments to parse.
 #
 # Returns:
-#   1 when the shell is unsupported or the first parameter is an option.
+#   1 when the first parameter is an option instead of a command.
 #
 __parse_args() {
     local options_name="$1"
@@ -40,6 +39,7 @@ __parse_args() {
             ;;
         -*)
             log_error "The first parameter should be a command; options must follow a command: $1"
+            bash "$CONFIG_LIB/help.sh" >&2
 
             return 1
             ;;
@@ -53,18 +53,6 @@ __parse_args() {
 }
 
 main() {
-    local shell="${1:-}"
-
-    if (( $# > 0 )); then
-        shift
-    fi
-
-    if ! exists_shell_interface "$shell"; then
-        log_error "Unsupported shell: ${shell:-<missing>}"
-
-        return 1
-    fi
-
     local -A options
     local -a args
 
@@ -72,26 +60,20 @@ main() {
 
     case "${options[CMD]}" in
         help)
-            exec bash "$SHELL_LIB/help.sh" "$shell" "${args[@]}"
+            exec bash "$CONFIG_COMMAND/help.sh" "${args[@]}"
             ;;
         install)
-            exec bash "$SHELL_LIB/install.sh" "$shell" "${args[@]}"
+            exec bash "$CONFIG_COMMAND/install.sh" "${args[@]}"
             ;;
         uninstall)
-            exec bash "$SHELL_LIB/uninstall.sh" "$shell" "${args[@]}"
-            ;;
-        activate)
-            exec bash "$SHELL_LIB/activate.sh" "$shell" "${args[@]}"
-            ;;
-        deactivate)
-            exec bash "$SHELL_LIB/deactivate.sh" "$shell" "${args[@]}"
+            exec bash "$CONFIG_COMMAND/uninstall.sh" "${args[@]}"
             ;;
         status)
-            exec bash "$SHELL_LIB/status.sh" "$shell" "${args[@]}"
+            exec bash "$CONFIG_COMMAND/status.sh" "${args[@]}"
             ;;
         *)
-            log_error "Unsupported $shell toolkit command: ${options[CMD]}"
-            bash "$SHELL_LIB/help.sh" "$shell" >&2
+            log_error "Unsupported configuration toolkit command: ${options[CMD]}"
+            bash "$CONFIG_COMMAND/help.sh" >&2
 
             return 1
             ;;

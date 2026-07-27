@@ -36,63 +36,69 @@ directly from the cloned repository with Bash.
 Show the basic help for each toolkit:
 
 ```bash
-bash ./syskit-bin.sh help
-bash ./syskit-bash.sh help
-bash ./syskit-zsh.sh help
-bash ./syskit-cfg.sh help
+bash ./syskit-bin help
+bash ./syskit-bash help
+bash ./syskit-zsh help
+bash ./syskit-cfg help
 ```
 
 Pass a command name to `help` for command-specific usage and behavior:
 
 ```bash
-bash ./syskit-bin.sh help install
-bash ./syskit-bin.sh status
-bash ./syskit-bash.sh help activate
-bash ./syskit-zsh.sh help status
-bash ./syskit-cfg.sh help install
+bash ./syskit-bin help install
+bash ./syskit-bin status
+bash ./syskit-bash help activate
+bash ./syskit-zsh help status
+bash ./syskit-cfg help install
 ```
 
 # 🧱 Project Structure
 
 ```text
 system-toolkit/
-├── syskit-bin.sh          Binary toolkit entrypoint
-├── syskit-bash.sh         Bash toolkit entrypoint
-├── syskit-zsh.sh          Zsh toolkit entrypoint
-├── syskit-cfg.sh          Configuration toolkit entrypoint
-├── bin/                   Standalone executable scripts
-├── config/                Configuration and preference assets
-├── shell/                 Bash and Zsh integration assets
-└── lib/
-    ├── common/            Shared logging and argument helpers
-    ├── bin/               Binary toolkit controller and commands
-    ├── config/            Configuration toolkit controller and commands
-    └── shell/             Shared Bash and Zsh controller and commands
+├── syskit-bin             Binary toolkit entrypoint
+├── syskit-bash            Bash toolkit entrypoint
+├── syskit-zsh             Zsh toolkit entrypoint
+├── syskit-cfg             Configuration toolkit entrypoint
+├── command/
+│   ├── bin/               Binary command dispatcher and scripts
+│   ├── config/            Configuration command dispatcher and scripts
+│   └── shell/             Shared Bash and Zsh command dispatcher and scripts
+├── lib/
+│   ├── common/            Shared logging and argument helpers
+│   ├── bin/               Reusable binary toolkit libraries
+│   └── shell/             Reusable shell toolkit libraries and interfaces
+└── payload/
+    ├── bin/               Standalone executable scripts
+    ├── config/            Configuration and preference assets
+    └── shell/             Bash and Zsh integration assets
 ```
 
-The top-level asset directories contain the files managed by SysKit. The
-matching directories under `lib/` contain the command implementations that
-operate on those assets. Their controllers live in `lib/bin/`, `lib/config/`,
-and `lib/shell/`.
+The `command/` directory contains the executable command dispatchers and
+lifecycle scripts. Reusable, sourceable functions live under `lib/`, while
+`payload/` contains the assets that those commands install or manage on the
+system.
 
 # ⚙️ How It Works
 
 Each toolkit has a dedicated entrypoint:
 
 ```text
-syskit-bin.sh [command] [args...]
-syskit-bash.sh [command] [args...]
-syskit-zsh.sh [command] [args...]
-syskit-cfg.sh [command] [args...]
+syskit-bin [command] [args...]
+syskit-bash [command] [args...]
+syskit-zsh [command] [args...]
+syskit-cfg [command] [args...]
 ```
 
-An entrypoint initializes the SysKit paths and invokes its toolkit controller.
-The controller parses the first argument as a command and explicitly routes it
-to a dedicated script such as `install.sh`, `activate.sh`, or `status.sh`.
+An entrypoint initializes the SysKit paths and invokes its toolkit's
+`command/[toolkit]/main.sh` dispatcher. The dispatcher parses the first
+argument as a command and explicitly routes it to a dedicated script such as
+`install.sh`, `activate.sh`, or `status.sh`.
 
-Bash and Zsh share the `lib/shell/` controller. Their entrypoints pass the
-selected shell as the controller's first internal parameter, allowing
-shell-specific compatibility implementations to be loaded when needed.
+Bash and Zsh share the `command/shell/` dispatcher. Their entrypoints pass the
+selected shell as the dispatcher's first internal parameter, allowing
+shell-specific compatibility libraries from `lib/shell/` to be loaded when
+needed.
 
 The binary toolkit installs standalone executable scripts directly into a local
 or global command directory. Other toolkit lifecycle commands establish their
@@ -103,21 +109,22 @@ command boundaries, help systems, scope handling, and routing independently.
 **Binary toolkit**
 
 The binary toolkit manages standalone executable scripts sourced from the
-`bin/` directory. It installs and uninstalls exact executable names in
+`payload/bin/` directory. It installs and uninstalls exact executable names in
 `~/.local/bin` by default or `/usr/local/bin` with global scope. Its status
 command compares SHA-256 checksums to report local and global state.
 
 **Shell toolkit**
 
-The shell toolkit manages Bash and Zsh integrations sourced from the `shell/`
-directory. Installation places the integration in its designated location,
-while activation makes the installed integration take effect.
+The shell toolkit manages Bash and Zsh integrations sourced from the
+`payload/shell/` directory. Installation places the integration in its
+designated location, while activation makes the installed integration take
+effect.
 
 **Configuration toolkit**
 
 The configuration toolkit manages configuration and preference files sourced
-from the `config/` directory. It installs, removes, and reports the status of
-managed configuration files.
+from the `payload/config/` directory. It installs, removes, and reports the
+status of managed configuration files.
 
 # 🔗 Relationship with Mint Provisioner
 
