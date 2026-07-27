@@ -57,6 +57,7 @@ install_module() {
     local module="$1"
     local source="$SHELL_DIR/$module/$module.bash"
     local install_dir="$BASH_BASE_DIR/module.d"
+    local target="$install_dir/$module.bash"
 
     if [[ ! -f "$source" ]]; then
         source="$SHELL_DIR/$module/$module.sh"
@@ -74,7 +75,7 @@ install_module() {
         return 1
     fi
 
-    if ! install -m 0644 -- "$source" "$install_dir/${source##*/}"; then
+    if ! install -m 0644 -- "$source" "$target"; then
         log_error "Failed to install Bash module: $module"
 
         return 1

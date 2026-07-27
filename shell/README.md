@@ -61,38 +61,19 @@ layout and file naming conventions if required by the shell.
 # Contents
 
 - [Bat](#bat-bat)
-- [Delta](#delta-delta)
 - [Eza](#eza-eza)
 - [Git](#git-git)
-- [GitUI](#gitui-git-ui)
-- [Lazygit](#lazygit-lazy-git)
 
 ---
 
 # Bat (`bat`)
 
-## Shell Aliases
+## Exported Variables
 
-| Alias | Description                                                                                                                         |
-|-------|-------------------------------------------------------------------------------------------------------------------------------------|
-| `cat` | **Expands to:** `bat --paging=never`<br><br>Displays files with syntax highlighting while behaving like the standard `cat` command. |
-
-## Shell Functions
-
-| Function       | Description                                                                                                                                                   |
-|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `bat-help`     | Displays the help output of any command using Bat syntax highlighting. If called without arguments, it renders help text from standard input.                 |
-| `git-bat-diff` | Displays all modified tracked files in the current Git repository using `bat --diff`. If Git is not installed, an informative error message is shown instead. |
-
----
-
-# Delta (`delta`)
-
-## Shell Functions
-
-| Function         | Description                                                                                                                                                                                        |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `git-delta-diff` | Executes `git diff` using Delta with syntax highlighting, side-by-side view, keyboard navigation, and dark theme enabled. If Git is not installed, the function displays an error message instead. |
+| Variable Name | Description                                            |
+|---------------|--------------------------------------------------------|
+| `BAT_THEME`   | Export `BAT_THEME` = `Dracula`.                        |
+| `MANPAGER`    | Export `MANPAGER` = `sh -c 'col -bx | bat -l man -p'`. |
 
 ---
 
@@ -147,23 +128,3 @@ layout and file naming conventions if required by the shell.
 | Function | Description                                                                                |
 |----------|--------------------------------------------------------------------------------------------|
 | `gpsup`  | Pushes the current branch to `origin` and automatically sets the upstream tracking branch. |
-
----
-
-# GitUI (`git-ui`)
-
-## Shell Aliases
-
-| Alias | Description                                                                                               |
-|-------|-----------------------------------------------------------------------------------------------------------|
-| `gui` | **Expands to:** `gitui`<br><br>Launches the GitUI terminal user interface for interactive Git operations. |
-
----
-
-# Lazygit (`lazy-git`)
-
-## Shell Aliases
-
-| Alias | Description                                                                                                   |
-|-------|---------------------------------------------------------------------------------------------------------------|
-| `lg`  | **Expands to:** `lazygit`<br><br>Launches the Lazygit terminal user interface for interactive Git operations. |

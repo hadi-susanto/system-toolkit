@@ -26,7 +26,7 @@ __resolve_install_icon() {
 
     if ! source="$(module_source_path "$module")"; then
         # Inconsistency detected...
-        log_error "$module was installed, but we can't determine it's source file"
+        log_error "$module was installed, but we can't determine its source file"
         printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
 
         return 0

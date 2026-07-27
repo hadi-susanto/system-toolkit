@@ -57,6 +57,7 @@ install_module() {
     local module="$1"
     local source="$SHELL_DIR/$module/$module.zsh"
     local install_dir="$ZSH_BASE_DIR/module.d"
+    local target="$install_dir/$module.zsh"
 
     if [[ ! -f "$source" ]]; then
         source="$SHELL_DIR/$module/$module.sh"
@@ -74,7 +75,7 @@ install_module() {
         return 1
     fi
 
-    if ! install -m 0644 -- "$source" "$install_dir/${source##*/}"; then
+    if ! install -m 0644 -- "$source" "$target"; then
         log_error "Failed to install Zsh module: $module"
 
         return 1
@@ -93,7 +94,7 @@ install_module() {
 #   module    Module name.
 #
 # Output:
-#   Full path to the installed Bash module source file.
+#   Full path to the installed Zsh module source file.
 #
 # Returns:
 #   1 when the module is not installed.
@@ -390,7 +391,7 @@ EOF
         'fi' \
         'unset __syskit_loader' \
         "$end_marker" >>"$startup_tmp"; then
-        log_error "Failed to append the SysKit Bash loader block"
+        log_error "Failed to append the SysKit Zsh loader block"
         rm -f -- "$startup_tmp"
 
         return 1
