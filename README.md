@@ -126,8 +126,9 @@ effect.
 
 The configuration toolkit discovers configuration modules and orchestrates
 their interactive installation and safe uninstallation one module at a time.
-Each module owns its target handling and may use source files from the
-`payload/config/` directory.
+It also reports module-defined status in independent sections. Each module
+owns its target handling and may use source files from the `payload/config/`
+directory.
 
 # 🔗 Relationship with Mint Provisioner
 

@@ -14,7 +14,7 @@ Commands:
   list            List available configuration modules.
   install         Install one configuration module.
   uninstall       Safely uninstall one configuration module.
-  status          Show the status of installed configuration files.
+  status          Show configuration module status.
 EOF
 }
 
@@ -94,13 +94,15 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg status [args...]
+  syskit-cfg status <category/module>
+  syskit-cfg status all
 
 Options:
-  No command-specific options.
+  -a, --all  Show status for every available configuration module.
 
 Description:
-  Shows the installation status of the managed configuration files.
+  Shows custom status output for one configuration module. The positional
+  value "all" is equivalent to --all. When no module is given, shows this help.
 EOF
 }
 

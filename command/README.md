@@ -43,6 +43,7 @@ Every installable configuration module must provide:
 metadata.conf
 install_check.sh
 install.sh
+status.sh
 ```
 
 Safe uninstallation is optional. A module supports it only when both files are
@@ -64,3 +65,8 @@ install or uninstall script. Named result constants are available by sourcing
 The framework invokes one module at a time and passes no user arguments to its
 lifecycle scripts. It exports `CONFIG_MODULE_ID`, `CONFIG_MODULE_DIR`,
 `CONFIG_MODULE_PAYLOAD`, and the `true` or `false` value `CONFIG_FORCE`.
+
+Each `status.sh` owns its output format and returns non-zero only when status
+inspection fails. The status command accepts one module, while `all`, `-a`, or
+`--all` runs every discovered module and preserves the first failure status.
+Invoking status without a module or all selector prints command help.
