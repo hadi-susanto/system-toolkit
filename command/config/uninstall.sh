@@ -70,7 +70,7 @@ __validate_uninstall_scripts() {
     local check_script="$module_dir/uninstall_check.sh"
     local uninstall_script="$module_dir/uninstall.sh"
 
-    if [[ -f "$check_script" ]] && [[ ! -L "$check_script" ]]; then
+    if [[ ! -f "$check_script" ]] && [[ ! -L "$check_script" ]]; then
         log_error "Configuration module is missing uninstall_check.sh: $canonical_id"
 
         return 1
