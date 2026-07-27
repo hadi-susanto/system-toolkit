@@ -1,0 +1,74 @@
+payload/README.md
+  d684cd2b6ee53d60 1-14
+payload/config/README.md
+  d684cd2b6ee53d60 8
+README.md
+  d684cd2b6ee53d60 39-42,48-52,63-74,77-80,87-90,93-96,98-101,112,118-121,126-127
+command/README.md
+  d684cd2b6ee53d60 1-16
+payload/bin/README.md
+  d684cd2b6ee53d60 1-10,12-304
+payload/shell/README.md
+  d684cd2b6ee53d60 1-19,21-25,27,29-34,36,38-40,42,44-46,48,50-52,54,56-131
+lib/shell/interface/README.md
+  d684cd2b6ee53d60 21-23,30,36-39,66-67,70,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "bd06b6601ff4689fb14e042489b6bfa04be62195",
+  "prompts": {
+    "76f381841a35d0b7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a4-bb9a-72c1-a145-7d34a9b897fc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    },
+    "ca1eacd3210cae3e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9419-e292-7181-9175-75e41c2a23bd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 145,
+      "overriden_lines": 0
+    },
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 845,
+      "total_deletions": 805,
+      "accepted_lines": 845,
+      "overriden_lines": 0
+    },
+    "f167686a018875e0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a5-1e8d-7402-9e5d-b9af6d6c2d3a",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 59,
+      "overriden_lines": 0
+    }
+  }
+}
