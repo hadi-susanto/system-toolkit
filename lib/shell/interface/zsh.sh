@@ -100,7 +100,7 @@ install_module() {
 #
 installed_module_path() {
     local module="$1"
-    local path="$ZSH_BASE_DIR/module.d/$module.bash"
+    local path="$ZSH_BASE_DIR/module.d/$module.zsh"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -109,6 +109,42 @@ installed_module_path() {
     fi
 
     path="$ZSH_BASE_DIR/module.d/$module.sh"
+
+    if [[ -f "$path" ]]; then
+        printf '%s\n' "$path"
+
+        return 0
+    fi
+
+    return 1
+}
+
+##
+# module_source_path <module>
+#
+# Returns the preferred compatible source file for a shell module.
+# A shell-specific source file is preferred over the generic source file.
+#
+# Parameters:
+#   module    Shell module name.
+#
+# Output:
+#   Full path to the preferred compatible source file.
+#
+# Returns:
+#   1 when no compatible source file exists.
+#
+module_source_path() {
+    local module="$1"
+    local path="$SHELL_DIR/$module/$module.zsh"
+
+    if [[ -f "$path" ]]; then
+        printf '%s\n' "$path"
+
+        return 0
+    fi
+
+    path="$SHELL_DIR/$module/$module.sh"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -393,13 +429,6 @@ deactivate_loader() {
     local has_start=0
     local has_end=0
 
-    # Ignore missing loader files so this function is idempotent.
-    if [[ -f "$loader" ]] && ! rm -f -- "$loader"; then
-        log_error "Failed to remove Zsh loader: $loader"
-
-        return 1
-    fi
-
     if [[ -L "$startup_file" ]]; then
         if ! startup_file="$(readlink -f -- "$startup_file")"; then
             log_error "Failed to resolve Zsh startup symlink: $HOME/.zshrc"
@@ -409,6 +438,11 @@ deactivate_loader() {
     fi
 
     if [[ ! -f "$startup_file" ]]; then
+        if [[ -f "$loader" ]] && ! rm -f -- "$loader"; then
+            log_warn ".zshrc does not load the SysKit loader, but the loader file could not be removed."
+            log_warn "The leftover file will not affect Zsh and can be safely ignored."
+        fi
+
         return 0
     fi
 
@@ -421,6 +455,11 @@ deactivate_loader() {
     fi
 
     if (( ! has_start && ! has_end )); then
+        if [[ -f "$loader" ]] && ! rm -f -- "$loader"; then
+            log_warn ".zshrc does not load the SysKit loader, but the loader file could not be removed."
+            log_warn "The leftover file will not affect Zsh and can be safely ignored."
+        fi
+
         return 0
     fi
 
@@ -460,4 +499,13 @@ deactivate_loader() {
 
         return 1
     fi
+
+    # Ignore missing loader files so this function is idempotent.
+    if [[ -f "$loader" ]] && ! rm -f -- "$loader"; then
+        log_error "Failed to remove Zsh loader: $loader"
+
+        return 1
+    fi
+
+    return 0
 }

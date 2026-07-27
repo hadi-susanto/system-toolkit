@@ -75,7 +75,7 @@ main "$@"
 ```
 
 The implementation should remain minimal and follow the same structure as the
-existing shell entry point. :contentReference[oaicite:0]{index=0}
+existing shell entry point.
 
 # Interface Contract
 
@@ -85,6 +85,7 @@ existing shell entry point. :contentReference[oaicite:0]{index=0}
 - [`module_installed`](#module_installed)
 - [`install_module`](#install_module)
 - [`installed_module_path`](#installed_module_path)
+- [`module_source_path`](#module_source_path)
 - [`uninstall_module`](#uninstall_module)
 - [`loader_active`](#loader_active)
 - [`activate_loader`](#activate_loader)
@@ -169,6 +170,33 @@ Returns the installed module file path.
 ### Output
 
 Prints the absolute path of the installed module file.
+
+---
+
+## `module_source_path`
+
+Returns the preferred compatible source file for a shell module.
+
+The implementation should prioritize a shell-specific source file over the
+generic source file. For example, the Bash interface should prefer
+`[module].bash` and fall back to `[module].sh`.
+
+### Parameters
+
+| Name     | Description        |
+|----------|--------------------|
+| `module` | Shell module name. |
+
+### Return Code
+
+| Code     | Description                       |
+|----------|-----------------------------------|
+| `0`      | A compatible source file exists.  |
+| Non-zero | No compatible source file exists. |
+
+### Output
+
+Prints the absolute path to the preferred compatible source file.
 
 ---
 

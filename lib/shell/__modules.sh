@@ -48,10 +48,10 @@ resolve_shell_module() {
     local name="$1"
     local source
 
-    if [[ -z "$module" ]] || [[ "$module" == "." ]] ||
-        [[ "$module" == ".." ]] || [[ "$module" == "all" ]] ||
-        [[ "$module" == -* ]] || [[ "$module" == */* ]]; then
-        log_error "Invalid shell module name: $module"
+    if [[ -z "$name" ]] || [[ "$name" == "." ]] ||
+        [[ "$name" == ".." ]] || [[ "$name" == "all" ]] ||
+        [[ "$name" == -* ]] || [[ "$name" == */* ]]; then
+        log_error "Invalid shell module name: $name"
 
         return 1
     fi

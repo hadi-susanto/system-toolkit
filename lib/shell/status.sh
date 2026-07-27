@@ -15,6 +15,7 @@ __boolean_to_icon() {
 
 __resolve_install_icon() {
     local module="$1"
+    local source
     local target
 
     if ! target="$(installed_module_path "$module")"; then
@@ -23,26 +24,35 @@ __resolve_install_icon() {
         return 0
     fi
 
+    if ! source="$(module_source_path "$module")"; then
+        # Inconsistency detected...
+        log_error "$module was installed, but we can't determine it's source file"
+        printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+
+        return 0
+    fi
+
     # Installed, need to check the checksum, different checksum mean update available
-    local basename="${target##*/}"
-    local source="$SHELL_DIR/$module/$basename"
     local source_checksum
     local target_checksum
 
-    source_checksum="$(sha256sum -- "$source" 2>/dev/null)" || {
+    if ! source_checksum="$(sha256sum -- "$source" 2>/dev/null)"; then
         printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
-        return 0
-    }
 
-    target_checksum="$(sha256sum -- "$target" 2>/dev/null)" || {
-        printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
         return 0
-    }
+    fi
+
+    if ! target_checksum="$(sha256sum -- "$target" 2>/dev/null)"; then
+        printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+
+        return 0
+    fi
 
     source_checksum="${source_checksum%% *}"
     target_checksum="${target_checksum%% *}"
 
-    if [[ "$source_checksum" == "$target_checksum" ]]; then
+    if [[ "${source##*/}" == "${target##*/}" ]] &&
+        [[ "$source_checksum" == "$target_checksum" ]]; then
         printf '%s[✓]%s\n' "$COLOR_GREEN" "$COLOR_RESET"
     else
         printf '%s[↑]%s' "$COLOR_YELLOW" "$COLOR_RESET"
@@ -69,7 +79,7 @@ main() {
     fi
 
     load_shell_interface \
-        "$shell" "support_module" "module_installed" "loader_active" || return 1
+        "$shell" "support_module" "installed_module_path" "module_source_path" "loader_active" || return 1
 
     if [[ $# -gt 0 ]]; then
         log_error "The status command does not accept arguments"
