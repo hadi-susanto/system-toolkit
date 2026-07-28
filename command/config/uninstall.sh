@@ -67,20 +67,31 @@ __validate_options() {
 __validate_uninstall_scripts() {
     local canonical_id="$1"
     local module_dir="$2"
-    local check_script="$module_dir/uninstall_check.sh"
-    local uninstall_script="$module_dir/uninstall.sh"
+    local has_check=0
+    local has_uninstall=0
 
-    if [[ ! -f "$check_script" ]] && [[ ! -L "$check_script" ]]; then
-        log_error "Configuration module is missing uninstall_check.sh: $canonical_id"
+    [[ -f "$module_dir/uninstall_check.sh" ]] &&
+        [[ ! -L "$module_dir/uninstall_check.sh" ]] &&
+        has_check=1
+
+    [[ -f "$module_dir/uninstall.sh" ]] &&
+        [[ ! -L "$module_dir/uninstall.sh" ]] &&
+        has_uninstall=1
+
+    if (( has_check && has_uninstall )); then
+        return 0
+    fi
+
+    if (( ! has_check && ! has_uninstall )); then
+        log_info "Configuration module: $canonical_id doesn't support uninstall, skipping uninstall"
 
         return 1
     fi
 
-    if [[ -f "$uninstall_script" ]] && [[ ! -L "$uninstall_script" ]]; then
-        log_error "Configuration module is missing uninstall.sh: $canonical_id"
+    log_error \
+        "Configuration module: $canonical_id must provide both uninstall_check.sh and uninstall.sh"
 
-        return 1
-    fi
+    return 1
 }
 
 main() {

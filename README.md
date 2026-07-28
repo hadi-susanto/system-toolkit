@@ -36,21 +36,21 @@ directly from the cloned repository with Bash.
 Show the basic help for each toolkit:
 
 ```bash
-bash ./syskit-bin help
-bash ./syskit-bash help
-bash ./syskit-zsh help
-bash ./syskit-cfg help
-bash ./syskit-cfg list
+./syskit-bin help
+./syskit-bash help
+./syskit-zsh help
+./syskit-cfg help
+./syskit-cfg list
 ```
 
 Pass a command name to `help` for command-specific usage and behavior:
 
 ```bash
-bash ./syskit-bin help install
-bash ./syskit-bin status
-bash ./syskit-bash help activate
-bash ./syskit-zsh help status
-bash ./syskit-cfg help install
+./syskit-bin help install
+./syskit-bin status
+./syskit-bash help activate
+./syskit-zsh help status
+./syskit-cfg help install
 ```
 
 # 🧱 Project Structure
