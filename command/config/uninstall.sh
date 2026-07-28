@@ -83,7 +83,7 @@ __validate_uninstall_scripts() {
     fi
 
     if (( ! has_check && ! has_uninstall )); then
-        log_info "Configuration module: $canonical_id doesn't support uninstall, skipping uninstall"
+        log_warn "Configuration module does not support uninstall: $canonical_id"
 
         return 1
     fi

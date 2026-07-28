@@ -22,14 +22,17 @@ __valid_config_module_id() {
 ##
 # list_config_modules <modules_name>
 #
-# Lists configuration module IDs represented by category/module directories.
+# Lists configuration module IDs represented by self-contained
+# category/module directories. Symbolic links are ignored. Directories with
+# invalid canonical module IDs are skipped with a warning.
 #
 # Parameters:
-#   modules_name    Name of the indexed array that receives canonical IDs.
+#   modules_name    Name of the indexed array that receives canonical module
+#                   IDs.
 #
 # Returns:
-#   1 when the configured module root is invalid or contains an invalid module
-#   ID.
+#   1 when the configuration module root is unset, is a symbolic link, or is
+#   not a directory.
 #
 list_config_modules() {
     local modules_name="$1"
@@ -50,11 +53,17 @@ list_config_modules() {
         return 1
     fi
 
+    if [[ -L "$module_root" ]]; then
+        log_error "Invalid configuration module directory: $module_root"
+
+        return 1
+    fi
+
     if [[ ! -e "$module_root" ]]; then
         return 0
     fi
 
-    if [[ ! -d "$module_root" ]] || [[ -L "$module_root" ]]; then
+    if [[ ! -d "$module_root" ]]; then
         log_error "Invalid configuration module directory: $module_root"
 
         return 1
@@ -74,6 +83,12 @@ list_config_modules() {
 
             module="${module_dir##*/}"
             canonical_id="$category/$module"
+
+            if ! __valid_config_module_id "$canonical_id"; then
+                log_warn "Skipping invalid configuration module ID: $canonical_id"
+
+                continue
+            fi
 
             modules_ref+=("$canonical_id")
         done
