@@ -135,6 +135,12 @@ parse_config_metadata() {
         return 1
     fi
 
+    if [[ -L "$module_root" ]] || [[ ! -d "$module_root" ]]; then
+        log_error "Invalid configuration module directory: $module_root"
+
+        return 1
+    fi
+
     if ! __valid_config_module_id "$canonical_id"; then
         log_error "Invalid configuration module ID: $canonical_id"
 
