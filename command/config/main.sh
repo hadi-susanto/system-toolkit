@@ -39,7 +39,7 @@ __parse_args() {
             ;;
         -*)
             log_error "The first parameter should be a command; options must follow a command: $1"
-            bash "$CONFIG_LIB/help.sh" >&2
+            bash "$CONFIG_COMMAND/help.sh" >&2
 
             return 1
             ;;
@@ -64,6 +64,9 @@ main() {
             ;;
         install)
             exec bash "$CONFIG_COMMAND/install.sh" "${args[@]}"
+            ;;
+        list)
+            exec bash "$CONFIG_COMMAND/list.sh" "${args[@]}"
             ;;
         uninstall)
             exec bash "$CONFIG_COMMAND/uninstall.sh" "${args[@]}"

@@ -7,13 +7,14 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh [command] [args...]
+  syskit-cfg [command] [args...]
 
 Commands:
   help [command]  Show basic help or details for a command.
-  install         Install SysKit configuration files.
-  uninstall       Remove installed SysKit configuration files.
-  status          Show the status of installed configuration files.
+  list            List available configuration modules.
+  install         Install one configuration module.
+  uninstall       Safely uninstall one configuration module.
+  status          Show configuration module status.
 EOF
 }
 
@@ -23,7 +24,7 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh help [command]
+  syskit-cfg help [command]
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
@@ -34,20 +35,38 @@ Description:
 EOF
 }
 
+__list_help() {
+    cat <<'EOF'
+System Toolkit Configuration Integration
+----------------------------------------
+
+Usage:
+  syskit-cfg list
+
+Options:
+  No command-specific options.
+
+Description:
+  Lists each available configuration module using its canonical ID, name, and
+  description from metadata.conf.
+EOF
+}
+
 __install_help() {
     cat <<'EOF'
 System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh install [args...]
+  syskit-cfg install [--force] <category/module>
 
 Options:
-  No command-specific options.
+  -f, --force  Run installation when install_check.sh requests a skip.
 
 Description:
-  Installs files from the SysKit configuration folder into their designated
-  configuration locations.
+  Validates and installs exactly one configuration module. The module owns all
+  interactive decisions and target handling. Force does not bypass a blocked
+  check or automatically approve module prompts.
 EOF
 }
 
@@ -57,13 +76,15 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh uninstall [args...]
+  syskit-cfg uninstall [--force] <category/module>
 
 Options:
-  No command-specific options.
+  -f, --force  Run uninstallation when uninstall_check.sh requests a skip.
 
 Description:
-  Removes SysKit configuration files from their designated locations.
+  Safely uninstalls exactly one configuration module when the module provides
+  both uninstall_check.sh and uninstall.sh. Force does not bypass a blocked
+  safety check or automatically approve module prompts.
 EOF
 }
 
@@ -73,13 +94,15 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg.sh status [args...]
+  syskit-cfg status <category/module>
+  syskit-cfg status all
 
 Options:
-  No command-specific options.
+  -a, --all  Show status for every available configuration module.
 
 Description:
-  Shows the installation status of the managed configuration files.
+  Shows custom status output for one configuration module. The positional
+  value "all" is equivalent to --all. When no module is given, shows this help.
 EOF
 }
 
@@ -92,6 +115,9 @@ main() {
             ;;
         help)
             __help_help
+            ;;
+        list)
+            __list_help
             ;;
         install)
             __install_help
