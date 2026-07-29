@@ -1,0 +1,31 @@
+command/shell/status.sh
+  20291e40163938bb 70-71,73-74,76,79-80,82,85-86,88-89,91-92,94,97-98,103,106-110,160-161,166,168-181
+command/config/modules/term/starship/install.sh
+  20291e40163938bb 26-42,78-80,86-87,103-108
+command/config/modules/term/starship/uninstall.sh
+  20291e40163938bb 26-42,84-86,92-93,109-114
+command/config/modules/term/starship/status.sh
+  20291e40163938bb 4-7,9-15,17-18,20-23,25,46,49-52,54,59,70,72,75-76,78-80,82,84-85,87,89-90,92,94-95,97,99
+command/shell/help.sh
+  20291e40163938bb 22,141-142,149-150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "f5a92226f6bda7fd38fcb3b31bad5144d5292bb9",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 499,
+      "total_deletions": 271,
+      "accepted_lines": 328,
+      "overriden_lines": 14
+    }
+  }
+}
