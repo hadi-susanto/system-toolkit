@@ -67,11 +67,11 @@ __validate_options() {
 __validate_install_scripts() {
     local canonical_id="$1"
     local module_dir="$2"
-    local check_script="$module_dir/install_check.sh"
+    local check_script="$module_dir/check_install_requirements.sh"
     local install_script="$module_dir/install.sh"
 
     if [[ ! -f "$check_script" ]] || [[ -L "$check_script" ]]; then
-        log_error "Configuration module is missing install_check.sh: $canonical_id"
+        log_error "Configuration module is missing check_install_requirements.sh: $canonical_id"
 
         return 1
     fi
@@ -107,7 +107,7 @@ main() {
     module_dir="$CONFIG_MODULES/$canonical_id"
     __validate_install_scripts "$canonical_id" "$module_dir" || return $?
 
-    check_script="$module_dir/install_check.sh"
+    check_script="$module_dir/check_install_requirements.sh"
     install_script="$module_dir/install.sh"
 
     export CONFIG_MODULE_ID="$canonical_id"

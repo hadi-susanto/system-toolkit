@@ -27,7 +27,7 @@ Every module must provide:
 
 ```text
 metadata.conf
-install_check.sh
+check_install_requirements.sh
 install.sh
 status.sh
 ```
@@ -46,7 +46,7 @@ Metadata is parsed as data rather than executed as shell code. Keys must use
 uppercase letters, digits, and underscores. Blank lines and lines beginning
 with `#` are ignored.
 
-### `install_check.sh`
+### `check_install_requirements.sh`
 
 Performs read-only dependency and installation-state checks before
 `install.sh` runs.
@@ -78,14 +78,14 @@ Safe uninstallation is optional. A module supports it only when it provides
 both files:
 
 ```text
-uninstall_check.sh
+chek_uninstall_requirements.sh
 uninstall.sh
 ```
 
-`uninstall_check.sh` follows the same return-code contract as
-`install_check.sh`. It must block uninstallation when the module cannot
-identify and reverse its changes safely. The `uninstall.sh` script performs the
-interactive removal after the check permits it.
+`chek_uninstall_requirements.sh` follows the same return-code contract as
+`check_install_requirements.sh`. It must block uninstallation when the module
+cannot identify and reverse its changes safely. The `uninstall.sh` script
+performs the interactive removal after the check permits it.
 
 If either operation cannot be implemented safely, omit both uninstall files.
 

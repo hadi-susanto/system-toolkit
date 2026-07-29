@@ -70,8 +70,8 @@ __validate_uninstall_scripts() {
     local has_check=0
     local has_uninstall=0
 
-    [[ -f "$module_dir/uninstall_check.sh" ]] &&
-        [[ ! -L "$module_dir/uninstall_check.sh" ]] &&
+    [[ -f "$module_dir/chek_uninstall_requirements.sh" ]] &&
+        [[ ! -L "$module_dir/chek_uninstall_requirements.sh" ]] &&
         has_check=1
 
     [[ -f "$module_dir/uninstall.sh" ]] &&
@@ -89,7 +89,7 @@ __validate_uninstall_scripts() {
     fi
 
     log_error \
-        "Configuration module: $canonical_id must provide both uninstall_check.sh and uninstall.sh"
+        "Configuration module: $canonical_id must provide both chek_uninstall_requirements.sh and uninstall.sh"
 
     return 1
 }
@@ -118,7 +118,7 @@ main() {
     module_dir="$CONFIG_MODULES/$canonical_id"
     __validate_uninstall_scripts "$canonical_id" "$module_dir" || return $?
 
-    check_script="$module_dir/uninstall_check.sh"
+    check_script="$module_dir/chek_uninstall_requirements.sh"
     uninstall_script="$module_dir/uninstall.sh"
 
     export CONFIG_MODULE_ID="$canonical_id"
