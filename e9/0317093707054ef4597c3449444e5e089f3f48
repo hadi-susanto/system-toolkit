@@ -1,0 +1,31 @@
+command/config/modules/term/oh-my-posh/check_install_requirements.sh
+  20291e40163938bb 4,8-14
+command/config/modules/term/oh-my-posh/uninstall.sh
+  20291e40163938bb 1-85
+command/config/modules/term/oh-my-posh/status.sh
+  20291e40163938bb 4-76,78-100
+command/config/modules/term/oh-my-posh/chek_uninstall_requirements.sh
+  20291e40163938bb 1-10
+command/config/modules/term/oh-my-posh/install.sh
+  20291e40163938bb 4-42,44-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "e90317093707054ef4597c3449444e5e089f3f48",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 285,
+      "total_deletions": 8,
+      "accepted_lines": 285,
+      "overriden_lines": 0
+    }
+  }
+}
