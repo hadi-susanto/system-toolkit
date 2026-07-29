@@ -8,11 +8,12 @@ source "$SHELL_LIB/modules.sh"
 ##
 # __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses all, force, and module-name arguments.
+# Parses all, force, and canonical module ID arguments.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives option state.
-#   args_name       Name of the indexed array that receives module names.
+#   args_name       Name of the indexed array that receives canonical module
+#                   IDs.
 #   arguments       Command-line arguments to parse.
 #
 __parse_args() {
@@ -73,13 +74,13 @@ __validate_options() {
     fi
 
     if (( options_ref[ALL] && ${#args_ref[@]} > 0 )); then
-        log_error "Cannot combine --all with module names"
+        log_error "Cannot combine --all with module IDs"
 
         return 1
     fi
 
     if (( ! options_ref[ALL] && ${#args_ref[@]} == 0 )); then
-        log_error "At least one module name or --all is required"
+        log_error "At least one canonical module ID or --all is required"
         log_warn "Use --all with cautions, it will uninstall all installed modules"
 
         return 1
