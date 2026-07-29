@@ -1,0 +1,70 @@
+command/config/modules/term/starship/check_install_requirements.sh
+  20291e40163938bb 4,8-14
+payload/shell/README.md
+  20291e40163938bb 72,139,141-143,145-147
+lib/common/prompt.sh
+  20291e40163938bb 1-202
+command/config/install.sh
+  e7f087ab8fa5b63f 98
+command/config/modules/term/starship/install.sh
+  20291e40163938bb 4-56,58-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "42e66c3d22ce0a2e6f249d9093b8bb8f126aad51",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 435,
+      "total_deletions": 131,
+      "accepted_lines": 303,
+      "overriden_lines": 0
+    },
+    "58a0be92e2b5994f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fabad-6a6c-7d82-82c7-ef5f77a072eb",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2301,
+      "accepted_lines": 18,
+      "overriden_lines": 0
+    },
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 141,
+      "total_deletions": 66,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    },
+    "e7f087ab8fa5b63f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fad45-babf-7c00-aecf-ddab38c2bbde",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 157,
+      "total_deletions": 161,
+      "accepted_lines": 157,
+      "overriden_lines": 0
+    }
+  }
+}
