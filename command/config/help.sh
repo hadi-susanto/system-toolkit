@@ -61,7 +61,7 @@ Usage:
   syskit-cfg install [--force] <category/module>
 
 Options:
-  -f, --force  Run installation when install_check.sh requests a skip.
+  -f, --force  Run installation when check_install_requirements.sh requests a skip.
 
 Description:
   Validates and installs exactly one configuration module. The module owns all
@@ -79,12 +79,12 @@ Usage:
   syskit-cfg uninstall [--force] <category/module>
 
 Options:
-  -f, --force  Run uninstallation when uninstall_check.sh requests a skip.
+  -f, --force  Run uninstallation when chek_uninstall_requirements.sh requests a skip.
 
 Description:
   Safely uninstalls exactly one configuration module when the module provides
-  both uninstall_check.sh and uninstall.sh. Force does not bypass a blocked
-  safety check or automatically approve module prompts.
+  both chek_uninstall_requirements.sh and uninstall.sh. Force does not bypass
+  a blocked safety check or automatically approve module prompts.
 EOF
 }
 

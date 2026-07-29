@@ -118,9 +118,9 @@ command compares SHA-256 checksums to report local and global state.
 **Shell toolkit**
 
 The shell toolkit manages Bash and Zsh integrations sourced from the
-`payload/shell/` directory. Installation places the integration in its
-designated location, while activation makes the installed integration take
-effect.
+`payload/shell/` directory. Shell modules use canonical
+`<category>/<module>` IDs. Installation places the integration in its designated
+location, while activation makes the installed integration take effect.
 
 **Configuration toolkit**
 

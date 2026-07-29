@@ -24,50 +24,55 @@ directory contains only the shell-specific integration assets.
 Each shell integration module is stored under:
 
 ```text
-payload/shell/[module]/[files]
+payload/shell/[category]/[module]/[files]
 ```
 
-where `[module]` contains all integration assets for a single SysKit module.
-The internal file layout depends on the shell adapter implementation.
+The canonical module ID is `[category]/[module]`. The module directory contains
+all integration assets for a single SysKit module. The internal file layout
+depends on the shell adapter implementation.
 
 ### Bash
 
 ```text
-payload/shell/[module]/[module.bash]
+payload/shell/[category]/[module]/[module.bash]
 ```
 
 or
 
 ```text
-payload/shell/[module]/[module.sh]
+payload/shell/[category]/[module]/[module.sh]
 ```
 
 ### Zsh
 
 ```text
-payload/shell/[module]/[module.zsh]
+payload/shell/[category]/[module]/[module.zsh]
 ```
 
 or
 
 ```text
-payload/shell/[module]/[module.sh]
+payload/shell/[category]/[module]/[module.sh]
 ```
 
 Future shell adapters (such as Fish or Nushell) may define their own directory
 layout and file naming conventions if required by the shell.
 
+Installed Bash and Zsh module filenames flatten the canonical ID by replacing
+`/` with `_`. For example, `cli/git` is installed as `cli_git.bash` for Bash or
+`cli_git.zsh` for Zsh.
+
 ---
 
 # Contents
 
-- [Bat](#bat-bat)
-- [Eza](#eza-eza)
-- [Git](#git-git)
+- [Bat](#bat-clibat)
+- [Eza](#eza-clieza)
+- [Git](#git-cligit)
 
 ---
 
-# Bat (`bat`)
+# Bat (`cli/bat`)
 
 ## Exported Variables
 
@@ -78,7 +83,7 @@ layout and file naming conventions if required by the shell.
 
 ---
 
-# Eza (`eza`)
+# Eza (`cli/eza`)
 
 ## Shell Aliases
 
@@ -101,7 +106,7 @@ layout and file naming conventions if required by the shell.
 
 ---
 
-# Git (`git`)
+# Git (`cli/git`)
 
 ## Shell Aliases
 

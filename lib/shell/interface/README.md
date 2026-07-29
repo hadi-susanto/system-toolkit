@@ -100,9 +100,9 @@ Checks whether a module provides integration compatible with this shell.
 
 ### Parameters
 
-| Name     | Description        |
-|----------|--------------------|
-| `module` | Shell module name. |
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format. |
 
 ### Return Code
 
@@ -117,11 +117,14 @@ Checks whether a module provides integration compatible with this shell.
 
 Checks whether a shell module has already been installed.
 
+Installed filenames use a flattened canonical ID. For example, `cli/git`
+resolves to `cli_git.bash` for Bash and `cli_git.zsh` for Zsh.
+
 ### Parameters
 
-| Name     | Description        |
-|----------|--------------------|
-| `module` | Shell module name. |
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format. |
 
 ### Return Code
 
@@ -136,11 +139,14 @@ Checks whether a shell module has already been installed.
 
 Installs a shell module.
 
+The installed filename must flatten the canonical ID by replacing `/` with
+`_`, then append the shell-specific extension.
+
 ### Parameters
 
-| Name     | Description        |
-|----------|--------------------|
-| `module` | Shell module name. |
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format. |
 
 ### Return Code
 
@@ -157,9 +163,9 @@ Returns the installed module file path.
 
 ### Parameters
 
-| Name     | Description        |
-|----------|--------------------|
-| `module` | Shell module name. |
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format. |
 
 ### Return Code
 
@@ -184,9 +190,9 @@ generic source file. For example, the Bash interface should prefer
 
 ### Parameters
 
-| Name     | Description        |
-|----------|--------------------|
-| `module` | Shell module name. |
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format. |
 
 ### Return Code
 
@@ -207,9 +213,9 @@ Removes a previously installed shell module.
 
 ### Parameters
 
-| Name     | Description        |
-|----------|--------------------|
-| `module` | Shell module name. |
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format. |
 
 ### Return Code
 

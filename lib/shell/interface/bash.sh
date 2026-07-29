@@ -1,70 +1,74 @@
 readonly BASH_BASE_DIR="$HOME/.local/share/syskit/bash"
 
 ##
-# support_module <module>
+# support_module <canonical_id>
 #
 # Checks whether a module provides a Bash-specific or generic source file.
 #
 # Parameters:
-#   module    Shell module name.
+#   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Returns:
 #   1 when no compatible source file exists.
 #
 support_module() {
-    local module="$1"
+    local canonical_id="$1"
+    local module_name="${canonical_id##*/}"
 
-    if [[ -f "$SHELL_PAYLOAD/$module/$module.bash" ]]; then
+    if [[ -f "$SHELL_PAYLOAD/$canonical_id/$module_name.bash" ]]; then
         return 0
     fi
 
-    [[ -f "$SHELL_PAYLOAD/$module/$module.sh" ]]
+    [[ -f "$SHELL_PAYLOAD/$canonical_id/$module_name.sh" ]]
 }
 
 ##
-# module_installed <module>
+# module_installed <canonical_id>
 #
 # Checks whether a Bash-compatible module is installed.
 #
 # Parameters:
-#   module    Shell module name.
+#   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Returns:
 #   1 when neither a Bash-specific nor generic installed file exists.
 #
 module_installed() {
-    local module="$1"
+    local canonical_id="$1"
+    local installed_name="${canonical_id//\//_}"
 
-    if [[ -f "$BASH_BASE_DIR/module.d/$module.bash" ]]; then
+    if [[ -f "$BASH_BASE_DIR/module.d/$installed_name.bash" ]]; then
         return 0
     fi
 
-    [[ -f "$BASH_BASE_DIR/module.d/$module.sh" ]]
+    [[ -f "$BASH_BASE_DIR/module.d/$installed_name.sh" ]]
 }
 
 ##
-# install_module <module>
+# install_module <canonical_id>
 #
 # Installs the preferred Bash-compatible source for a module.
 #
 # Parameters:
-#   module    Shell module name.
+#   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Returns:
 #   1 when no compatible source exists or the file cannot be installed.
 #
 install_module() {
-    local module="$1"
-    local source="$SHELL_PAYLOAD/$module/$module.bash"
+    local canonical_id="$1"
+    local module_name="${canonical_id##*/}"
+    local installed_name="${canonical_id//\//_}"
+    local source="$SHELL_PAYLOAD/$canonical_id/$module_name.bash"
     local install_dir="$BASH_BASE_DIR/module.d"
-    local target="$install_dir/$module.bash"
+    local target="$install_dir/$installed_name.bash"
 
     if [[ ! -f "$source" ]]; then
-        source="$SHELL_PAYLOAD/$module/$module.sh"
+        source="$SHELL_PAYLOAD/$canonical_id/$module_name.sh"
     fi
 
     if [[ ! -f "$source" ]]; then
-        log_error "No Bash-compatible source is available for module: $module"
+        log_error "No Bash-compatible source is available for module: $canonical_id"
 
         return 1
     fi
@@ -76,14 +80,14 @@ install_module() {
     fi
 
     if ! install -m 0644 -- "$source" "$target"; then
-        log_error "Failed to install Bash module: $module"
+        log_error "Failed to install Bash module: $canonical_id"
 
         return 1
     fi
 }
 
 ##
-# installed_module_path <module>
+# installed_module_path <canonical_id>
 #
 # Returns the path to the installed Bash module source file.
 # This function behaves similarly to `installed_module`, except
@@ -91,7 +95,7 @@ install_module() {
 # only an exit status.
 #
 # Parameters:
-#   module    Module name.
+#   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Output:
 #   Full path to the installed Bash module source file.
@@ -100,8 +104,9 @@ install_module() {
 #   1 when the module is not installed.
 #
 installed_module_path() {
-    local module="$1"
-    local path="$BASH_BASE_DIR/module.d/$module.bash"
+    local canonical_id="$1"
+    local installed_name="${canonical_id//\//_}"
+    local path="$BASH_BASE_DIR/module.d/$installed_name.bash"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -109,7 +114,7 @@ installed_module_path() {
         return 0
     fi
 
-    path="$BASH_BASE_DIR/module.d/$module.sh"
+    path="$BASH_BASE_DIR/module.d/$installed_name.sh"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -121,13 +126,13 @@ installed_module_path() {
 }
 
 ##
-# module_source_path <module>
+# module_source_path <canonical_id>
 #
 # Returns the preferred compatible source file for a shell module.
 # A shell-specific source file is preferred over the generic source file.
 #
 # Parameters:
-#   module    Shell module name.
+#   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Output:
 #   Full path to the preferred compatible source file.
@@ -136,8 +141,9 @@ installed_module_path() {
 #   1 when no compatible source file exists.
 #
 module_source_path() {
-    local module="$1"
-    local path="$SHELL_PAYLOAD/$module/$module.bash"
+    local canonical_id="$1"
+    local module_name="${canonical_id##*/}"
+    local path="$SHELL_PAYLOAD/$canonical_id/$module_name.bash"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -145,7 +151,7 @@ module_source_path() {
         return 0
     fi
 
-    path="$SHELL_PAYLOAD/$module/$module.sh"
+    path="$SHELL_PAYLOAD/$canonical_id/$module_name.sh"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -157,25 +163,26 @@ module_source_path() {
 }
 
 ##
-# uninstall_module <module>
+# uninstall_module <canonical_id>
 #
 # Removes every installed Bash-compatible file for a module.
 #
 # Parameters:
-#   module    Shell module name.
+#   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Returns:
 #   A non-zero status when an installed file cannot be removed.
 #
 uninstall_module() {
-    local module="$1"
+    local canonical_id="$1"
+    local installed_name="${canonical_id//\//_}"
     local module_dir="$BASH_BASE_DIR/module.d"
     local extension
     local file
     local failed=0
 
     for extension in bash sh; do
-        file="$module_dir/$module.$extension"
+        file="$module_dir/$installed_name.$extension"
 
         if [[ ! -e "$file" ]] && [[ ! -L "$file" ]]; then
             continue

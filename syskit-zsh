@@ -6,6 +6,7 @@ export SYSKIT_ROOT="$__script_dir"
 export COMMON_LIB="$SYSKIT_ROOT/lib/common"
 export SHELL_LIB="$SYSKIT_ROOT/lib/shell"
 export SHELL_COMMAND="$SYSKIT_ROOT/command/shell"
+export SHELL_MODULES="$SHELL_COMMAND/modules"
 export SHELL_PAYLOAD="$SYSKIT_ROOT/payload/shell"
 
 main() {

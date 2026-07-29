@@ -13,8 +13,10 @@ Usage:
 
 Commands:
   help [command]     Show basic help or details for a command.
-  install <module>   Install [module] for ${shell_name}.
-  uninstall <module> Remove installed [module] from ${shell_name}.
+  install <id>       Install a module for ${shell_name}.
+                     <id> in canonical format: <category/module>.
+  uninstall <id>     Remove an installed module from ${shell_name}.
+                     <id> in canonical format: <category/module>.
   activate           Activate ${shell_name} module loader.
   deactivate         Deactivate ${shell_name} module loader.
   status             Show whether the integration is installed and active.
@@ -50,16 +52,19 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name} install [--force] <module...>
+  syskit-${shell_name} install [--force] <category/module...>
   syskit-${shell_name} install [--force] --all
 
 Options:
   -a, --all    Install every available shell module.
-  -f, --force  Reinstall modules that are already installed.
+  -f, --force  Reinstall modules and bypass failed dependency checks.
 
 Description:
   Installs one or more SysKit modules for ${shell_name} into their designated
-  location. Use --all instead of naming individual modules.
+  location. Module IDs use the <category>/<module> format. Before installation,
+  a module-specific dependency check is run when available; otherwise, the
+  module-name segment is checked as a command. Use --all instead of naming
+  individual modules.
 EOF
 }
 
@@ -71,7 +76,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name} uninstall [--force] <module...>
+  syskit-${shell_name} uninstall [--force] <category/module...>
   syskit-${shell_name} uninstall [--force] --all
 
 Options:

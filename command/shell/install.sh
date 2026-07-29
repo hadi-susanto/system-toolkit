@@ -8,11 +8,12 @@ source "$SHELL_LIB/modules.sh"
 ##
 # __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses all, force, and module-name arguments.
+# Parses all, force, and canonical module ID arguments.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives option state.
-#   args_name       Name of the indexed array that receives module names.
+#   args_name       Name of the indexed array that receives canonical module
+#                   IDs.
 #   arguments       Command-line arguments to parse.
 #
 __parse_args() {
@@ -73,13 +74,13 @@ __validate_options() {
     fi
 
     if (( options_ref[ALL] && ${#args_ref[@]} > 0 )); then
-        log_error "Cannot combine --all with module names"
+        log_error "Cannot combine --all with module IDs"
 
         return 1
     fi
 
     if (( ! options_ref[ALL] && ${#args_ref[@]} == 0 )); then
-        log_error "At least one module name or --all is required"
+        log_error "At least one canonical module ID or --all is required"
 
         return 1
     fi
@@ -111,6 +112,35 @@ __deduplicate_modules() {
     done
 }
 
+##
+# __check_module_dependencies <canonical_id>
+#
+# Checks a module's dedicated dependency script when available. Otherwise,
+# checks whether the module-name segment is available as a command.
+#
+# Parameters:
+#   canonical_id    Module ID in <category>/<module> format.
+#
+# Returns:
+#   The dedicated dependency check status, or 1 when the fallback command is
+#   unavailable.
+#
+__check_module_dependencies() {
+    local canonical_id="$1"
+    local check_script="$SHELL_MODULES/$canonical_id/check_dependencies.sh"
+    local command_name="${canonical_id##*/}"
+
+    if [[ -f "$check_script" ]] && [[ ! -L "$check_script" ]]; then
+        if bash "$check_script"; then
+            return 0
+        fi
+
+        return 1
+    fi
+
+    command -v "$command_name" >/dev/null 2>&1
+}
+
 __install_module() {
     local shell="$1"
     local module="$2"
@@ -130,6 +160,17 @@ __install_module() {
         fi
 
         log_warn "Reinstalling shell module: $module"
+    fi
+
+    if ! __check_module_dependencies "$module"; then
+        if (( ! force )); then
+            log_error "Shell module dependency check failed for module: $module"
+            log_info "Please inpect the logs above"
+
+            return 1
+        fi
+
+        log_warn "Forcing shell module installation despite failed dependency checks: $module"
     fi
 
     if ! install_module "$module"; then
