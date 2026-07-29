@@ -1,0 +1,44 @@
+payload/shell/README.md
+  20291e40163938bb 72,139,141-143,145-147
+lib/common/prompt.sh
+  20291e40163938bb 1-202
+command/config/modules/term/starship/install.sh
+  20291e40163938bb 4-56,58-89
+command/config/install.sh
+  e7f087ab8fa5b63f 98
+command/config/modules/term/starship/check_install_requirements.sh
+  20291e40163938bb 4,8-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "59c68f46c9657972e35d60d195270bb4c43ebad5",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 303,
+      "overriden_lines": 0
+    },
+    "e7f087ab8fa5b63f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fad45-babf-7c00-aecf-ddab38c2bbde",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
