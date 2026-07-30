@@ -1,0 +1,31 @@
+command/README.md
+  6f0373ccded9960d 18-25
+README.md
+  6f0373ccded9960d 105-111,128-131,138-141
+command/config/modules/README.md
+  6f0373ccded9960d 24,26-27,29-31,34-44
+payload/config/README.md
+  6f0373ccded9960d 25,53-57
+payload/shell/README.md
+  6f0373ccded9960d 34-35,37-39,42-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "aaf51681299f38473dc8f5482ad5c1c309078248",
+  "prompts": {
+    "6f0373ccded9960d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb265-9ca5-7491-9763-c81ca8765972",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 545,
+      "total_deletions": 490,
+      "accepted_lines": 543,
+      "overriden_lines": 0
+    }
+  }
+}
