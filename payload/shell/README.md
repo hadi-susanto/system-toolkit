@@ -69,6 +69,7 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 - [Bat](#bat-clibat)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Starship](#starship-termstarship)
 
 ---
@@ -77,10 +78,16 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 
 ## Exported Variables
 
-| Variable Name | Description                                            |
-|---------------|--------------------------------------------------------|
-| `BAT_THEME`   | Export `BAT_THEME` = `Dracula`.                        |
+| Variable Name | Description                         |
+|---------------|-------------------------------------|
+| `BAT_THEME`   | Export `BAT_THEME` = `Dracula`.     |
 | `MANPAGER`    | Export `MANPAGER` = `sh -c 'col -bx | bat -l man -p'`. |
+
+## Shell Aliases
+
+| Alias     | Description                                                        |
+|-----------|--------------------------------------------------------------------|
+| `bat-cat` | Runs `bat --paging=never` so output is never displayed in a pager. |
 
 ---
 
@@ -130,11 +137,18 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 | `gf`   | **Expands to:** `git fetch`<br><br>Downloads commits, branches, and tags from the configured remote without modifying the working tree. |
 | `gfo`  | **Expands to:** `git fetch origin`<br><br>Fetches updates from the `origin` remote only.                                                |
 
-## Shell Functions
+---
 
-| Function | Description                                                                                |
-|----------|--------------------------------------------------------------------------------------------|
-| `gpsup`  | Pushes the current branch to `origin` and automatically sets the upstream tracking branch. |
+# Oh My Posh (`term/oh-my-posh`)
+
+Provides separate Bash and Zsh initialization payloads. Each payload evaluates
+the shell-specific output from `oh-my-posh init`.
+
+The corresponding configuration module can install either integration and
+activate either SysKit shell loader. It treats Starship as mutually exclusive
+and skips installation when Starship is detected unless `--force` is used.
+
+---
 
 # Starship (`term/starship`)
 
@@ -146,3 +160,6 @@ The corresponding configuration module sets `add_newline = false` through
 Starship's own configuration editor so Starship does not add a second blank
 line. Its uninstall workflow restores `add_newline = true` and delegates shell
 payload removal to the corresponding SysKit shell command.
+
+The configuration module treats Oh My Posh as mutually exclusive and skips
+installation when Oh My Posh is detected unless `--force` is used.

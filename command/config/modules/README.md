@@ -129,3 +129,16 @@ Command modules contain lifecycle logic. Payload directories contain only
 files or templates that the module may install or use while configuring the
 system. Modules that do not require source assets may omit their payload
 directory.
+
+## Current Terminal Modules
+
+| Canonical ID      | Managed behavior                                                                                                 |
+|-------------------|------------------------------------------------------------------------------------------------------------------|
+| `term/ghostty`    | Installs a managed optional include and the `syskit.ghostty` configuration asset.                                |
+| `term/kitty`      | Installs a managed glob include plus independent `syskit.kitty` and `syskit.session` assets.                     |
+| `term/oh-my-posh` | Installs Bash or Zsh initialization and can activate either shell loader.                                        |
+| `term/starship`   | Installs Bash or Zsh initialization, can activate either shell loader, and edits `add_newline` through Starship. |
+
+Starship and Oh My Posh are mutually exclusive during normal configuration
+installation. Their requirement checks return the skip status when the other
+prompt executable is detected; `--force` explicitly overrides that skip.

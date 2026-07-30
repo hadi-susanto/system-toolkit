@@ -13,9 +13,9 @@ lib/shell/interface/fish.sh
 lib/shell/interface/nu.sh
 ```
 
-Adding a new shell only requires implementing the interface contract described
-below. Once the interface file is present, SysKit automatically detects and uses
-it.
+Adding a new shell requires implementing the interface contract described
+below and providing its dedicated entrypoint. Once both are present, SysKit can
+detect and use the shell.
 
 Depending on the shell, additional shell-specific integration assets may also be
 required under the `payload/shell/` directory. Some shells can reuse generic
