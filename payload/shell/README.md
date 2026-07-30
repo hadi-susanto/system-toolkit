@@ -31,6 +31,18 @@ The canonical module ID is `[category]/[module]`. The module directory contains
 all integration assets for a single SysKit module. The internal file layout
 depends on the shell adapter implementation.
 
+Install and uninstall commands accept either the canonical ID or a unique
+module-name segment. For example, both commands below select `cli/git`:
+
+```bash
+syskit-bash install git
+syskit-zsh uninstall cli/git
+```
+
+Resolution is limited to this shell payload tree. If a module-name segment
+exists under more than one category, callers must use its canonical ID.
+Installed files and shell adapters always receive the resolved canonical ID.
+
 ### Bash
 
 ```text

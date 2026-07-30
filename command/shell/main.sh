@@ -69,6 +69,7 @@ main() {
     local -a args
 
     __parse_args options args "$@" || return $?
+    route_command_help options args
 
     case "${options[CMD]}" in
         help)

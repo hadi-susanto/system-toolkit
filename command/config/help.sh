@@ -25,13 +25,17 @@ System Toolkit Configuration Integration
 
 Usage:
   syskit-cfg help [command]
+  syskit-cfg <command> help
+  syskit-cfg <command> -h
+  syskit-cfg <command> --help
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
 
 Description:
   Shows basic toolkit help when no command is given. When a command is given,
-  shows its usage, options, and behavior.
+  shows its usage, options, and behavior. The post-command help forms are
+  aliases for "help <command>".
 EOF
 }
 
@@ -58,16 +62,17 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg install [--force] <category/module>
+  syskit-cfg install [--force] <module>
 
 Options:
   -f, --force  Override supported module skips and existing-target safeguards.
 
 Description:
   Validates and installs exactly one configuration module. The module owns all
-  interactive decisions and target handling. Supporting modules may also
+  interactive decisions and target handling. A unique module-name segment or
+  canonical <category/module> ID is accepted. Supporting modules may also
   require force to overwrite managed targets. Force does not bypass a blocked
-  check or automatically approve module prompts.
+  safety check or automatically approve module prompts.
 EOF
 }
 
@@ -77,7 +82,7 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg uninstall [--force] <category/module>
+  syskit-cfg uninstall [--force] <module>
 
 Options:
   -f, --force  Override supported module skips and checksum safeguards.
@@ -85,7 +90,8 @@ Options:
 Description:
   Safely uninstalls exactly one configuration module when it provides
   uninstall.sh. When check_uninstall_requirements.sh is present, it runs before
-  uninstallation. Supporting modules may also require force to remove modified
+  uninstallation. A unique module-name segment or canonical <category/module>
+  ID is accepted. Supporting modules may also require force to remove modified
   managed files. Force does not bypass a blocked safety check or automatically
   approve module prompts.
 EOF

@@ -12,14 +12,12 @@ Usage:
   syskit-${shell_name} [command] [args...]
 
 Commands:
-  help [command]     Show basic help or details for a command.
-  install <id...>    Install one or more modules for ${shell_name}.
-                     <id> in canonical format: <category/module>.
-  uninstall <id...>  Remove one or more installed modules from ${shell_name}.
-                     <id> in canonical format: <category/module>.
-  activate           Activate ${shell_name} module loader.
-  deactivate         Deactivate ${shell_name} module loader.
-  status [target]    Show the full report or one loader/module status.
+  help [command]         Show basic help or details for a command.
+  install <module...>    Install one or more modules for ${shell_name}.
+  uninstall <module...>  Remove one or more installed modules from ${shell_name}.
+  activate               Activate ${shell_name} module loader.
+  deactivate             Deactivate ${shell_name} module loader.
+  status [target]        Show the full report or one loader/module status.
 
 Supported shells: Bash and Zsh.
 EOF
@@ -34,13 +32,17 @@ System Toolkit Shell Integration (Shell-Dependent)
 
 Usage:
   syskit-${shell_name} help [command]
+  syskit-${shell_name} <command> help
+  syskit-${shell_name} <command> -h
+  syskit-${shell_name} <command> --help
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
 
 Description:
   Shows basic toolkit help when no command is given. When a command is given,
-  shows its usage, options, and behavior.
+  shows its usage, options, and behavior. The post-command help forms are
+  aliases for "help <command>".
 EOF
 }
 
@@ -52,7 +54,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name} install [--force] <category/module...>
+  syskit-${shell_name} install [--force] <module...>
   syskit-${shell_name} install [--force] --all
 
 Options:
@@ -61,10 +63,10 @@ Options:
 
 Description:
   Installs one or more SysKit modules for ${shell_name} into their designated
-  location. Module IDs use the <category>/<module> format. Before installation,
-  a module-specific dependency check is run when available; otherwise, the
-  module-name segment is checked as a command. Use --all instead of naming
-  individual modules.
+  location. A unique module-name segment or canonical <category/module> ID is
+  accepted. Before installation, a module-specific dependency check is run when
+  available; otherwise, the module-name segment is checked as a command. Use
+  --all instead of naming individual modules.
 EOF
 }
 
@@ -76,7 +78,7 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name} uninstall [--force] <category/module...>
+  syskit-${shell_name} uninstall [--force] <module...>
   syskit-${shell_name} uninstall [--force] --all
 
 Options:
@@ -85,7 +87,8 @@ Options:
 
 Description:
   Uninstalls one or more SysKit modules for ${shell_name} from their designated
-  location. Use --all instead of naming individual modules.
+  location. A unique module-name segment or canonical <category/module> ID is
+  accepted. Use --all instead of naming individual modules.
 EOF
 }
 

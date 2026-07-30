@@ -21,6 +21,28 @@ command/config/modules/term/kitty/
 
 Module IDs use lowercase letters, numbers, and hyphens.
 
+## Lifecycle Command Resolution
+
+The `install` and `uninstall` commands accept either a canonical ID or a unique
+module-name segment:
+
+```bash
+syskit-cfg install kitty
+syskit-cfg uninstall term/kitty
+```
+
+The resolver searches only `command/config/modules/`. A name that exists only
+in another toolkit is not accepted; for example, `git` does not resolve here
+even though `cli/git` exists in the shell payload. If the same module-name
+segment exists under multiple configuration categories, the command fails as
+ambiguous and requires a canonical ID.
+
+Internal aliases are checked only when direct resolution finds no module. Alias
+targets are validated against the current configuration module tree so stale
+canonical IDs are rejected. The legacy names `hide-password-asterisks` and
+`sys/hide-password-asterisks` currently resolve to
+`sys/password-asterisks`.
+
 ## Required Files
 
 Every module must provide:

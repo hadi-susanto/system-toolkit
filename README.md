@@ -102,6 +102,13 @@ selected shell as the dispatcher's first internal parameter, allowing
 shell-specific compatibility libraries from `lib/shell/` to be loaded when
 needed.
 
+Configuration and shell `install` and `uninstall` commands accept either a
+canonical `<category>/<module>` ID or a unique module-name segment. For
+example, `kitty` resolves to `term/kitty` for the configuration toolkit, while
+`git` resolves to `cli/git` only for the shell toolkit. Resolution stays within
+the selected toolkit's module directory, and an ambiguous module name is
+rejected instead of selecting one arbitrarily.
+
 The binary toolkit installs standalone executable scripts directly into a local
 or global command directory. Other toolkit lifecycle commands establish their
 command boundaries, help systems, scope handling, and routing independently.
@@ -118,17 +125,20 @@ command compares SHA-256 checksums to report local and global state.
 **Shell toolkit**
 
 The shell toolkit manages Bash and Zsh integrations sourced from the
-`payload/shell/` directory. Shell modules use canonical
-`<category>/<module>` IDs. Installation places the integration in its designated
-location, while activation makes the installed integration take effect.
+`payload/shell/` directory. Shell modules use canonical `<category>/<module>`
+IDs internally; install and uninstall also accept unique short names such as
+`git`. Installation places the integration in its designated location, while
+activation makes the installed integration take effect.
 
 **Configuration toolkit**
 
 The configuration toolkit discovers configuration modules and orchestrates
 their interactive installation one module at a time, along with safe
 uninstallation when a module supports it. It also reports module-defined
-status in independent sections. Each module owns its target handling and may
-use source files from the `payload/config/` directory.
+status in independent sections. Install and uninstall accept either a unique
+short name such as `kitty` or its canonical ID, `term/kitty`. Each module owns
+its target handling and may use source files from the `payload/config/`
+directory.
 
 # 🔗 Relationship with Mint Provisioner
 

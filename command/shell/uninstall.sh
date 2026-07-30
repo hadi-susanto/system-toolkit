@@ -2,18 +2,19 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$COMMON_LIB/resolver.sh"
 source "$SHELL_LIB/interface_loader.sh"
 source "$SHELL_LIB/modules.sh"
 
 ##
 # __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses all, force, and canonical module ID arguments.
+# Parses all, force, and module arguments.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives option state.
-#   args_name       Name of the indexed array that receives canonical module
-#                   IDs.
+#   args_name       Name of the indexed array that receives module names or
+#                   canonical IDs.
 #   arguments       Command-line arguments to parse.
 #
 __parse_args() {
@@ -65,8 +66,6 @@ __validate_options() {
     local args_name="$2"
     local -n options_ref="$options_name"
     local -n args_ref="$args_name"
-    local module
-
     if [[ -n "${options_ref[INVALID_OPTION]}" ]]; then
         log_error "Unknown uninstall option: ${options_ref[INVALID_OPTION]}"
 
@@ -80,36 +79,49 @@ __validate_options() {
     fi
 
     if (( ! options_ref[ALL] && ${#args_ref[@]} == 0 )); then
-        log_error "At least one canonical module ID or --all is required"
+        log_error "At least one module or --all is required"
         log_warn "Use --all with caution; it will uninstall all installed modules"
 
         return 1
     fi
-
-    for module in "${args_ref[@]}"; do
-        if ! resolve_shell_module "$module" >/dev/null; then
-            return 1
-        fi
-    done
 }
 
-__deduplicate_modules() {
+__resolve_modules() {
     local args_name="$1"
     local modules_name="$2"
     local -n args_ref="$args_name"
     local -n modules_ref="$modules_name"
     local -A seen=()
-    local module
+    local requested_module
+    local canonical_id
+    local resolve_status=0
 
     modules_ref=()
 
-    for module in "${args_ref[@]}"; do
-        if (( seen["$module"] )); then
+    for requested_module in "${args_ref[@]}"; do
+        if canonical_id="$(resolve_module "$SHELL_PAYLOAD" "$requested_module")"; then
+            :
+        else
+            resolve_status=$?
+
+            case "$resolve_status" in
+                2)
+                    log_error "Ambiguous shell module name: $requested_module"
+                    ;;
+                *)
+                    log_error "Unknown shell module: $requested_module"
+                    ;;
+            esac
+
+            return "$resolve_status"
+        fi
+
+        if (( seen["$canonical_id"] )); then
             continue
         fi
 
-        seen["$module"]=1
-        modules_ref+=("$module")
+        seen["$canonical_id"]=1
+        modules_ref+=("$canonical_id")
     done
 }
 
@@ -173,7 +185,7 @@ main() {
             return 1
         fi
     else
-        __deduplicate_modules args modules
+        __resolve_modules args modules || return $?
     fi
 
     for module in "${modules[@]}"; do

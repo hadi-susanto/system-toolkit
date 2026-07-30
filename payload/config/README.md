@@ -22,7 +22,8 @@ command/config/modules/<category>/<module>/
 Provides local Bash and Zsh completion files mirrored from the apt-fast vendor
 repository. The module can install either bundled file or download the
 corresponding current vendor source. Existing completion targets require
-`syskit-cfg install --force sys/apt-fast` before they can be overwritten.
+`syskit-cfg install --force apt-fast` (or the canonical `sys/apt-fast` ID)
+before they can be overwritten.
 
 ## Terminal Assets
 
@@ -49,8 +50,9 @@ The module manages `globinclude syskit.kitty` inside
 including checksum-based update availability.
 
 Both terminal modules preserve existing payload targets during normal
-installation. Running `syskit-cfg install --force <category/module>` allows
-their file-install action to overwrite existing targets. File uninstallation
-checks every installed payload against its source before removing any of them.
-Checksum failures are all reported and prevent removal unless
-`syskit-cfg uninstall --force <category/module>` is used.
+installation. Running `syskit-cfg install --force kitty`, or using the
+canonical `term/kitty` ID, allows its file-install action to overwrite existing
+targets. File uninstallation checks every installed payload against its source
+before removing any of them. Checksum failures are all reported and prevent
+removal unless `syskit-cfg uninstall --force kitty` (or its canonical ID) is
+used.

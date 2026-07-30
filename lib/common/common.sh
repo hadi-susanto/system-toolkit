@@ -61,33 +61,32 @@ log_error() {
 }
 
 ##
-# validate_no_options <command> [arguments...]
+# route_command_help <options_name> <args_name>
 #
-# Rejects command options while allowing positional arguments.
+# Rewrites "<command> help", "<command> -h", and "<command> --help" to the
+# equivalent "help <command>" dispatch state.
 #
 # Parameters:
-#   command      Command name used in error messages.
-#   arguments    Command arguments to validate.
+#   options_name    Name of the associative array containing the CMD key.
+#   args_name       Name of the indexed array containing command arguments.
 #
-# Returns:
-#   1 when an option is found before an explicit "--" separator.
-#
-validate_no_options() {
-    local command="$1"
-    shift
+route_command_help() {
+    local options_name="$1"
+    local args_name="$2"
+    local -n options_ref="$options_name"
+    local -n args_ref="$args_name"
+    local command="${options_ref[CMD]}"
 
-    local argument
+    if (( ${#args_ref[@]} == 0 )); then
+        return 0
+    fi
 
-    for argument in "$@"; do
-        case "$argument" in
-            --)
-                return 0
-                ;;
-            -*)
-                log_error "Unknown option for '$command': $argument"
+    case "${args_ref[0]}" in
+        help | -h | --help)
+            options_ref[CMD]="help"
+            args_ref=("$command")
+            ;;
+    esac
 
-                return 1
-                ;;
-        esac
-    done
+    return 0
 }
