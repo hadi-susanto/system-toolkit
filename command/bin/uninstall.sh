@@ -52,7 +52,7 @@ __parse_args() {
                 options_ref[SCOPE]="global"
                 options_ref[INSTALL_DIR]="$global_dir"
                 ;;
-            -a | --all)
+            -a | --all | all)
                 options_ref[ALL]=1
                 ;;
             --)

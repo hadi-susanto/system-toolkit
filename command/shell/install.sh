@@ -143,6 +143,8 @@ __check_module_dependencies() {
     fi
 
     log_error "Missing required command: '$command_name'."
+
+    return 1
 }
 
 __install_module() {
@@ -162,14 +164,13 @@ __install_module() {
 
             return 0
         fi
-
-        log_warn "Reinstalling shell module: $module"
     fi
 
     if ! __check_module_dependencies "$module"; then
+        log_warn "Shell module dependency check failed for module: $module"
+
         if (( ! force )); then
-            log_error "Shell module dependency check failed for module: $module"
-            log_info "Please inspect the logs above"
+            log_info "Installation of $module aborted"
 
             return 1
         fi
