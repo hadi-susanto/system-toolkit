@@ -169,7 +169,7 @@ __install_module() {
     if ! __check_module_dependencies "$module"; then
         if (( ! force )); then
             log_error "Shell module dependency check failed for module: $module"
-            log_info "Please inpect the logs above"
+            log_info "Please inspect the logs above"
 
             return 1
         fi
