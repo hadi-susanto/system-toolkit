@@ -1,0 +1,9 @@
+payload/shell/README.md
+  20291e40163938bb 72,139,141-143,145-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "00b67bc219c5e94f2f39681ff184924324b14a16",
+  "prompts": {}
+}
