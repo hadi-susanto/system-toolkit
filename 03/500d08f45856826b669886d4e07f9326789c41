@@ -1,0 +1,35 @@
+command/shell/uninstall.sh
+  6f0373ccded9960d 5,12,16-17,82,89,95-97,101-116,119,123-124,188
+command/config/install.sh
+  6f0373ccded9960d 5,97,106-118,120
+command/config/uninstall.sh
+  6f0373ccded9960d 5,113,122-125,127-129,132,136
+command/shell/help.sh
+  6f0373ccded9960d 15-20,57,66-69,81,90-91
+command/config/help.sh
+  6f0373ccded9960d 65,72-73,75,85,93-94
+command/shell/install.sh
+  6f0373ccded9960d 5,12,16-17,82,88,94-96,100-115,118,122-123,232
+lib/common/resolver.sh
+  6f0373ccded9960d 1-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "03500d08f45856826b669886d4e07f9326789c41",
+  "prompts": {
+    "6f0373ccded9960d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb265-9ca5-7491-9763-c81ca8765972",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 1235,
+      "total_deletions": 1077,
+      "accepted_lines": 1234,
+      "overriden_lines": 0
+    }
+  }
+}
