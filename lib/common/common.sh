@@ -61,6 +61,37 @@ log_error() {
 }
 
 ##
+# route_command_help <options_name> <args_name>
+#
+# Rewrites "<command> help", "<command> -h", and "<command> --help" to the
+# equivalent "help <command>" dispatch state.
+#
+# Parameters:
+#   options_name    Name of the associative array containing the CMD key.
+#   args_name       Name of the indexed array containing command arguments.
+#
+route_command_help() {
+    local options_name="$1"
+    local args_name="$2"
+    local -n options_ref="$options_name"
+    local -n args_ref="$args_name"
+    local command="${options_ref[CMD]}"
+
+    if (( ${#args_ref[@]} == 0 )); then
+        return 0
+    fi
+
+    case "${args_ref[0]}" in
+        help | -h | --help)
+            options_ref[CMD]="help"
+            args_ref=("$command")
+            ;;
+    esac
+
+    return 0
+}
+
+##
 # validate_no_options <command> [arguments...]
 #
 # Rejects command options while allowing positional arguments.

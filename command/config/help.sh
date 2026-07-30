@@ -25,13 +25,17 @@ System Toolkit Configuration Integration
 
 Usage:
   syskit-cfg help [command]
+  syskit-cfg <command> help
+  syskit-cfg <command> -h
+  syskit-cfg <command> --help
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
 
 Description:
   Shows basic toolkit help when no command is given. When a command is given,
-  shows its usage, options, and behavior.
+  shows its usage, options, and behavior. The post-command help forms are
+  aliases for "help <command>".
 EOF
 }
 

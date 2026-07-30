@@ -34,13 +34,17 @@ System Toolkit Shell Integration (Shell-Dependent)
 
 Usage:
   syskit-${shell_name} help [command]
+  syskit-${shell_name} <command> help
+  syskit-${shell_name} <command> -h
+  syskit-${shell_name} <command> --help
 
 Arguments:
   command  Optional command for which detailed help should be displayed.
 
 Description:
   Shows basic toolkit help when no command is given. When a command is given,
-  shows its usage, options, and behavior.
+  shows its usage, options, and behavior. The post-command help forms are
+  aliases for "help <command>".
 EOF
 }
 
