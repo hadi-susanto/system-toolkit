@@ -68,7 +68,7 @@ initial_window_height 30c
 window_margin_width 0
 draw_minimal_borders yes
 
-# Tell Kitty to load default session,  some configuration only available on session
+# Load the default session; some options are only available in session files
 startup_session syskit.session
 
 # Tell Kitty to disable auto update
