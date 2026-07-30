@@ -138,7 +138,11 @@ __check_module_dependencies() {
         return 1
     fi
 
-    command -v "$command_name" >/dev/null 2>&1
+    if command -v "$command_name" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    log_error "Missing required command: '$command_name'."
 }
 
 __install_module() {
@@ -165,12 +169,12 @@ __install_module() {
     if ! __check_module_dependencies "$module"; then
         if (( ! force )); then
             log_error "Shell module dependency check failed for module: $module"
-            log_info "Please inpect the logs above"
+            log_info "Please inspect the logs above"
 
             return 1
         fi
 
-        log_warn "Forcing shell module installation despite failed dependency checks: $module"
+        log_warn "Forcing install despite failed dependency checks: $module"
     fi
 
     if ! install_module "$module"; then

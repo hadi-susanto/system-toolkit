@@ -7,22 +7,22 @@ source "$COMMON_LIB/runner.sh"
 
 readonly __OH_MY_POSH_SHELL_MODULE_ID="term/oh-my-posh"
 
-__install_shell_integration() {
+__uninstall_shell_integration() {
     local shell="$1"
 
     if ! run_syskit_bin \
-        "syskit-$shell" install "$__OH_MY_POSH_SHELL_MODULE_ID"; then
-        log_error "Failed to install Oh My Posh integration for $shell"
+        "syskit-$shell" uninstall "$__OH_MY_POSH_SHELL_MODULE_ID"; then
+        log_error "Failed to uninstall Oh My Posh integration for $shell"
 
         return 1
     fi
 }
 
-__install_shell_loader() {
+__uninstall_shell_loader() {
     local shell="$1"
 
-    if ! run_syskit_bin "syskit-$shell" activate; then
-        log_error "Failed to install the SysKit $shell loader"
+    if ! run_syskit_bin "syskit-$shell" deactivate; then
+        log_error "Failed to uninstall the SysKit $shell loader"
 
         return 1
     fi
@@ -38,11 +38,11 @@ main() {
 
         if ! selected="$(
             choose_option \
-                $'Oh My Posh Configuration:\n--------------------------' \
-                "Enable Bash integration" \
-                "Enable Zsh integration" \
-                "Install Bash Loader" \
-                "Install Zsh Loader"
+                $'Oh My Posh Uninstallation:\n-----------------------------' \
+                "Disable Bash integration" \
+                "Disable Zsh integration" \
+                "Uninstall Bash Loader" \
+                "Uninstall Zsh Loader"
         )"; then
             return 1
         fi
@@ -51,16 +51,16 @@ main() {
 
         case "$selected" in
             1)
-                __install_shell_integration bash || return $?
+                __uninstall_shell_integration bash || return $?
                 ;;
             2)
-                __install_shell_integration zsh || return $?
+                __uninstall_shell_integration zsh || return $?
                 ;;
             3)
-                __install_shell_loader bash || return $?
+                __uninstall_shell_loader bash || return $?
                 ;;
             4)
-                __install_shell_loader zsh || return $?
+                __uninstall_shell_loader zsh || return $?
                 ;;
             X)
                 return 0

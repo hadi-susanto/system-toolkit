@@ -13,13 +13,13 @@ Usage:
 
 Commands:
   help [command]     Show basic help or details for a command.
-  install <id>       Install a module for ${shell_name}.
+  install <id...>    Install one or more modules for ${shell_name}.
                      <id> in canonical format: <category/module>.
-  uninstall <id>     Remove an installed module from ${shell_name}.
+  uninstall <id...>  Remove one or more installed modules from ${shell_name}.
                      <id> in canonical format: <category/module>.
   activate           Activate ${shell_name} module loader.
   deactivate         Deactivate ${shell_name} module loader.
-  status             Show whether the integration is installed and active.
+  status [target]    Show the full report or one loader/module status.
 
 Supported shells: Bash and Zsh.
 EOF
@@ -81,10 +81,10 @@ Usage:
 
 Options:
   -a, --all    Uninstall every available shell module.
-  -f, --force  Force uninstall modules even its state is uninstalled.
+  -f, --force  Attempt removal even when a module is not installed.
 
 Description:
-  Unnstalls one or more SysKit modules for ${shell_name} from their designated
+  Uninstalls one or more SysKit modules for ${shell_name} from their designated
   location. Use --all instead of naming individual modules.
 EOF
 }
@@ -120,12 +120,12 @@ Usage:
   syskit-${shell_name} deactivate [--force]
 
 Options:
-  -f, --force  Force removal even loader status is deactivated.
+  -f, --force  Attempt removal even when the loader is inactive.
 
 Description:
-  Remove the SysKit ${shell_name} module loader and remove the managed source
-  block to the shell startup file. Installed modules will not removed, once
-  re-activated all previous installed modules will be loaded automatically.
+  Removes the SysKit ${shell_name} module loader and its managed source block
+  from the shell startup file. Installed modules are preserved and will be
+  loaded automatically if the loader is activated again.
 EOF
 }
 
@@ -137,13 +137,18 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name} status [args...]
+  syskit-${shell_name} status [all]
+  syskit-${shell_name} status loader
+  syskit-${shell_name} status <category/module>
 
 Options:
   No command-specific options.
 
 Description:
-  Shows whether the SysKit ${shell_name} integration is installed and active.
+  With no target or with "all", shows the complete ${shell_name} module and
+  loader report.
+  The "loader" target reports whether the shell exists and its loader is
+  active. A canonical module ID reports whether that module is installed.
 EOF
 }
 
@@ -152,7 +157,7 @@ main() {
     local help_type="${2:-basic}"
 
     if (( $# > 2 )); then
-        log_error "The help command only accept zero or one argument"
+        log_error "The help command accepts zero or one argument"
 
         return 1
     fi

@@ -54,7 +54,7 @@ __resolve_install_icon() {
     if [[ "$source_checksum" == "$target_checksum" ]]; then
         printf '%s[✓]%s (installed)\n' "$COLOR_GREEN" "$COLOR_RESET"
     else
-        printf '%s[↑]%s (update available)' "$COLOR_YELLOW" "$COLOR_RESET"
+        printf '%s[↑]%s (update available)\n' "$COLOR_YELLOW" "$COLOR_RESET"
     fi
 }
 
@@ -67,24 +67,47 @@ __default_shell() {
     [[ "$shell" == "$default_shell" ]]
 }
 
-main() {
-    local shell="${1:-}"
-    local -a modules
-    local name
-    local index=1
+__show_loader_status() {
+    local shell="$1"
 
-    if (( $# > 0 )); then
-        shift
+    if ! shell_installed "$shell"; then
+        printf '%s not installed\n' "$shell"
+
+        return 2
     fi
 
-    load_shell_interface \
-        "$shell" "support_module" "installed_module_path" "module_source_path" "loader_active" || return 1
-
-    if [[ $# -gt 0 ]]; then
-        log_error "The status command does not accept arguments"
+    if ! loader_active; then
+        printf '%s loader inactive\n' "$shell"
 
         return 1
     fi
+
+    printf '%s loader active\n' "$shell"
+}
+
+__show_module_status() {
+    local canonical_id="$1"
+
+    if ! resolve_shell_module "$canonical_id" >/dev/null 2>&1; then
+        printf 'invalid canonical id: %s\n' "$canonical_id"
+
+        return 2
+    fi
+
+    if ! module_installed "$canonical_id"; then
+        printf '%s not installed\n' "$canonical_id"
+
+        return 1
+    fi
+
+    printf '%s installed\n' "$canonical_id"
+}
+
+__show_full_status() {
+    local shell="$1"
+    local -a modules
+    local name
+    local index=1
 
     if ! command -v sha256sum >/dev/null 2>&1; then
         log_error "Required command is unavailable: sha256sum"
@@ -119,6 +142,75 @@ main() {
     printf 'Legend:\n'
     printf '  [S]: Indicates whether the current module supports the current shell.\n'
     printf '  [I]: Indicates whether the current module is installed for the current shell.\n'
+}
+
+##
+# __parse_args <options_name> <args_name> [target]
+#
+# Parses the optional status target, defaulting to the full report.
+#
+# Parameters:
+#   options_name    Name of the associative array that receives command state.
+#   args_name       Name of the indexed array reserved for positional values.
+#   target          Optional all, loader, or canonical module ID target.
+#
+# Returns:
+#   1 when more than one target is provided.
+#
+__parse_args() {
+    local options_name="$1"
+    local args_name="$2"
+    shift 2
+
+    local -n options_ref="$options_name"
+    local -n args_ref="$args_name"
+
+    options_ref=(
+        [CMD]="all"
+    )
+    args_ref=()
+
+    if (( $# > 1 )); then
+        log_error "The status command accepts zero or one argument"
+
+        return 1
+    fi
+
+    if (( $# == 1 )); then
+        options_ref[CMD]="$1"
+    fi
+}
+
+main() {
+    local shell="${1:-}"
+    local -A options
+    local -a args
+
+    if (( $# > 0 )); then
+        shift
+    fi
+
+    __parse_args options args "$@" || return $?
+
+    load_shell_interface \
+        "$shell" \
+        "support_module" \
+        "installed_module_path" \
+        "module_source_path" \
+        "loader_active" \
+        "module_installed" || return 1
+
+    case "${options[CMD]}" in
+        '' | all)
+            __show_full_status "$shell"
+            ;;
+        loader)
+            __show_loader_status "$shell"
+            ;;
+        *)
+            __show_module_status "${options[CMD]}"
+            ;;
+    esac
 }
 
 main "$@"

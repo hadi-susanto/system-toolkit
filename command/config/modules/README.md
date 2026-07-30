@@ -74,20 +74,24 @@ output format and returns non-zero only when inspection fails.
 
 ## Optional Uninstallation
 
-Safe uninstallation is optional. A module supports it only when it provides
-both files:
+Safe uninstallation is optional. A module supports it when it provides:
 
 ```text
-chek_uninstall_requirements.sh
 uninstall.sh
 ```
 
-`chek_uninstall_requirements.sh` follows the same return-code contract as
-`check_install_requirements.sh`. It must block uninstallation when the module
-cannot identify and reverse its changes safely. The `uninstall.sh` script
-performs the interactive removal after the check permits it.
+Modules may also provide:
 
-If either operation cannot be implemented safely, omit both uninstall files.
+```text
+check_uninstall_requirements.sh
+```
+
+When present, `check_uninstall_requirements.sh` follows the same return-code
+contract as `check_install_requirements.sh` and runs before `uninstall.sh`. It
+must block uninstallation when the module cannot identify and reverse its
+changes safely.
+
+If uninstallation cannot be implemented safely, omit `uninstall.sh`.
 
 ## Script Contract
 
@@ -125,3 +129,16 @@ Command modules contain lifecycle logic. Payload directories contain only
 files or templates that the module may install or use while configuring the
 system. Modules that do not require source assets may omit their payload
 directory.
+
+## Current Terminal Modules
+
+| Canonical ID      | Managed behavior                                                                                                 |
+|-------------------|------------------------------------------------------------------------------------------------------------------|
+| `term/ghostty`    | Installs a managed optional include and the `syskit.ghostty` configuration asset.                                |
+| `term/kitty`      | Installs a managed glob include plus independent `syskit.kitty` and `syskit.session` assets.                     |
+| `term/oh-my-posh` | Installs Bash or Zsh initialization and can activate either shell loader.                                        |
+| `term/starship`   | Installs Bash or Zsh initialization, can activate either shell loader, and edits `add_newline` through Starship. |
+
+Starship and Oh My Posh are mutually exclusive during normal configuration
+installation. Their requirement checks return the skip status when the other
+prompt executable is detected; `--force` explicitly overrides that skip.

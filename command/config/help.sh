@@ -79,12 +79,13 @@ Usage:
   syskit-cfg uninstall [--force] <category/module>
 
 Options:
-  -f, --force  Run uninstallation when chek_uninstall_requirements.sh requests a skip.
+  -f, --force  Run uninstallation when an optional requirements check requests a skip.
 
 Description:
-  Safely uninstalls exactly one configuration module when the module provides
-  both chek_uninstall_requirements.sh and uninstall.sh. Force does not bypass
-  a blocked safety check or automatically approve module prompts.
+  Safely uninstalls exactly one configuration module when it provides
+  uninstall.sh. When check_uninstall_requirements.sh is present, it runs before
+  uninstallation. Force does not bypass a blocked safety check or automatically
+  approve module prompts.
 EOF
 }
 

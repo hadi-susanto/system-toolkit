@@ -139,7 +139,7 @@ main() {
         git_config_args+=(-c delta.line-numbers=true)
     fi
 
-    git \
+    exec git \
         "${git_config_args[@]}" \
         diff "${diff_args[@]}"
 }

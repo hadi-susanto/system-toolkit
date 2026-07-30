@@ -33,7 +33,7 @@ Usage:
 
 Description:
   Prints track information for one media file or all matching files in a
-  directory using mkvmerge -J help.
+  directory using mkvmerge -J.
 
 Options:
   -i, --input FILE|DIR  Input file or directory. Default: current directory.

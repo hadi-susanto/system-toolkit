@@ -47,7 +47,7 @@ Pass a command name to `help` for command-specific usage and behavior:
 
 ```bash
 ./syskit-bin help install
-./syskit-bin status
+./syskit-bin help status
 ./syskit-bash help activate
 ./syskit-zsh help status
 ./syskit-cfg help install
@@ -66,7 +66,7 @@ system-toolkit/
 │   ├── config/            Configuration command dispatcher and scripts
 │   └── shell/             Shared Bash and Zsh command dispatcher and scripts
 ├── lib/
-│   ├── common/            Shared logging and argument helpers
+│   ├── common/            Shared logging, prompts, and process helpers
 │   ├── bin/               Reusable binary toolkit libraries
 │   ├── config/            Configuration metadata and module helpers
 │   └── shell/             Reusable shell toolkit libraries and interfaces
@@ -125,10 +125,10 @@ location, while activation makes the installed integration take effect.
 **Configuration toolkit**
 
 The configuration toolkit discovers configuration modules and orchestrates
-their interactive installation and safe uninstallation one module at a time.
-It also reports module-defined status in independent sections. Each module
-owns its target handling and may use source files from the `payload/config/`
-directory.
+their interactive installation one module at a time, along with safe
+uninstallation when a module supports it. It also reports module-defined
+status in independent sections. Each module owns its target handling and may
+use source files from the `payload/config/` directory.
 
 # 🔗 Relationship with Mint Provisioner
 

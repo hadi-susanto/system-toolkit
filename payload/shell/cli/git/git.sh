@@ -1,3 +1,10 @@
+# Check required dependencies
+if ! command -v git >/dev/null 2>&1; then
+    printf '\033[31m[ERROR]\033[0m git is not installed; skipping git integration\n' >&2
+
+    return 0
+fi
+
 alias gcm="git commit -m"
 alias gp="git push"
 alias gb="git branch"
@@ -12,16 +19,3 @@ alias gsw="git switch"
 alias gswc="git switch --create"
 alias gf="git fetch"
 alias gfo="git fetch origin"
-
-##
-# Pushes the current Git branch to origin and configures its upstream branch.
-#
-# Returns:
-#   Non-zero when the branch cannot be resolved or the push fails.
-#
-gpsup() {
-    local branch
-
-    branch="$(git rev-parse --abbrev-ref HEAD)" || return $?
-    git push --set-upstream origin "$branch"
-}

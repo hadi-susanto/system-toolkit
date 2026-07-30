@@ -68,7 +68,7 @@ __validate_options() {
     local module
 
     if [[ -n "${options_ref[INVALID_OPTION]}" ]]; then
-        log_error "Unknown install option: ${options_ref[INVALID_OPTION]}"
+        log_error "Unknown uninstall option: ${options_ref[INVALID_OPTION]}"
 
         return 1
     fi
@@ -81,7 +81,7 @@ __validate_options() {
 
     if (( ! options_ref[ALL] && ${#args_ref[@]} == 0 )); then
         log_error "At least one canonical module ID or --all is required"
-        log_warn "Use --all with cautions, it will uninstall all installed modules"
+        log_warn "Use --all with caution; it will uninstall all installed modules"
 
         return 1
     fi

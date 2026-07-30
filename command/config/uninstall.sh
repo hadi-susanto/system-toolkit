@@ -67,31 +67,36 @@ __validate_options() {
 __validate_uninstall_scripts() {
     local canonical_id="$1"
     local module_dir="$2"
-    local has_check=0
-    local has_uninstall=0
+    local check_script="$module_dir/check_uninstall_requirements.sh"
+    local uninstall_script="$module_dir/uninstall.sh"
 
-    [[ -f "$module_dir/chek_uninstall_requirements.sh" ]] &&
-        [[ ! -L "$module_dir/chek_uninstall_requirements.sh" ]] &&
-        has_check=1
+    if [[ -L "$uninstall_script" ]] ||
+        [[ -e "$uninstall_script" && ! -f "$uninstall_script" ]]; then
+        log_error "Configuration module has an invalid uninstall.sh: $canonical_id"
 
-    [[ -f "$module_dir/uninstall.sh" ]] &&
-        [[ ! -L "$module_dir/uninstall.sh" ]] &&
-        has_uninstall=1
-
-    if (( has_check && has_uninstall )); then
-        return 0
+        return 1
     fi
 
-    if (( ! has_check && ! has_uninstall )); then
+    if [[ ! -f "$uninstall_script" ]]; then
+        if [[ -e "$check_script" ]] || [[ -L "$check_script" ]]; then
+            log_error \
+                "Configuration module provides check_uninstall_requirements.sh without uninstall.sh: $canonical_id"
+
+            return 1
+        fi
+
         log_warn "Configuration module does not support uninstall: $canonical_id"
 
         return 1
     fi
 
-    log_error \
-        "Configuration module: $canonical_id must provide both chek_uninstall_requirements.sh and uninstall.sh"
+    if [[ -L "$check_script" ]] ||
+        [[ -e "$check_script" && ! -f "$check_script" ]]; then
+        log_error \
+            "Configuration module has an invalid check_uninstall_requirements.sh: $canonical_id"
 
-    return 1
+        return 1
+    fi
 }
 
 main() {
@@ -118,7 +123,7 @@ main() {
     module_dir="$CONFIG_MODULES/$canonical_id"
     __validate_uninstall_scripts "$canonical_id" "$module_dir" || return $?
 
-    check_script="$module_dir/chek_uninstall_requirements.sh"
+    check_script="$module_dir/check_uninstall_requirements.sh"
     uninstall_script="$module_dir/uninstall.sh"
 
     export CONFIG_MODULE_ID="$canonical_id"
@@ -130,32 +135,34 @@ main() {
         CONFIG_FORCE="true"
     fi
 
-    log_info "Checking configuration module uninstallation: ${metadata[NAME]} [$canonical_id]"
-    bash "$check_script" || check_status=$?
+    if [[ -f "$check_script" ]]; then
+        log_info "Checking configuration module uninstallation: ${metadata[NAME]} [$canonical_id]"
+        bash "$check_script" || check_status=$?
 
-    case "$check_status" in
-        "$CONFIG_CHECK_PROCEED")
-            ;;
-        "$CONFIG_CHECK_SKIP")
-            if (( ! options[FORCE] )); then
-                log_info "Configuration module uninstallation is already satisfied; skipping: $canonical_id"
+        case "$check_status" in
+            "$CONFIG_CHECK_PROCEED")
+                ;;
+            "$CONFIG_CHECK_SKIP")
+                if (( ! options[FORCE] )); then
+                    log_info "Configuration module uninstallation is already satisfied; skipping: $canonical_id"
 
-                return 0
-            fi
+                    return 0
+                fi
 
-            log_warn "Forcing configuration module uninstallation after a skip result: $canonical_id"
-            ;;
-        "$CONFIG_CHECK_BLOCK")
-            log_error "Configuration module uninstallation is blocked: $canonical_id"
+                log_warn "Forcing configuration module uninstallation after a skip result: $canonical_id"
+                ;;
+            "$CONFIG_CHECK_BLOCK")
+                log_error "Configuration module uninstallation is blocked: $canonical_id"
 
-            return "$check_status"
-            ;;
-        *)
-            log_error "Configuration module uninstall check failed with status $check_status: $canonical_id"
+                return "$check_status"
+                ;;
+            *)
+                log_error "Configuration module uninstall check failed with status $check_status: $canonical_id"
 
-            return "$check_status"
-            ;;
-    esac
+                return "$check_status"
+                ;;
+        esac
+    fi
 
     log_info "Uninstalling configuration module: ${metadata[NAME]} [$canonical_id]"
     bash "$uninstall_script" || uninstall_status=$?

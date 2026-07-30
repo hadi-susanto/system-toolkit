@@ -7,7 +7,7 @@ source "$SHELL_LIB/interface_loader.sh"
 ##
 # __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses force and positional arguments for loader activation.
+# Parses force and positional arguments for loader deactivation.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives option state.
@@ -73,7 +73,7 @@ __validate_options() {
     local -n args_ref="$args_name"
 
     if [[ -n "${options_ref[INVALID_OPTION]}" ]]; then
-        log_error "Unknown activate option: ${options_ref[INVALID_OPTION]}"
+        log_error "Unknown deactivate option: ${options_ref[INVALID_OPTION]}"
 
         return 1
     fi
@@ -101,7 +101,7 @@ __deactivate_loader() {
 
     if ! loader_active; then
         if (( ! force )); then
-            log_warn "Shell loader is already deactive; skipping: $shell"
+            log_warn "Shell loader is already inactive; skipping: $shell"
 
             return 0
         fi

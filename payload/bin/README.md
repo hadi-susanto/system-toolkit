@@ -12,11 +12,12 @@ Local installation uses `~/.local/bin`, while global installation uses
 `/usr/local/bin`. Command routing and implementation live under
 `command/bin/`, while reusable helpers live under `lib/bin/`.
 
-# Table of Content
+# Table of Contents
 
 - [`bat-help`](#bat-help)
 - [`git-bat-diff`](#git-bat-diff)
 - [`git-delta-diff`](#git-delta-diff)
+- [`gpsup`](#gpsup)
 - [`mkvmerge-extract-info`](#mkvmerge-extract-info)
 - [`mkvmerge-process`](#mkvmerge-process)
 - [`organize-files-by-date`](#organize-files-by-date)
@@ -59,10 +60,10 @@ bat-help -- command-name
 
 ## Environment Variables
 
-| ENV           | Description                                                                                                  |
-|---------------|--------------------------------------------------------------------------------------------------------------|
-| `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                         |
-| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset.    |
+| ENV           | Description                                                                                               |
+|---------------|-----------------------------------------------------------------------------------------------------------|
+| `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                      |
+| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
 
 ---
 
@@ -89,10 +90,10 @@ git-bat-diff
 
 ## Environment Variables
 
-| ENV           | Description                                                                                                  |
-|---------------|--------------------------------------------------------------------------------------------------------------|
-| `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                         |
-| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset.    |
+| ENV           | Description                                                                                               |
+|---------------|-----------------------------------------------------------------------------------------------------------|
+| `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                      |
+| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
 
 ---
 
@@ -154,6 +155,27 @@ All other arguments are forwarded directly to `git diff`.
 | ENV           | Description                                                                                               |
 |---------------|-----------------------------------------------------------------------------------------------------------|
 | `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                      |
+| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
+
+---
+
+# `gpsup`
+
+Pushes the current Git branch to `origin` and sets it as the upstream branch.
+Any arguments are forwarded to `git push` after the remote and branch.
+
+Requires `git`, an attached branch, and an `origin` remote.
+
+```bash
+gpsup
+gpsup --force-with-lease
+```
+
+## Environment Variables
+
+| ENV           | Description                                                                                               |
+|---------------|-----------------------------------------------------------------------------------------------------------|
+| `NO_COLOR`    | Disable colored error labels when set to a non-empty value. Default: unset.                               |
 | `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
 
 ---
