@@ -1,0 +1,29 @@
+command/config/help.sh
+  6f0373ccded9960d 82,87-88
+payload/config/README.md
+  6f0373ccded9960d 44-47
+command/config/modules/term/ghostty/uninstall.sh
+  6f0373ccded9960d 105-106,109-110,112-117,120,124-135,139-140,145-151,156,162-165,169-170
+command/config/modules/term/kitty/uninstall.sh
+  6f0373ccded9960d 105-106,109-110,112-117,120,124-135,139-140,145-151,156,162-165,169-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "12fcca79f0a074449260b23a5dcfd28c1e2a8593",
+  "prompts": {
+    "6f0373ccded9960d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb265-9ca5-7491-9763-c81ca8765972",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 577,
+      "total_deletions": 449,
+      "accepted_lines": 577,
+      "overriden_lines": 0
+    }
+  }
+}
