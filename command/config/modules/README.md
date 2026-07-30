@@ -130,6 +130,18 @@ files or templates that the module may install or use while configuring the
 system. Modules that do not require source assets may omit their payload
 directory.
 
+## Current System Modules
+
+| Canonical ID             | Managed behavior                                                                                  |
+|--------------------------|---------------------------------------------------------------------------------------------------|
+| `sys/apt-fast`           | Installs Bash or Zsh completion from the apt-fast vendor source or bundled local payloads.        |
+| `sys/password-asterisks` | Enables or disables Linux Mint sudo password feedback by moving its managed sudoers file.         |
+| `sys/plymouth`           | Enables the Plymouth splash or disables it for verbose boot output, then regenerates GRUB config. |
+
+The apt-fast module also supports interactive removal of either installed
+completion. Existing completion targets are preserved unless configuration
+installation is run with `--force`.
+
 ## Current Terminal Modules
 
 | Canonical ID      | Managed behavior                                                                                                 |

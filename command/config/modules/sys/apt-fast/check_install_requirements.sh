@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "$COMMON_LIB/common.sh"
 source "$CONFIG_LIB/checks.sh"
 
 main() {
-    return "$CONFIG_CHECK_BLOCK"
+    if ! command -v apt-fast >/dev/null 2>&1; then
+        log_error "apt-fast is required before its completions can be installed"
+
+        return "$CONFIG_CHECK_BLOCK"
+    fi
+
+    return "$CONFIG_CHECK_PROCEED"
 }
 
 main "$@"

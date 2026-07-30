@@ -15,6 +15,15 @@ The corresponding lifecycle logic lives under:
 command/config/modules/<category>/<module>/
 ```
 
+## System Assets
+
+### apt-fast (`sys/apt-fast`)
+
+Provides local Bash and Zsh completion files mirrored from the apt-fast vendor
+repository. The module can install either bundled file or download the
+corresponding current vendor source. Existing completion targets require
+`syskit-cfg install --force sys/apt-fast` before they can be overwritten.
+
 ## Terminal Assets
 
 ### Ghostty (`term/ghostty`)

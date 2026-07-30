@@ -61,11 +61,12 @@ Usage:
   syskit-cfg install [--force] <category/module>
 
 Options:
-  -f, --force  Run installation when check_install_requirements.sh requests a skip.
+  -f, --force  Override supported module skips and existing-target safeguards.
 
 Description:
   Validates and installs exactly one configuration module. The module owns all
-  interactive decisions and target handling. Force does not bypass a blocked
+  interactive decisions and target handling. Supporting modules may also
+  require force to overwrite managed targets. Force does not bypass a blocked
   check or automatically approve module prompts.
 EOF
 }
