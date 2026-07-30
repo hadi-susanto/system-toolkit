@@ -41,4 +41,7 @@ including checksum-based update availability.
 
 Both terminal modules preserve existing payload targets during normal
 installation. Running `syskit-cfg install --force <category/module>` allows
-their file-install action to overwrite existing targets.
+their file-install action to overwrite existing targets. File uninstallation
+checks every installed payload against its source before removing any of them.
+Checksum failures are all reported and prevent removal unless
+`syskit-cfg uninstall --force <category/module>` is used.
