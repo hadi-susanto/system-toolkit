@@ -15,6 +15,15 @@ The corresponding lifecycle logic lives under:
 command/config/modules/<category>/<module>/
 ```
 
+## System Assets
+
+### apt-fast (`sys/apt-fast`)
+
+Provides local Bash and Zsh completion files mirrored from the apt-fast vendor
+repository. The module can install either bundled file or download the
+corresponding current vendor source. Existing completion targets require
+`syskit-cfg install --force sys/apt-fast` before they can be overwritten.
+
 ## Terminal Assets
 
 ### Ghostty (`term/ghostty`)
@@ -41,4 +50,7 @@ including checksum-based update availability.
 
 Both terminal modules preserve existing payload targets during normal
 installation. Running `syskit-cfg install --force <category/module>` allows
-their file-install action to overwrite existing targets.
+their file-install action to overwrite existing targets. File uninstallation
+checks every installed payload against its source before removing any of them.
+Checksum failures are all reported and prevent removal unless
+`syskit-cfg uninstall --force <category/module>` is used.

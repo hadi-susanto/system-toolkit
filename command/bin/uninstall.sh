@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$COMMON_LIB/checksum.sh"
 source "$BIN_LIB/executables.sh"
 source "$BIN_LIB/scope.sh"
 
@@ -51,7 +52,7 @@ __parse_args() {
                 options_ref[SCOPE]="global"
                 options_ref[INSTALL_DIR]="$global_dir"
                 ;;
-            -a | --all)
+            -a | --all | all)
                 options_ref[ALL]=1
                 ;;
             --)
@@ -120,12 +121,6 @@ __validate_options() {
     if ! install_dir_in_path "${options_ref[INSTALL_DIR]}"; then
         log_warn "${options_ref[INSTALL_DIR]} is not present in PATH"
     fi
-
-    if ! command -v sha256sum >/dev/null 2>&1; then
-        log_error "Required command is unavailable: sha256sum"
-
-        return 1
-    fi
 }
 
 __resolve_args_to_executables() {
@@ -156,6 +151,7 @@ __uninstall_executable() {
     local -n options_ref="$options_name"
     local source="${BIN_PAYLOAD}/${name}"
     local target="${options_ref[INSTALL_DIR]}/$name"
+    local checksum_status=0
 
     if [[ ! -e "$target" ]] && [[ ! -L "$target" ]]; then
         log_warn "Executable is not installed; skipping: $target"
@@ -169,11 +165,40 @@ __uninstall_executable() {
         return 1
     fi
 
-    if ! bin_checksums_match "$source" "$target"; then
-        log_warn "Installed checksum differs; assuming an update is available: $name"
+    if checksums_match "$source" "$target"; then
+        checksum_status=0
+    else
+        checksum_status=$?
     fi
 
-    rm -f -- "$target" || return $?
+    case "$checksum_status" in
+        0)
+            ;;
+        1)
+            log_warn "Installed checksum differs; assuming an update is available: $name"
+            ;;
+        2)
+            log_error "Failed to checksum executable source: $source"
+
+            return 1
+            ;;
+        3)
+            log_error "Failed to checksum installed executable: $target"
+
+            return 1
+            ;;
+        127)
+            log_error "Required command is unavailable: sha256sum"
+
+            return 1
+            ;;
+    esac
+
+    if ! rm -f -- "$target"; then
+        log_error "Failed to remove executable: $target"
+
+        return 1
+    fi
 
     log_info "Uninstalled executable: $name"
 }

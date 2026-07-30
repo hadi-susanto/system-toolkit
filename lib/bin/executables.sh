@@ -66,32 +66,6 @@ resolve_bin_executable() {
 }
 
 ##
-# bin_checksums_match <source> <target>
-#
-# Compares two files using SHA-256 checksums.
-#
-# Parameters:
-#   source    SysKit executable source path.
-#   target    Installed executable path.
-#
-# Returns:
-#   1 when either checksum cannot be read or the checksums differ.
-#
-bin_checksums_match() {
-    local source="$1"
-    local target="$2"
-    local source_checksum
-    local target_checksum
-
-    source_checksum="$(sha256sum -- "$source" 2>/dev/null)" || return 1
-    target_checksum="$(sha256sum -- "$target" 2>/dev/null)" || return 1
-    source_checksum="${source_checksum%% *}"
-    target_checksum="${target_checksum%% *}"
-
-    [[ "$source_checksum" == "$target_checksum" ]]
-}
-
-##
 # bin_status_marker <source> <target>
 #
 # Resolves the installation marker for a SysKit executable.
@@ -101,11 +75,18 @@ bin_checksums_match() {
 #   target    Expected installed executable path.
 #
 # Output:
-#   Prints [✗] when absent, [✓] when current, or [↑] when checksums differ.
+#   Prints [✗] when absent, [✓] when current, [↑] when checksums differ, or
+#   [?] when a checksum cannot be calculated.
+#
+# Returns:
+#   2 when the source checksum cannot be read.
+#   3 when the target checksum cannot be read.
+#   127 when sha256sum is unavailable.
 #
 bin_status_marker() {
     local source="$1"
     local target="$2"
+    local checksum_status=0
 
     if [[ ! -e "$target" ]] && [[ ! -L "$target" ]]; then
         printf '%s[✗]%s\n' "$COLOR_RED" "$COLOR_RESET"
@@ -113,11 +94,23 @@ bin_status_marker() {
         return 0
     fi
 
-    if bin_checksums_match "$source" "$target"; then
-        printf '%s[✓]%s\n' "$COLOR_GREEN" "$COLOR_RESET"
-
-        return 0
+    if checksums_match "$source" "$target"; then
+        checksum_status=0
+    else
+        checksum_status=$?
     fi
 
-    printf '%s[↑]%s' "$COLOR_YELLOW" "$COLOR_RESET"
+    case "$checksum_status" in
+        0)
+            printf '%s[✓]%s\n' "$COLOR_GREEN" "$COLOR_RESET"
+            ;;
+        1)
+            printf '%s[↑]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+            ;;
+        2 | 3 | 127)
+            printf '%s[?]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
+
+            return "$checksum_status"
+            ;;
+    esac
 }

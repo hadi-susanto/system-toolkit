@@ -99,6 +99,7 @@ __install_file_config() {
         if [[ -e "$target" ]] || [[ -L "$target" ]]; then
             if [[ "${CONFIG_FORCE:-false}" != "true" ]]; then
                 log_warn "Kitty configuration file already exists; skipping: $target"
+                log_info "Re-run the configuration with --force to overwrite it"
 
                 continue
             fi
