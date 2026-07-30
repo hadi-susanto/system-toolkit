@@ -1,0 +1,27 @@
+payload/bin/mkvmerge-extract-info
+  20291e40163938bb 36
+payload/bin/mkvmerge-process
+  20291e40163938bb 38
+payload/bin/gpsup
+  20291e40163938bb 24,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "64e81833ae9efe85f8c4410c6b2e0f82571dd764",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 19,
+      "overriden_lines": 0
+    }
+  }
+}
