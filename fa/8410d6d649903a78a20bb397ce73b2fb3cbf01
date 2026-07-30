@@ -1,0 +1,50 @@
+command/config/modules/README.md
+  20291e40163938bb 132-135,137-144
+payload/bin/README.md
+  20291e40163938bb 15,20,93,95-96,162-178,180,182
+command/config/modules/term/kitty/status.sh
+  20291e40163938bb 19,25,44,71,90,96
+README.md
+  20291e40163938bb 50,69,128-131
+payload/shell/cli/bat/bat.sh
+  20291e40163938bb 6-7
+payload/shell/README.md
+  20291e40163938bb 72,86-88,90-91,140-142,144-151,163-165
+lib/shell/interface/README.md
+  20291e40163938bb 16-18
+payload/config/README.md
+  20291e40163938bb 3-4,6-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "fa8410d6d649903a78a20bb397ce73b2fb3cbf01",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 3266,
+      "total_deletions": 3179,
+      "accepted_lines": 114,
+      "overriden_lines": 0
+    },
+    "58a0be92e2b5994f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fabad-6a6c-7d82-82c7-ef5f77a072eb",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2301,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
