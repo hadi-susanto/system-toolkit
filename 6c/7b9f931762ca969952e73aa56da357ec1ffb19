@@ -1,0 +1,94 @@
+command/config/modules/term/oh-my-posh/install.sh
+  20291e40163938bb 4-42,44-74
+command/config/modules/term/oh-my-posh/status.sh
+  20291e40163938bb 4-76,78-99
+command/config/modules/term/oh-my-posh/uninstall.sh
+  20291e40163938bb 1-73
+command/shell/status.sh
+  20291e40163938bb 57,70-71,73-74,76,78-80,82,85-89,91-92,94,97-100,102-103,106-110,112,114-115,117,120-121,126,129-133,147-171,173-174,176-177,179-181,186-187,193-195,200,202-215
+command/shell/help.sh
+  20291e40163938bb 22,140-144,148-151,153-156
+command/config/modules/term/kitty/status.sh
+  20291e40163938bb 19,25,44,71,90,96
+payload/bin/README.md
+  20291e40163938bb 15,20-23,93,95-99,162-178,180,182,184-200,202,204,206-222,224,226,228-244,246,248
+command/config/modules/term/starship/metadata.conf
+  20291e40163938bb 2
+command/config/modules/term/oh-my-posh/check_install_requirements.sh
+  20291e40163938bb 4-17,21-23
+README.md
+  20291e40163938bb 50,69,128-131
+payload/shell/cli/bat/bat.sh
+  20291e40163938bb 6-7,16-17,26-27,36-37
+lib/common/prompt.sh
+  20291e40163938bb 1-202
+command/config/modules/term/starship/status.sh
+  20291e40163938bb 4,7-8,38,64,71,98-99
+lib/shell/interface/README.md
+  20291e40163938bb 16-18
+command/config/modules/term/starship/install.sh
+  20291e40163938bb 6-8,107-109
+payload/config/README.md
+  20291e40163938bb 3-4,6-152
+payload/shell/README.md
+  20291e40163938bb 72-74,86-88,90-91,93-95,97-98,132,139-148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "6c7b9f931762ca969952e73aa56da357ec1ffb19",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 862,
+      "overriden_lines": 0
+    },
+    "58a0be92e2b5994f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fabad-6a6c-7d82-82c7-ef5f77a072eb",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2301,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 141,
+      "total_deletions": 66,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "e7f087ab8fa5b63f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fad45-babf-7c00-aecf-ddab38c2bbde",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
