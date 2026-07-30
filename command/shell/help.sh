@@ -19,7 +19,7 @@ Commands:
                      <id> in canonical format: <category/module>.
   activate           Activate ${shell_name} module loader.
   deactivate         Deactivate ${shell_name} module loader.
-  status             Show whether the integration is installed and active.
+  status [target]    Show the full report or one loader/module status.
 
 Supported shells: Bash and Zsh.
 EOF
@@ -137,13 +137,18 @@ System Toolkit Shell Integration (Shell-Dependent)
 --------------------------------------------------
 
 Usage:
-  syskit-${shell_name} status [args...]
+  syskit-${shell_name} status [all]
+  syskit-${shell_name} status loader
+  syskit-${shell_name} status <category/module>
 
 Options:
   No command-specific options.
 
 Description:
-  Shows whether the SysKit ${shell_name} integration is installed and active.
+  With no target or with "all", shows the complete ${shell_name} module and
+  loader report.
+  The "loader" target reports whether the shell exists and its loader is
+  active. A canonical module ID reports whether that module is installed.
 EOF
 }
 
