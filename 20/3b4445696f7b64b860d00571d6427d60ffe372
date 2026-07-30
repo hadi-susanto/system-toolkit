@@ -1,0 +1,67 @@
+payload/config/README.md
+  6f0373ccded9960d 44-47
+command/config/help.sh
+  6f0373ccded9960d 82,87-88
+command/bin/status.sh
+  6f0373ccded9960d 5,28,47-49,51-53,60,65,70
+command/config/modules/term/kitty/status.sh
+  6f0373ccded9960d 5,35,49-52,55-77
+lib/common/checksum.sh
+  6f0373ccded9960d 1-48
+command/config/modules/term/kitty/uninstall.sh
+  6f0373ccded9960d 5,106-107,110,112,114,118-123,127-130,133-153,158,164-167,171-172
+command/config/modules/term/ghostty/status.sh
+  6f0373ccded9960d 5,35,49-52,55-77
+command/shell/status.sh
+  6f0373ccded9960d 5,21,37-38,40,43-51,53-56,58-61,63-65,117,119,129-132,137,153
+lib/bin/executables.sh
+  6f0373ccded9960d 78-79,81-84,89,97-100,103-115
+command/bin/uninstall.sh
+  6f0373ccded9960d 5,154,168-171,174-181,183-186,188-191,194-195,197-198,200-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "203b4445696f7b64b860d00571d6427d60ffe372",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 44,
+      "overriden_lines": 0
+    },
+    "6f0373ccded9960d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb265-9ca5-7491-9763-c81ca8765972",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 1738,
+      "total_deletions": 1525,
+      "accepted_lines": 1204,
+      "overriden_lines": 0
+    },
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 141,
+      "total_deletions": 66,
+      "accepted_lines": 22,
+      "overriden_lines": 0
+    }
+  }
+}
