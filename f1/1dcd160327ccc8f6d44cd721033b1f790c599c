@@ -1,0 +1,49 @@
+payload/bin/gpsup
+  20291e40163938bb 24,32
+command/shell/uninstall.sh
+  20291e40163938bb 71,84
+command/config/modules/term/starship/status.sh
+  20291e40163938bb 38,64
+payload/bin/mkvmerge-extract-info
+  20291e40163938bb 36
+command/config/modules/term/oh-my-posh/status.sh
+  20291e40163938bb 38,64
+command/shell/help.sh
+  20291e40163938bb 16,18,84,87,123,126-128,160
+command/config/modules/term/starship/metadata.conf
+  20291e40163938bb 2
+payload/bin/mkvmerge-process
+  20291e40163938bb 38
+payload/config/term/kitty/syskit.kitty
+  20291e40163938bb 71
+command/config/modules/term/kitty/status.sh
+  20291e40163938bb 19,25,44,71,90,96
+payload/config/term/ghostty/syskit.ghostty
+  20291e40163938bb 31-32
+command/shell/deactivate.sh
+  20291e40163938bb 10,76,104
+command/shell/status.sh
+  20291e40163938bb 57
+command/shell/install.sh
+  20291e40163938bb 172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "f11dcd160327ccc8f6d44cd721033b1f790c599c",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 34,
+      "overriden_lines": 0
+    }
+  }
+}
