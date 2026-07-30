@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$*" >&2
+}
+
+main() {
+    local branch
+
+    if ! command -v git >/dev/null 2>&1; then
+        __log_error 'gpsup: missing required command: git'
+
+        return 127
+    fi
+
+    branch="$(git branch --show-current)"
+
+    if [[ -z "$branch" ]]; then
+        __log_error 'gpsup: detached HEAD; unable to determine current branch'
+
+        return 1
+    fi
+
+    exec git push --set-upstream origin "$branch" "$@"
+}
+
+main "$@"

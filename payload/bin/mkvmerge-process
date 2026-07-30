@@ -35,7 +35,7 @@ Options:
   -d, --default         Shorthand for --default-track-flag.
   -f, --forced          Shorthand for --forced-display-flag.
   -a, --apply           Apply the planned mkvmerge execution.
-                        Without this option, only mkvmerge command printed.
+                        Without this option, only the mkvmerge command is printed.
   -h, --help            Show this help message.
 
 MKVMERGE_OPTIONS:
