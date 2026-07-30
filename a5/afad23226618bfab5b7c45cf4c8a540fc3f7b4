@@ -1,0 +1,23 @@
+command/config/modules/term/oh-my-posh/status.sh
+  20291e40163938bb 38,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "a5afad23226618bfab5b7c45cf4c8a540fc3f7b4",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 27,
+      "overriden_lines": 0
+    }
+  }
+}
