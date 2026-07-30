@@ -1,0 +1,80 @@
+command/config/modules/term/oh-my-posh/install.sh
+  20291e40163938bb 4-42,44-73
+command/shell/status.sh
+  20291e40163938bb 70-71,73-74,76,78-80,82,85-89,91-92,94,97-100,102-103,106-110,112,114-115,117,120-121,126,129-133,147-171,173-174,176-177,179-181,186-187,193-195,200,202-215
+command/config/modules/term/starship/install.sh
+  20291e40163938bb 6-8
+command/config/modules/term/starship/status.sh
+  20291e40163938bb 4,7-8
+command/config/modules/term/oh-my-posh/uninstall.sh
+  20291e40163938bb 1-73
+command/config/modules/term/oh-my-posh/check_install_requirements.sh
+  20291e40163938bb 4-17,21-23
+payload/shell/README.md
+  20291e40163938bb 72-73,139,141-143,145-147
+command/shell/help.sh
+  20291e40163938bb 22,140-144,148-151,153-156
+lib/common/prompt.sh
+  20291e40163938bb 1-202
+command/config/modules/term/oh-my-posh/status.sh
+  20291e40163938bb 4-76,78-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "ed96ff3e151831e223cab66a9a84d62974a2ed31",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 575,
+      "overriden_lines": 0
+    },
+    "58a0be92e2b5994f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fabad-6a6c-7d82-82c7-ef5f77a072eb",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2301,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 141,
+      "total_deletions": 66,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "e7f087ab8fa5b63f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fad45-babf-7c00-aecf-ddab38c2bbde",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
