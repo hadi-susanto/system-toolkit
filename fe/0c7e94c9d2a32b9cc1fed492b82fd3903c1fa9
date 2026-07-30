@@ -1,0 +1,56 @@
+command/config/help.sh
+  6f0373ccded9960d 64,68-69
+command/config/modules/sys/apt-fast/install.sh
+  6f0373ccded9960d 4-97,100-120,122-157,159-198
+command/config/modules/sys/plymouth/check_install_requirements.sh
+  6f0373ccded9960d 4,6,11-31
+command/config/modules/sys/apt-fast/check_install_requirements.sh
+  6f0373ccded9960d 4,8-14
+command/config/modules/sys/plymouth/metadata.conf
+  6f0373ccded9960d 2
+command/config/modules/sys/apt-fast/uninstall.sh
+  6f0373ccded9960d 1-82
+command/config/modules/README.md
+  6f0373ccded9960d 133,135-139,141-144
+command/config/modules/sys/apt-fast/status.sh
+  6f0373ccded9960d 4-26,28-47
+command/config/modules/sys/plymouth/install.sh
+  6f0373ccded9960d 4-12,14-65,67,69-83,85-100
+command/config/modules/sys/plymouth/status.sh
+  6f0373ccded9960d 4-6,8,10-36
+payload/config/README.md
+  6f0373ccded9960d 18,20,22-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "fe0c7e94c9d2a32b9cc1fed492b82fd3903c1fa9",
+  "prompts": {
+    "09f1b504f17c1830": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb312-4f27-7dc1-98b7-bd8c1c0d4da2",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 28,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "6f0373ccded9960d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb265-9ca5-7491-9763-c81ca8765972",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 891,
+      "total_deletions": 329,
+      "accepted_lines": 842,
+      "overriden_lines": 3
+    }
+  }
+}
