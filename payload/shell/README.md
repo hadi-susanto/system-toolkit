@@ -69,6 +69,7 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 - [Bat](#bat-clibat)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [Starship](#starship-termstarship)
 
 ---
 
@@ -134,3 +135,14 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 | Function | Description                                                                                |
 |----------|--------------------------------------------------------------------------------------------|
 | `gpsup`  | Pushes the current branch to `origin` and automatically sets the upstream tracking branch. |
+
+# Starship (`term/starship`)
+
+Provides separate Bash and Zsh initialization payloads for Starship. Both
+payloads add a blank line before every prompt except the first prompt in a
+shell session, then initialize Starship for the selected shell.
+
+The corresponding configuration module sets `add_newline = false` through
+Starship's own configuration editor so Starship does not add a second blank
+line. Its uninstall workflow restores `add_newline = true` and delegates shell
+payload removal to the corresponding SysKit shell command.

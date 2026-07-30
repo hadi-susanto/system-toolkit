@@ -7,33 +7,33 @@ source "$COMMON_LIB/runner.sh"
 
 readonly __STARSHIP_SHELL_MODULE_ID="term/starship"
 
-__install_shell_integration() {
+__uninstall_shell_integration() {
     local shell="$1"
 
     if ! run_syskit_bin \
-        "syskit-$shell" install "$__STARSHIP_SHELL_MODULE_ID"; then
-        log_error "Failed to install Starship integration for $shell"
+        "syskit-$shell" uninstall "$__STARSHIP_SHELL_MODULE_ID"; then
+        log_error "Failed to uninstall Starship integration for $shell"
 
         return 1
     fi
 }
 
-__install_shell_loader() {
+__uninstall_shell_loader() {
     local shell="$1"
 
-    if ! run_syskit_bin "syskit-$shell" activate; then
-        log_error "Failed to install the SysKit $shell loader"
+    if ! run_syskit_bin "syskit-$shell" deactivate; then
+        log_error "Failed to uninstall the SysKit $shell loader"
 
         return 1
     fi
 }
 
-__install_starship_configuration() {
+__uninstall_starship_configuration() {
     local confirmation_status
 
     printf '%s\n' \
         'The following Starship configuration changes will be applied:' \
-        '  add_newline = false' \
+        '  add_newline = true' \
         '' >&2
 
     if confirm_action "Apply these changes?"; then
@@ -50,13 +50,19 @@ __install_starship_configuration() {
         return "$confirmation_status"
     fi
 
-    if ! starship config add_newline false; then
+    if ! command -v starship >/dev/null 2>&1; then
+        log_error "Starship is required to restore add_newline = true"
+
+        return 1
+    fi
+
+    if ! starship config add_newline true; then
         log_error "Failed to update the Starship configuration"
 
         return 1
     fi
 
-    log_info "Updated Starship configuration: add_newline = false"
+    log_info "Updated Starship configuration: add_newline = true"
 }
 
 main() {
@@ -69,12 +75,12 @@ main() {
 
         if ! selected="$(
             choose_option \
-                $'Starship Configuration:\n-----------------------' \
-                "Enable Bash integration" \
-                "Enable Zsh integration" \
-                "Install Bash Loader" \
-                "Install Zsh Loader" \
-                "Install pre-defined configuration"
+                $'Starship Uninstallation:\n------------------------' \
+                "Disable Bash integration" \
+                "Disable Zsh integration" \
+                "Uninstall Bash Loader" \
+                "Uninstall Zsh Loader" \
+                "Uninstall pre-defined configuration"
         )"; then
             return 1
         fi
@@ -83,19 +89,19 @@ main() {
 
         case "$selected" in
             1)
-                __install_shell_integration bash || return $?
+                __uninstall_shell_integration bash || return $?
                 ;;
             2)
-                __install_shell_integration zsh || return $?
+                __uninstall_shell_integration zsh || return $?
                 ;;
             3)
-                __install_shell_loader bash || return $?
+                __uninstall_shell_loader bash || return $?
                 ;;
             4)
-                __install_shell_loader zsh || return $?
+                __uninstall_shell_loader zsh || return $?
                 ;;
             5)
-                __install_starship_configuration || return $?
+                __uninstall_starship_configuration || return $?
                 ;;
             X)
                 return 0
