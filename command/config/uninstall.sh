@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$COMMON_LIB/resolver.sh"
 source "$CONFIG_LIB/checks.sh"
 source "$CONFIG_LIB/metadata.sh"
 
@@ -109,6 +110,7 @@ main() {
     local uninstall_script
     local check_status=0
     local uninstall_status=0
+    local resolve_status=0
 
     __parse_args options args "$@"
     if ! __validate_options options args; then
@@ -117,7 +119,23 @@ main() {
         return 1
     fi
 
-    canonical_id="${args[0]}"
+    if canonical_id="$(resolve_module "$CONFIG_MODULES" "${args[0]}")"; then
+        :
+    else
+        resolve_status=$?
+
+        case "$resolve_status" in
+            2)
+                log_error "Ambiguous configuration module name: ${args[0]}"
+                ;;
+            *)
+                log_error "Unknown configuration module: ${args[0]}"
+                ;;
+        esac
+
+        return "$resolve_status"
+    fi
+
     parse_config_metadata "$canonical_id" metadata || return $?
 
     module_dir="$CONFIG_MODULES/$canonical_id"

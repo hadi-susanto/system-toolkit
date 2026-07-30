@@ -90,35 +90,3 @@ route_command_help() {
 
     return 0
 }
-
-##
-# validate_no_options <command> [arguments...]
-#
-# Rejects command options while allowing positional arguments.
-#
-# Parameters:
-#   command      Command name used in error messages.
-#   arguments    Command arguments to validate.
-#
-# Returns:
-#   1 when an option is found before an explicit "--" separator.
-#
-validate_no_options() {
-    local command="$1"
-    shift
-
-    local argument
-
-    for argument in "$@"; do
-        case "$argument" in
-            --)
-                return 0
-                ;;
-            -*)
-                log_error "Unknown option for '$command': $argument"
-
-                return 1
-                ;;
-        esac
-    done
-}
