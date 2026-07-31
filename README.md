@@ -40,18 +40,21 @@ Show the basic help for each toolkit:
 ./syskit-bash help
 ./syskit-zsh help
 ./syskit-cfg help
-./syskit-cfg list
 ```
 
-Pass a command name to `help` for command-specific usage and behavior:
+Pass a command name to `help` for command-specific usage and behavior.
+
+All of the following forms are supported:
 
 ```bash
 ./syskit-bin help install
-./syskit-bin help status
-./syskit-bash help activate
-./syskit-zsh help status
-./syskit-cfg help install
+./syskit-bin install help
+./syskit-bin install -h
+./syskit-bin install --help
 ```
+
+The same syntax applies to `syskit-bash`, `syskit-zsh`, and `syskit-cfg`.
+
 
 # 🧱 Project Structure
 
