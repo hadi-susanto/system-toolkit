@@ -1,48 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/prompt.sh"
 source "$COMMON_LIB/runner.sh"
 
 readonly __OH_MY_POSH_SHELL_MODULE_ID="term/oh-my-posh"
 
-__install_shell_integration() {
-    local shell="$1"
-    local force="$2"
-    local -a force_args=()
-
-    if [[ "$force" == "true" ]]; then
-        force_args+=(--force)
-    fi
-
-    if ! run_syskit_bin \
-        "syskit-$shell" install "${force_args[@]}" \
-        "$__OH_MY_POSH_SHELL_MODULE_ID"; then
-        log_error "Failed to install Oh My Posh integration for $shell"
-
-        return 1
-    fi
-}
-
-__install_shell_loader() {
-    local shell="$1"
-    local force="$2"
-    local -a force_args=()
-
-    if [[ "$force" == "true" ]]; then
-        force_args+=(--force)
-    fi
-
-    if ! run_syskit_bin "syskit-$shell" activate "${force_args[@]}"; then
-        log_error "Failed to install the SysKit $shell loader"
-
-        return 1
-    fi
-}
-
 main() {
     local selected
+    local force=0
+
+    if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
+        force=1
+    fi
 
     while true; do
         printf 'Current Oh My Posh Status:\n--------------------------\n'
@@ -64,20 +34,18 @@ main() {
 
         case "$selected" in
             1)
-                __install_shell_integration \
-                    bash "${CONFIG_FORCE:-false}" || return $?
+                install_shell_integration \
+                    bash "$__OH_MY_POSH_SHELL_MODULE_ID" "$force" || return $?
                 ;;
             2)
-                __install_shell_integration \
-                    zsh "${CONFIG_FORCE:-false}" || return $?
+                install_shell_integration \
+                    zsh "$__OH_MY_POSH_SHELL_MODULE_ID" "$force" || return $?
                 ;;
             3)
-                __install_shell_loader \
-                    bash "${CONFIG_FORCE:-false}" || return $?
+                install_shell_loader bash "$force" || return $?
                 ;;
             4)
-                __install_shell_loader \
-                    zsh "${CONFIG_FORCE:-false}" || return $?
+                install_shell_loader zsh "$force" || return $?
                 ;;
             X)
                 return 0
