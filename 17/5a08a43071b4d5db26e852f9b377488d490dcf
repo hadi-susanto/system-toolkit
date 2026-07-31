@@ -1,0 +1,27 @@
+command/config/modules/README.md
+  eac0cf66088360f8 186-194,196-199,201-204
+payload/shell/README.md
+  eac0cf66088360f8 86,194-201,203-205,207-213,215-218
+README.md
+  eac0cf66088360f8 46,58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "175a08a43071b4d5db26e852f9b377488d490dcf",
+  "prompts": {
+    "eac0cf66088360f8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb651-ac5d-7ff2-a839-277370416455",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 42,
+      "overriden_lines": 0
+    }
+  }
+}
