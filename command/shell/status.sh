@@ -3,6 +3,7 @@ set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/checksum.sh"
+source "$COMMON_LIB/resolver.sh"
 source "$SHELL_LIB/interface_loader.sh"
 source "$SHELL_LIB/modules.sh"
 
@@ -93,10 +94,13 @@ __show_loader_status() {
 }
 
 __show_module_status() {
-    local canonical_id="$1"
+    local module_id="$1"
+    local canonical_id
 
-    if ! resolve_shell_module "$canonical_id" >/dev/null 2>&1; then
-        printf 'invalid canonical id: %s\n' "$canonical_id"
+    if ! canonical_id="$(
+        resolve_module "$SHELL_PAYLOAD" "$module_id"
+    )"; then
+        printf 'invalid or ambiguous module ID: %s\n' "$module_id"
 
         return 2
     fi

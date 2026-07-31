@@ -1,9 +1,3 @@
-__valid_shell_module_id() {
-    local canonical_id="$1"
-
-    [[ "$canonical_id" =~ ^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$ ]]
-}
-
 ##
 # list_shell_modules <modules_name>
 #
@@ -67,60 +61,4 @@ list_shell_modules() {
             modules_ref+=("$canonical_id")
         done
     done
-}
-
-##
-# resolve_shell_module <canonical_id>
-#
-# Resolves the exact folder path of a shell module.
-#
-# Parameters:
-#   canonical_id    Module ID in <category>/<module> format.
-#
-# Output:
-#   Prints the module source folder path.
-#
-# Returns:
-#   1 when the ID is invalid or does not identify an available module.
-#
-resolve_shell_module() {
-    local canonical_id="$1"
-    local module_root="${SHELL_PAYLOAD:-}"
-    local category_dir
-    local module_dir
-
-    if [[ -z "$module_root" ]]; then
-        log_error "Shell module directory is not set"
-
-        return 1
-    fi
-
-    if [[ -L "$module_root" ]] || [[ ! -d "$module_root" ]]; then
-        log_error "Invalid shell module directory: $module_root"
-
-        return 1
-    fi
-
-    if ! __valid_shell_module_id "$canonical_id"; then
-        log_error "Invalid shell module ID: $canonical_id"
-
-        return 1
-    fi
-
-    category_dir="$module_root/${canonical_id%%/*}"
-    module_dir="$module_root/$canonical_id"
-
-    if [[ ! -d "$category_dir" ]] || [[ -L "$category_dir" ]]; then
-        log_error "Shell module category not found: ${canonical_id%%/*}"
-
-        return 1
-    fi
-
-    if [[ ! -d "$module_dir" ]] || [[ -L "$module_dir" ]]; then
-        log_error "Unknown shell module ID: $canonical_id"
-
-        return 1
-    fi
-
-    printf '%s\n' "$module_dir"
 }
