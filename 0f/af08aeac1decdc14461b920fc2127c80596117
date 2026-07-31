@@ -1,0 +1,47 @@
+lib/common/runner.sh
+  9238f6c3799cb149 7,60-77,79-134,136-139,141,144,147,150,152-154,156-159,162-163,165-166,168-169,171-173,176-199,201-204,207-208,210-211,213-215,217-239,242-243,246-247,249,251,253-278
+command/config/modules/term/power-level-10k/uninstall.sh
+  9238f6c3799cb149 10,12-13,16-17
+command/config/modules/term/oh-my-posh/install.sh
+  9238f6c3799cb149 11,13-15,37-38,41-42,45,48
+command/config/modules/term/power-level-10k/status.sh
+  9238f6c3799cb149 46,52
+command/config/modules/term/power-level-10k/install.sh
+  9238f6c3799cb149 14,18,43,51,67-71,105,108-109,112
+command/config/modules/term/oh-my-posh/uninstall.sh
+  9238f6c3799cb149 11,13-15,37-38,41-42,45,48
+command/config/modules/dev/sdkman/install.sh
+  9238f6c3799cb149 14,18,42,50,66-70,106,109-110,113-114,117,120
+command/config/modules/dev/sdkman/status.sh
+  9238f6c3799cb149 43,48,54,59
+command/config/modules/term/starship/install.sh
+  9238f6c3799cb149 42,44-46,69-70,73-74,77,80
+command/config/modules/term/starship/status.sh
+  9238f6c3799cb149 13,18,24,29
+command/config/modules/term/starship/uninstall.sh
+  9238f6c3799cb149 48,50-52,75-76,79-80,83,86
+command/config/modules/dev/sdkman/uninstall.sh
+  9238f6c3799cb149 11-15,17-18,22-23
+command/config/modules/term/oh-my-posh/status.sh
+  9238f6c3799cb149 13,18,24,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "0faf08aeac1decdc14461b920fc2127c80596117",
+  "prompts": {
+    "9238f6c3799cb149": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb84e-2b6b-7401-8f6b-ccbfa2796834",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 820,
+      "total_deletions": 1005,
+      "accepted_lines": 806,
+      "overriden_lines": 10
+    }
+  }
+}
