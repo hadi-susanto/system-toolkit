@@ -183,12 +183,25 @@ installation is run with `--force`.
 
 ## Current Terminal Modules
 
-| Canonical ID      | Managed behavior                                                                                                 |
-|-------------------|------------------------------------------------------------------------------------------------------------------|
-| `term/ghostty`    | Installs a managed optional include and the `syskit.ghostty` configuration asset.                                |
-| `term/kitty`      | Installs a managed glob include plus independent `syskit.kitty` and `syskit.session` assets.                     |
-| `term/oh-my-posh` | Installs Bash or Zsh initialization and can activate either shell loader.                                        |
-| `term/starship`   | Installs Bash or Zsh initialization, can activate either shell loader, and edits `add_newline` through Starship. |
+| Canonical ID           | Managed behavior                                                                                                 |
+|------------------------|------------------------------------------------------------------------------------------------------------------|
+| `term/ghostty`         | Installs a managed optional include and the `syskit.ghostty` configuration asset.                                |
+| `term/kitty`           | Installs a managed glob include plus independent `syskit.kitty` and `syskit.session` assets.                     |
+| `term/oh-my-posh`      | Installs Bash or Zsh initialization and can activate either shell loader.                                        |
+| `term/power-level-10k` | Persists the Powerlevel10k installation directory, installs Zsh initialization, and can activate the Zsh loader. |
+| `term/starship`        | Installs Bash or Zsh initialization, can activate either shell loader, and edits `add_newline` through Starship. |
+
+Set the Powerlevel10k installation directory when installing its configuration:
+
+```bash
+POWERLEVEL10K_INSTALL_DIR="/absolute/powerlevel10k/path" \
+    syskit-cfg install term/power-level-10k
+```
+
+The directory must contain a readable `powerlevel10k.zsh-theme`. It can be
+stored through the first interactive action in
+`~/.local/state/syskit/term/power-level-10k/install-dir`. Replacing a different
+or invalid stored path requires `--force`.
 
 Starship and Oh My Posh are mutually exclusive during normal configuration
 installation. Their requirement checks return the skip status when the other

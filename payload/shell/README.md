@@ -83,6 +83,7 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 - [Git](#git-cligit)
 - [SDKMAN!](#sdkman-devsdkman)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
+- [Powerlevel10k](#powerlevel10k-termpower-level-10k)
 - [Starship](#starship-termstarship)
 - [Zsh](#zsh-termzsh)
 
@@ -187,6 +188,31 @@ the shell-specific output from `oh-my-posh init`.
 The corresponding configuration module can install either integration and
 activate either SysKit shell loader. It treats Starship as mutually exclusive
 and skips installation when Starship is detected unless `--force` is used.
+
+---
+
+# Powerlevel10k (`term/power-level-10k`)
+
+Provides a Zsh-only initialization payload. The payload reads the configured
+Powerlevel10k installation directory from:
+
+```text
+~/.local/state/syskit/term/power-level-10k/install-dir
+```
+
+When the state and `<POWERLEVEL10K_INSTALL_DIR>/powerlevel10k.zsh-theme` are
+available, the payload exports `POWERLEVEL10K_INSTALL_DIR` and sources the
+theme. Missing or invalid state is reported without interrupting shell startup.
+
+The corresponding configuration module provides interactive actions to install
+the state file, install the Zsh integration, or activate the SysKit Zsh loader:
+
+```bash
+POWERLEVEL10K_INSTALL_DIR="/absolute/powerlevel10k/path" \
+    syskit-cfg install term/power-level-10k
+```
+
+Powerlevel10k is loaded in the regular shell-module order.
 
 ---
 
