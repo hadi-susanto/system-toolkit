@@ -81,8 +81,11 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 - [Bat](#bat-clibat)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [SDKMAN!](#sdkman-devsdkman)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
+- [Powerlevel10k](#powerlevel10k-termpower-level-10k)
 - [Starship](#starship-termstarship)
+- [Zsh](#zsh-termzsh)
 
 ---
 
@@ -151,6 +154,32 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 
 ---
 
+# SDKMAN! (`dev/sdkman`)
+
+Provides one shared initialization payload for Bash and Zsh. The payload reads
+the configured SDKMAN! installation directory from:
+
+```text
+~/.local/state/syskit/dev/sdkman/install-dir
+```
+
+When the state and `<SDKMAN_DIR>/bin/sdkman-init.sh` are available, the payload
+exports `SDKMAN_DIR` and sources the SDKMAN! initialization script. Missing or
+invalid state is reported without interrupting shell startup.
+
+The corresponding configuration module provides interactive actions to install
+the state file, install either shell integration, or activate either SysKit
+shell loader. Set `SDKMAN_DIR` for a custom installation:
+
+```bash
+SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg install dev/sdkman
+```
+
+When `SDKMAN_DIR` is empty, the configuration module uses `$HOME/.sdkman`.
+SDKMAN! is loaded in the regular shell-module order.
+
+---
+
 # Oh My Posh (`term/oh-my-posh`)
 
 Provides separate Bash and Zsh initialization payloads. Each payload evaluates
@@ -159,6 +188,31 @@ the shell-specific output from `oh-my-posh init`.
 The corresponding configuration module can install either integration and
 activate either SysKit shell loader. It treats Starship as mutually exclusive
 and skips installation when Starship is detected unless `--force` is used.
+
+---
+
+# Powerlevel10k (`term/power-level-10k`)
+
+Provides a Zsh-only initialization payload. The payload reads the configured
+Powerlevel10k installation directory from:
+
+```text
+~/.local/state/syskit/term/power-level-10k/install-dir
+```
+
+When the state and `<POWERLEVEL10K_INSTALL_DIR>/powerlevel10k.zsh-theme` are
+available, the payload exports `POWERLEVEL10K_INSTALL_DIR` and sources the
+theme. Missing or invalid state is reported without interrupting shell startup.
+
+The corresponding configuration module provides interactive actions to install
+the state file, install the Zsh integration, or activate the SysKit Zsh loader:
+
+```bash
+POWERLEVEL10K_INSTALL_DIR="/absolute/powerlevel10k/path" \
+    syskit-cfg install term/power-level-10k
+```
+
+Powerlevel10k is loaded in the regular shell-module order.
 
 ---
 
@@ -175,3 +229,19 @@ payload removal to the corresponding SysKit shell command.
 
 The configuration module treats Oh My Posh as mutually exclusive and skips
 installation when Oh My Posh is detected unless `--force` is used.
+
+---
+
+# Zsh (`term/zsh`)
+
+Provides the general interactive Zsh preferences migrated from Mint
+Provisioner as a Zsh-only shell integration. It configures:
+
+- History storage and duplicate handling.
+- Completion with a selectable menu.
+- Editor, pager, and locale environment variables.
+- User executable directories in `PATH`.
+- Colored `grep` output and Emacs-style key bindings.
+- Optional local customizations from `~/.zshrc.local`.
+
+This module does not install Zsh or change the user's login shell.

@@ -1,3 +1,10 @@
+# Check required dependencies
+if ! command -v starship >/dev/null 2>&1; then
+    printf '\033[31m[ERROR]\033[0m starship is not installed; skipping Starship\n' >&2
+
+    return 0
+fi
+
 __syskit_starship_first_prompt=1
 
 __syskit_starship_newline() {
