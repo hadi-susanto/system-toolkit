@@ -11,12 +11,6 @@ main() {
         return "$CONFIG_CHECK_BLOCK"
     fi
 
-    if command -v oh-my-posh >/dev/null 2>&1; then
-        log_warn "Oh My Posh is detected; skipping mutually exclusive Starship configuration"
-
-        return "$CONFIG_CHECK_SKIP"
-    fi
-
     return "$CONFIG_CHECK_PROCEED"
 }
 

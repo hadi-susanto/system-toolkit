@@ -186,8 +186,9 @@ Provides separate Bash and Zsh initialization payloads. Each payload evaluates
 the shell-specific output from `oh-my-posh init`.
 
 The corresponding configuration module can install either integration and
-activate either SysKit shell loader. It treats Starship as mutually exclusive
-and skips installation when Starship is detected unless `--force` is used.
+activate either SysKit shell loader. The shell dependency check prevents it
+from being installed alongside Starship or Powerlevel10k for the same shell
+unless `--force` is used.
 
 ---
 
@@ -212,7 +213,9 @@ POWERLEVEL10K_INSTALL_DIR="/absolute/powerlevel10k/path" \
     syskit-cfg install term/power-level-10k
 ```
 
-Powerlevel10k is loaded in the regular shell-module order.
+Powerlevel10k is loaded in the regular shell-module order. Its dependency check
+prevents it from being installed alongside Starship or Oh My Posh for Zsh
+unless `--force` is used.
 
 ---
 
@@ -227,8 +230,9 @@ Starship's own configuration editor so Starship does not add a second blank
 line. Its uninstall workflow restores `add_newline = true` and delegates shell
 payload removal to the corresponding SysKit shell command.
 
-The configuration module treats Oh My Posh as mutually exclusive and skips
-installation when Oh My Posh is detected unless `--force` is used.
+The shell dependency check prevents Starship from being installed alongside Oh
+My Posh or Powerlevel10k for the same shell unless `--force` is used. Prompt
+integrations installed only for another shell do not conflict.
 
 ---
 

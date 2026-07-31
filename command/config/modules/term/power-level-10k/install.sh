@@ -63,8 +63,16 @@ __install_powerlevel10k_state() {
 }
 
 __install_zsh_integration() {
+    local force="$1"
+    local -a force_args=()
+
+    if [[ "$force" == "true" ]]; then
+        force_args+=(--force)
+    fi
+
     if ! run_syskit_bin \
-        syskit-zsh install "$__POWERLEVEL10K_SHELL_MODULE_ID"; then
+        syskit-zsh install "${force_args[@]}" \
+        "$__POWERLEVEL10K_SHELL_MODULE_ID"; then
         log_error "Failed to install Powerlevel10k integration for Zsh"
 
         return 1
@@ -72,7 +80,14 @@ __install_zsh_integration() {
 }
 
 __activate_zsh_loader() {
-    if ! run_syskit_bin syskit-zsh activate; then
+    local force="$1"
+    local -a force_args=()
+
+    if [[ "$force" == "true" ]]; then
+        force_args+=(--force)
+    fi
+
+    if ! run_syskit_bin syskit-zsh activate "${force_args[@]}"; then
         log_error "Failed to activate the SysKit Zsh loader"
 
         return 1
@@ -118,10 +133,12 @@ main() {
                     "$install_dir" "${CONFIG_FORCE:-false}" || return $?
                 ;;
             2)
-                __install_zsh_integration || return $?
+                __install_zsh_integration \
+                    "${CONFIG_FORCE:-false}" || return $?
                 ;;
             3)
-                __activate_zsh_loader || return $?
+                __activate_zsh_loader \
+                    "${CONFIG_FORCE:-false}" || return $?
                 ;;
             X)
                 return 0

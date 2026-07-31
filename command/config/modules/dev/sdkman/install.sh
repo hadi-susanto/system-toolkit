@@ -63,9 +63,16 @@ __install_sdkman_state() {
 
 __install_shell_integration() {
     local shell="$1"
+    local force="$2"
+    local -a force_args=()
+
+    if [[ "$force" == "true" ]]; then
+        force_args+=(--force)
+    fi
 
     if ! run_syskit_bin \
-        "syskit-$shell" install "$__SDKMAN_SHELL_MODULE_ID"; then
+        "syskit-$shell" install "${force_args[@]}" \
+        "$__SDKMAN_SHELL_MODULE_ID"; then
         log_error "Failed to install SDKMAN! integration for $shell"
 
         return 1
@@ -74,8 +81,14 @@ __install_shell_integration() {
 
 __activate_shell_loader() {
     local shell="$1"
+    local force="$2"
+    local -a force_args=()
 
-    if ! run_syskit_bin "syskit-$shell" activate; then
+    if [[ "$force" == "true" ]]; then
+        force_args+=(--force)
+    fi
+
+    if ! run_syskit_bin "syskit-$shell" activate "${force_args[@]}"; then
         log_error "Failed to activate the SysKit $shell loader"
 
         return 1
@@ -123,16 +136,20 @@ main() {
                     "$install_dir" "${CONFIG_FORCE:-false}" || return $?
                 ;;
             2)
-                __install_shell_integration bash || return $?
+                __install_shell_integration \
+                    bash "${CONFIG_FORCE:-false}" || return $?
                 ;;
             3)
-                __install_shell_integration zsh || return $?
+                __install_shell_integration \
+                    zsh "${CONFIG_FORCE:-false}" || return $?
                 ;;
             4)
-                __activate_shell_loader bash || return $?
+                __activate_shell_loader \
+                    bash "${CONFIG_FORCE:-false}" || return $?
                 ;;
             5)
-                __activate_shell_loader zsh || return $?
+                __activate_shell_loader \
+                    zsh "${CONFIG_FORCE:-false}" || return $?
                 ;;
             X)
                 return 0

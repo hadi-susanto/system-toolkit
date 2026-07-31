@@ -125,12 +125,14 @@ __resolve_modules() {
 }
 
 ##
-# __check_module_dependencies <canonical_id>
+# __check_module_dependencies <shell> <canonical_id>
 #
-# Checks a module's dedicated dependency script when available. Otherwise,
-# checks whether the module-name segment is available as a command.
+# Runs a module's dedicated dependency script in an isolated Bash process when
+# available. Otherwise, checks whether the module-name segment is available as
+# a command.
 #
 # Parameters:
+#   shell           Active shell interface identifier.
 #   canonical_id    Module ID in <category>/<module> format.
 #
 # Returns:
@@ -138,12 +140,13 @@ __resolve_modules() {
 #   unavailable.
 #
 __check_module_dependencies() {
-    local canonical_id="$1"
+    local shell="$1"
+    local canonical_id="$2"
     local check_script="$SHELL_MODULES/$canonical_id/check_dependencies.sh"
     local command_name="${canonical_id##*/}"
 
     if [[ -f "$check_script" ]] && [[ ! -L "$check_script" ]]; then
-        if bash "$check_script"; then
+        if bash "$check_script" "$shell"; then
             return 0
         fi
 
@@ -178,7 +181,7 @@ __install_module() {
         fi
     fi
 
-    if ! __check_module_dependencies "$module"; then
+    if ! __check_module_dependencies "$shell" "$module"; then
         log_warn "Shell module dependency check failed for module: $module"
 
         if (( ! force )); then
