@@ -83,6 +83,7 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 - [Git](#git-cligit)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Starship](#starship-termstarship)
+- [Zsh](#zsh-termzsh)
 
 ---
 
@@ -175,3 +176,19 @@ payload removal to the corresponding SysKit shell command.
 
 The configuration module treats Oh My Posh as mutually exclusive and skips
 installation when Oh My Posh is detected unless `--force` is used.
+
+---
+
+# Zsh (`term/zsh`)
+
+Provides the general interactive Zsh preferences migrated from Mint
+Provisioner as a Zsh-only shell integration. It configures:
+
+- History storage and duplicate handling.
+- Completion with a selectable menu.
+- Editor, pager, and locale environment variables.
+- User executable directories in `PATH`.
+- Colored `grep` output and Emacs-style key bindings.
+- Optional local customizations from `~/.zshrc.local`.
+
+This module does not install Zsh or change the user's login shell.
