@@ -81,6 +81,7 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 - [Bat](#bat-clibat)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [SDKMAN!](#sdkman-devsdkman)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Starship](#starship-termstarship)
 - [Zsh](#zsh-termzsh)
@@ -149,6 +150,32 @@ Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 | `gswc` | **Expands to:** `git switch --create`<br><br>Creates a new branch and switches to it.                                                   |
 | `gf`   | **Expands to:** `git fetch`<br><br>Downloads commits, branches, and tags from the configured remote without modifying the working tree. |
 | `gfo`  | **Expands to:** `git fetch origin`<br><br>Fetches updates from the `origin` remote only.                                                |
+
+---
+
+# SDKMAN! (`dev/sdkman`)
+
+Provides one shared initialization payload for Bash and Zsh. The payload reads
+the configured SDKMAN! installation directory from:
+
+```text
+~/.local/state/syskit/dev/sdkman/install-dir
+```
+
+When the state and `<SDKMAN_DIR>/bin/sdkman-init.sh` are available, the payload
+exports `SDKMAN_DIR` and sources the SDKMAN! initialization script. Missing or
+invalid state is reported without interrupting shell startup.
+
+The corresponding configuration module provides interactive actions to install
+the state file, install either shell integration, or activate either SysKit
+shell loader. Set `SDKMAN_DIR` for a custom installation:
+
+```bash
+SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg install dev/sdkman
+```
+
+When `SDKMAN_DIR` is empty, the configuration module uses `$HOME/.sdkman`.
+SDKMAN! is loaded in the regular shell-module order.
 
 ---
 

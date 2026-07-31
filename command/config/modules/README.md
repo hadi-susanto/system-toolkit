@@ -152,6 +152,23 @@ files or templates that the module may install or use while configuring the
 system. Modules that do not require source assets may omit their payload
 directory.
 
+## Current Development Modules
+
+| Canonical ID | Managed behavior                                                                                                               |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `dev/sdkman` | Persists the SDKMAN! installation directory, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
+
+Set `SDKMAN_DIR` when SDKMAN! uses a custom installation directory:
+
+```bash
+SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg install dev/sdkman
+```
+
+When the variable is empty, the module checks `$HOME/.sdkman`. The resolved
+directory can be stored through the first interactive action in
+`~/.local/state/syskit/dev/sdkman/install-dir`. Replacing a different or invalid
+stored path requires `--force`.
+
 ## Current System Modules
 
 | Canonical ID             | Managed behavior                                                                                  |
