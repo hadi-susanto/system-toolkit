@@ -1,31 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/runner.sh"
 source "$CONFIG_MODULE_DIR/lib/sdkman.sh"
 
 readonly __SDKMAN_SHELL_MODULE_ID="dev/sdkman"
 
-__uninstall_shell_integration() {
-    local shell="$1"
-
-    if ! run_syskit_bin \
-        "syskit-$shell" uninstall "$__SDKMAN_SHELL_MODULE_ID"; then
-        log_error "Failed to uninstall SDKMAN! integration for $shell"
-
-        return 1
-    fi
-}
-
 main() {
     local failed=0
+    local force=0
 
-    if ! __uninstall_shell_integration bash; then
+    if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
+        force=1
+    fi
+
+    if ! uninstall_shell_integration \
+        bash "$__SDKMAN_SHELL_MODULE_ID" "$force"; then
         failed=1
     fi
 
-    if ! __uninstall_shell_integration zsh; then
+    if ! uninstall_shell_integration \
+        zsh "$__SDKMAN_SHELL_MODULE_ID" "$force"; then
         failed=1
     fi
 

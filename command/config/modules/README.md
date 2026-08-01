@@ -203,6 +203,8 @@ stored through the first interactive action in
 `~/.local/state/syskit/term/power-level-10k/install-dir`. Replacing a different
 or invalid stored path requires `--force`.
 
-Starship and Oh My Posh are mutually exclusive during normal configuration
-installation. Their requirement checks return the skip status when the other
-prompt executable is detected; `--force` explicitly overrides that skip.
+Starship, Oh My Posh, and Powerlevel10k integrations are mutually exclusive
+within each shell. The shell module dependency checks inspect integration state
+for the selected shell, so different prompt integrations may be used across
+Bash and Zsh. Configuration installation forwards `--force` to delegated shell
+integration and loader commands.

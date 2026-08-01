@@ -103,15 +103,17 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg status <category/module>
-  syskit-cfg status all
+  syskit-cfg status <module...>
+  syskit-cfg status --all
 
 Options:
   -a, --all  Show status for every available configuration module.
 
 Description:
-  Shows custom status output for one configuration module. The positional
-  value "all" is equivalent to --all. When no module is given, shows this help.
+  Shows custom status output for one or more configuration modules.
+  Each module may be specified using its unique name or canonical ID.
+  The positional value "all" is equivalent to --all.
+  When no module is given, shows this help.
 EOF
 }
 

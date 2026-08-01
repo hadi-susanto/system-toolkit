@@ -1,35 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/prompt.sh"
 source "$COMMON_LIB/runner.sh"
 
 readonly __OH_MY_POSH_SHELL_MODULE_ID="term/oh-my-posh"
 
-__install_shell_integration() {
-    local shell="$1"
-
-    if ! run_syskit_bin \
-        "syskit-$shell" install "$__OH_MY_POSH_SHELL_MODULE_ID"; then
-        log_error "Failed to install Oh My Posh integration for $shell"
-
-        return 1
-    fi
-}
-
-__install_shell_loader() {
-    local shell="$1"
-
-    if ! run_syskit_bin "syskit-$shell" activate; then
-        log_error "Failed to install the SysKit $shell loader"
-
-        return 1
-    fi
-}
-
 main() {
     local selected
+    local force=0
+
+    if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
+        force=1
+    fi
 
     while true; do
         printf 'Current Oh My Posh Status:\n--------------------------\n'
@@ -51,16 +34,18 @@ main() {
 
         case "$selected" in
             1)
-                __install_shell_integration bash || return $?
+                install_shell_integration \
+                    bash "$__OH_MY_POSH_SHELL_MODULE_ID" "$force" || return $?
                 ;;
             2)
-                __install_shell_integration zsh || return $?
+                install_shell_integration \
+                    zsh "$__OH_MY_POSH_SHELL_MODULE_ID" "$force" || return $?
                 ;;
             3)
-                __install_shell_loader bash || return $?
+                install_shell_loader bash "$force" || return $?
                 ;;
             4)
-                __install_shell_loader zsh || return $?
+                install_shell_loader zsh "$force" || return $?
                 ;;
             X)
                 return 0

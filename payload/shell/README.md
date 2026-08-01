@@ -72,7 +72,9 @@ layout and file naming conventions if required by the shell.
 
 Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 `/` with `_`. For example, `cli/git` is installed as `cli_git.bash` for Bash or
-`cli_git.zsh` for Zsh.
+`cli_git.zsh` for Zsh. Regular integrations live in `module.d`; integrations
+whose command module contains a `.delayed` marker live in `delayed.d` and are
+loaded after every regular integration.
 
 ---
 
@@ -176,7 +178,9 @@ SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg install dev/sdkman
 ```
 
 When `SDKMAN_DIR` is empty, the configuration module uses `$HOME/.sdkman`.
-SDKMAN! is loaded in the regular shell-module order.
+SDKMAN! is installed into `delayed.d` and loaded after every regular shell
+module. Existing integrations in `module.d` move to the delayed phase when
+reinstalled with `--force`.
 
 ---
 
@@ -186,8 +190,9 @@ Provides separate Bash and Zsh initialization payloads. Each payload evaluates
 the shell-specific output from `oh-my-posh init`.
 
 The corresponding configuration module can install either integration and
-activate either SysKit shell loader. It treats Starship as mutually exclusive
-and skips installation when Starship is detected unless `--force` is used.
+activate either SysKit shell loader. The shell dependency check prevents it
+from being installed alongside Starship or Powerlevel10k for the same shell
+unless `--force` is used.
 
 ---
 
@@ -200,9 +205,10 @@ Powerlevel10k installation directory from:
 ~/.local/state/syskit/term/power-level-10k/install-dir
 ```
 
-When the state and `<POWERLEVEL10K_INSTALL_DIR>/powerlevel10k.zsh-theme` are
-available, the payload exports `POWERLEVEL10K_INSTALL_DIR` and sources the
-theme. Missing or invalid state is reported without interrupting shell startup.
+When the state file and
+`<POWERLEVEL10K_INSTALL_DIR>/powerlevel10k.zsh-theme` are available, the
+payload sources the theme directly. Missing or invalid state is reported
+without interrupting shell startup.
 
 The corresponding configuration module provides interactive actions to install
 the state file, install the Zsh integration, or activate the SysKit Zsh loader:
@@ -227,8 +233,9 @@ Starship's own configuration editor so Starship does not add a second blank
 line. Its uninstall workflow restores `add_newline = true` and delegates shell
 payload removal to the corresponding SysKit shell command.
 
-The configuration module treats Oh My Posh as mutually exclusive and skips
-installation when Oh My Posh is detected unless `--force` is used.
+The shell dependency check prevents Starship from being installed alongside Oh
+My Posh or Powerlevel10k for the same shell unless `--force` is used. Prompt
+integrations installed only for another shell do not conflict.
 
 ---
 

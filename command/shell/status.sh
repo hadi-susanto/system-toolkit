@@ -3,6 +3,7 @@ set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/checksum.sh"
+source "$COMMON_LIB/resolver.sh"
 source "$SHELL_LIB/interface_loader.sh"
 source "$SHELL_LIB/modules.sh"
 
@@ -93,10 +94,13 @@ __show_loader_status() {
 }
 
 __show_module_status() {
-    local canonical_id="$1"
+    local module_id="$1"
+    local canonical_id
 
-    if ! resolve_shell_module "$canonical_id" >/dev/null 2>&1; then
-        printf 'invalid canonical id: %s\n' "$canonical_id"
+    if ! canonical_id="$(
+        resolve_module "$SHELL_PAYLOAD" "$module_id"
+    )"; then
+        printf 'invalid or ambiguous module ID: %s\n' "$module_id"
 
         return 2
     fi
@@ -153,19 +157,6 @@ __show_full_status() {
     return "$failed"
 }
 
-##
-# __parse_args <options_name> <args_name> [target]
-#
-# Parses the optional status target, defaulting to the full report.
-#
-# Parameters:
-#   options_name    Name of the associative array that receives command state.
-#   args_name       Name of the indexed array reserved for positional values.
-#   target          Optional all, loader, or canonical module ID target.
-#
-# Returns:
-#   1 when more than one target is provided.
-#
 __parse_args() {
     local options_name="$1"
     local args_name="$2"
@@ -185,9 +176,23 @@ __parse_args() {
         return 1
     fi
 
-    if (( $# == 1 )); then
-        options_ref[CMD]="$1"
+    if (( $# == 0 )); then
+        return 0
     fi
+
+    case "$1" in
+        all | -a | --all)
+            options_ref[CMD]="all"
+            ;;
+        -*)
+            log_error "Unknown status option: $1"
+
+            return 1
+            ;;
+        *)
+            options_ref[CMD]="$1"
+            ;;
+    esac
 }
 
 main() {

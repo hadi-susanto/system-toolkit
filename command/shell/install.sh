@@ -125,25 +125,32 @@ __resolve_modules() {
 }
 
 ##
-# __check_module_dependencies <canonical_id>
+# __check_module_dependencies <shell> <canonical_id>
 #
-# Checks a module's dedicated dependency script when available. Otherwise,
-# checks whether the module-name segment is available as a command.
+# Checks a shell module's dependencies. Runs its dedicated dependency-check
+# script in an isolated Bash process when available; otherwise, checks whether
+# the module-name segment is available as a command.
 #
 # Parameters:
+#   shell           Active shell interface identifier.
 #   canonical_id    Module ID in <category>/<module> format.
 #
+# Output:
+#   Preserves output from the dedicated dependency-check script. Logs an error
+#   when the fallback command is unavailable.
+#
 # Returns:
-#   The dedicated dependency check status, or 1 when the fallback command is
-#   unavailable.
+#   0 when the module dependencies are satisfied.
+#   1 when the dedicated check fails or the fallback command is unavailable.
 #
 __check_module_dependencies() {
-    local canonical_id="$1"
+    local shell="$1"
+    local canonical_id="$2"
     local check_script="$SHELL_MODULES/$canonical_id/check_dependencies.sh"
     local command_name="${canonical_id##*/}"
 
     if [[ -f "$check_script" ]] && [[ ! -L "$check_script" ]]; then
-        if bash "$check_script"; then
+        if bash "$check_script" "$shell"; then
             return 0
         fi
 
@@ -163,11 +170,23 @@ __install_module() {
     local shell="$1"
     local module="$2"
     local force="$3"
+    local delayed=0
+    local delayed_status=0
 
     if ! support_module "$module"; then
         log_warn "Module '$module' is not supported by this shell: $shell"
 
         return 1
+    fi
+
+    if module_delayed "$module"; then
+        delayed=1
+    else
+        delayed_status=$?
+
+        if (( delayed_status != 1 )); then
+            return "$delayed_status"
+        fi
     fi
 
     if module_installed "$module"; then
@@ -178,7 +197,7 @@ __install_module() {
         fi
     fi
 
-    if ! __check_module_dependencies "$module"; then
+    if ! __check_module_dependencies "$shell" "$module"; then
         log_warn "Shell module dependency check failed for module: $module"
 
         if (( ! force )); then
@@ -190,7 +209,7 @@ __install_module() {
         log_warn "Forcing install despite failed dependency checks: $module"
     fi
 
-    if ! install_module "$module"; then
+    if ! install_module "$module" "$delayed"; then
         log_error "Failed to install shell module: $module"
 
         return 1

@@ -5,6 +5,50 @@ __valid_shell_module_id() {
 }
 
 ##
+# module_delayed <canonical_id>
+#
+# Checks whether a shell module declares delayed loading through its command
+# module marker.
+#
+# Parameters:
+#   canonical_id    Shell module ID in <category>/<module> format.
+#
+# Returns:
+#   1 when the marker is absent.
+#   2 when the module ID, marker root, or marker type is invalid.
+#
+module_delayed() {
+    local canonical_id="$1"
+    local module_root="${SHELL_MODULES:-}"
+    local marker
+
+    if [[ -z "$module_root" ]] || [[ -L "$module_root" ]] ||
+        [[ ! -d "$module_root" ]]; then
+        log_error "Invalid shell command module directory: ${module_root:-<missing>}"
+
+        return 2
+    fi
+
+    if ! __valid_shell_module_id "$canonical_id"; then
+        log_error "Invalid shell module ID: $canonical_id"
+
+        return 2
+    fi
+
+    marker="$module_root/$canonical_id/.delayed"
+
+    if [[ ! -e "$marker" ]] && [[ ! -L "$marker" ]]; then
+        return 1
+    fi
+
+    if [[ -L "$marker" ]] || [[ ! -f "$marker" ]]; then
+        log_error "Invalid delayed shell module marker: $marker"
+
+        return 2
+    fi
+}
+
+##
 # list_shell_modules <modules_name>
 #
 # Lists canonical module IDs represented by category/module subdirectories of
@@ -67,60 +111,4 @@ list_shell_modules() {
             modules_ref+=("$canonical_id")
         done
     done
-}
-
-##
-# resolve_shell_module <canonical_id>
-#
-# Resolves the exact folder path of a shell module.
-#
-# Parameters:
-#   canonical_id    Module ID in <category>/<module> format.
-#
-# Output:
-#   Prints the module source folder path.
-#
-# Returns:
-#   1 when the ID is invalid or does not identify an available module.
-#
-resolve_shell_module() {
-    local canonical_id="$1"
-    local module_root="${SHELL_PAYLOAD:-}"
-    local category_dir
-    local module_dir
-
-    if [[ -z "$module_root" ]]; then
-        log_error "Shell module directory is not set"
-
-        return 1
-    fi
-
-    if [[ -L "$module_root" ]] || [[ ! -d "$module_root" ]]; then
-        log_error "Invalid shell module directory: $module_root"
-
-        return 1
-    fi
-
-    if ! __valid_shell_module_id "$canonical_id"; then
-        log_error "Invalid shell module ID: $canonical_id"
-
-        return 1
-    fi
-
-    category_dir="$module_root/${canonical_id%%/*}"
-    module_dir="$module_root/$canonical_id"
-
-    if [[ ! -d "$category_dir" ]] || [[ -L "$category_dir" ]]; then
-        log_error "Shell module category not found: ${canonical_id%%/*}"
-
-        return 1
-    fi
-
-    if [[ ! -d "$module_dir" ]] || [[ -L "$module_dir" ]]; then
-        log_error "Unknown shell module ID: $canonical_id"
-
-        return 1
-    fi
-
-    printf '%s\n' "$module_dir"
 }

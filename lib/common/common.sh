@@ -4,13 +4,8 @@ fi
 
 readonly __SYSKIT_COMMON_LOADED=1
 
-if [[ -n "${NO_COLOR:-}" ]]; then
-    readonly COLOR_GREEN=''
-    readonly COLOR_RED=''
-    readonly COLOR_YELLOW=''
-    readonly COLOR_CYAN=''
-    readonly COLOR_RESET=''
-elif [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; then
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
     readonly COLOR_GREEN=$'\033[0;32m'
     readonly COLOR_RED=$'\033[0;31m'
     readonly COLOR_YELLOW=$'\033[0;33m'

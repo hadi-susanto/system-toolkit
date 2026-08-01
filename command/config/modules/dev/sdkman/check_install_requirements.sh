@@ -16,6 +16,8 @@ main() {
 
     if ! sdkman_installation_valid "$install_dir"; then
         log_error "SDKMAN! initialization is missing or unreadable: $install_dir/bin/sdkman-init.sh"
+        log_info "Set SDKMAN_DIR to the correct SDKMAN! installation directory"
+        log_info "Example: SDKMAN_DIR=/path/to/sdkman syskit-cfg install dev/sdkman"
 
         return "$CONFIG_CHECK_BLOCK"
     fi

@@ -117,8 +117,8 @@ Checks whether a module provides integration compatible with this shell.
 
 Checks whether a shell module has already been installed.
 
-Installed filenames use a flattened canonical ID. For example, `cli/git`
-resolves to `cli_git.bash` for Bash and `cli_git.zsh` for Zsh.
+Implementations must detect the module regardless of whether it was installed
+for regular or delayed loading. Storage layout and naming remain shell-specific.
 
 ### Parameters
 
@@ -139,14 +139,18 @@ resolves to `cli_git.bash` for Bash and `cli_git.zsh` for Zsh.
 
 Installs a shell module.
 
-The installed filename must flatten the canonical ID by replacing `/` with
-`_`, then append the shell-specific extension.
+The optional numeric `delayed` parameter defaults to `0`. A value of `0`
+requests regular loading, while any non-zero value requests delayed loading.
+Implementations must respect this flag and ensure delayed modules load after
+all regular modules. An implementation that cannot support delayed loading must
+return a non-zero status when delayed loading is requested.
 
 ### Parameters
 
-| Name           | Description                                      |
-|----------------|--------------------------------------------------|
-| `canonical_id` | Shell module ID in `<category>/<module>` format. |
+| Name           | Description                                               |
+|----------------|-----------------------------------------------------------|
+| `canonical_id` | Shell module ID in `<category>/<module>` format.          |
+| `delayed`      | Optional `0` for regular or non-zero for delayed loading. |
 
 ### Return Code
 
@@ -159,7 +163,8 @@ The installed filename must flatten the canonical ID by replacing `/` with
 
 ## `installed_module_path`
 
-Returns the installed module file path.
+Returns the installed module file path regardless of whether it was installed
+for regular or delayed loading.
 
 ### Parameters
 
@@ -209,7 +214,8 @@ Prints the absolute path to the preferred compatible source file.
 
 ## `uninstall_module`
 
-Removes a previously installed shell module.
+Removes a previously installed shell module regardless of whether it was
+installed for regular or delayed loading.
 
 ### Parameters
 
@@ -251,7 +257,7 @@ None.
 Creates and activates the shell loader.
 
 Implementations should install any required loader files and update the shell's
-startup configuration.
+startup configuration. All regular modules must load before any delayed module.
 
 ### Parameters
 

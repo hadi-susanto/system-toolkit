@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/prompt.sh"
 source "$COMMON_LIB/runner.sh"
 source "$CONFIG_MODULE_DIR/lib/powerlevel10k.sh"
@@ -12,11 +11,11 @@ readonly __POWERLEVEL10K_SHELL_MODULE_ID="term/power-level-10k"
 # __install_powerlevel10k_state <install_dir> <force>
 #
 # Persists the selected Powerlevel10k installation unless conflicting or
-# invalid state exists without CONFIG_FORCE=true.
+# invalid state exists without force.
 #
 # Parameters:
 #   install_dir    Valid absolute Powerlevel10k installation directory.
-#   force          true to replace conflicting or invalid state.
+#   force          1 to replace conflicting or invalid state, or 0 otherwise.
 #
 # Returns:
 #   1 when existing state cannot be replaced safely or persistence fails.
@@ -41,7 +40,7 @@ __install_powerlevel10k_state() {
             return 0
         fi
 
-        if [[ "$force" != "true" ]]; then
+        if (( ! force )); then
             log_error "Powerlevel10k state already points to a different installation: $persisted_dir"
             log_error "Use --force to replace it with: $install_dir"
 
@@ -49,7 +48,7 @@ __install_powerlevel10k_state() {
         fi
 
         log_warn "Replacing Powerlevel10k installation state: $persisted_dir -> $install_dir"
-    elif [[ "$force" != "true" ]]; then
+    elif (( ! force )); then
         log_error "Powerlevel10k state is invalid or unreadable: $__POWERLEVEL10K_STATE_FILE"
         log_error "Use --force to replace it"
 
@@ -62,26 +61,14 @@ __install_powerlevel10k_state() {
     log_info "Configured Powerlevel10k installation directory: $install_dir"
 }
 
-__install_zsh_integration() {
-    if ! run_syskit_bin \
-        syskit-zsh install "$__POWERLEVEL10K_SHELL_MODULE_ID"; then
-        log_error "Failed to install Powerlevel10k integration for Zsh"
-
-        return 1
-    fi
-}
-
-__activate_zsh_loader() {
-    if ! run_syskit_bin syskit-zsh activate; then
-        log_error "Failed to activate the SysKit Zsh loader"
-
-        return 1
-    fi
-}
-
 main() {
     local install_dir
     local selected
+    local force=0
+
+    if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
+        force=1
+    fi
 
     if ! install_dir="$(resolve_powerlevel10k_install_dir)"; then
         log_error "POWERLEVEL10K_INSTALL_DIR must be an absolute path without line breaks"
@@ -115,13 +102,14 @@ main() {
         case "$selected" in
             1)
                 __install_powerlevel10k_state \
-                    "$install_dir" "${CONFIG_FORCE:-false}" || return $?
+                    "$install_dir" "$force" || return $?
                 ;;
             2)
-                __install_zsh_integration || return $?
+                install_shell_integration \
+                    zsh "$__POWERLEVEL10K_SHELL_MODULE_ID" "$force" || return $?
                 ;;
             3)
-                __activate_zsh_loader || return $?
+                install_shell_loader zsh "$force" || return $?
                 ;;
             X)
                 return 0
