@@ -157,19 +157,6 @@ __show_full_status() {
     return "$failed"
 }
 
-##
-# __parse_args <options_name> <args_name> [target]
-#
-# Parses the optional status target, defaulting to the full report.
-#
-# Parameters:
-#   options_name    Name of the associative array that receives command state.
-#   args_name       Name of the indexed array reserved for positional values.
-#   target          Optional all, loader, or canonical module ID target.
-#
-# Returns:
-#   1 when more than one target is provided.
-#
 __parse_args() {
     local options_name="$1"
     local args_name="$2"
@@ -189,9 +176,23 @@ __parse_args() {
         return 1
     fi
 
-    if (( $# == 1 )); then
-        options_ref[CMD]="$1"
+    if (( $# == 0 )); then
+        return 0
     fi
+
+    case "$1" in
+        all | -a | --all)
+            options_ref[CMD]="all"
+            ;;
+        -*)
+            log_error "Unknown status option: $1"
+
+            return 1
+            ;;
+        *)
+            options_ref[CMD]="$1"
+            ;;
+    esac
 }
 
 main() {

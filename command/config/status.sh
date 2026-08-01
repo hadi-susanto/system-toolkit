@@ -58,7 +58,7 @@ __validate_options() {
     fi
 
     if (( options_ref[ALL] && ${#args_ref[@]} > 0 )); then
-        log_error "Cannot combine --all with a configuration modules"
+        log_error "Cannot combine --all with configuration modules"
 
         return 1
     fi
