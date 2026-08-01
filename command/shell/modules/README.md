@@ -14,13 +14,6 @@ The shell installer resolves this marker and installs the integration into
 numeric `0` or `1` policy and do not read command module metadata directly.
 Loaders source all regular modules before delayed modules.
 
-SDKMAN! declares delayed loading. Existing installations can be migrated with:
-
-```bash
-syskit-bash install --force dev/sdkman
-syskit-zsh install --force dev/sdkman
-```
-
 ## Dependency Checks
 
 Shell modules may provide a dedicated dependency script at:
@@ -36,9 +29,14 @@ integration state should source `lib/shell/interface_loader.sh` and load the
 required contract explicitly:
 
 ```bash
-local shell="${1:-}"
+main() {
+    local shell="${1:-}"
 
-load_shell_interface "$shell" "module_installed" || return $?
+    load_shell_interface \
+        "$shell" "module_installed" || return $?
+}
+
+main "$@"
 ```
 
 Dependency scripts return `0` when installation may proceed and a non-zero

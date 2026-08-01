@@ -16,7 +16,7 @@ main() {
 
     if ! powerlevel10k_installation_valid "$install_dir"; then
         log_error "Powerlevel10k theme is missing or unreadable: $install_dir/powerlevel10k.zsh-theme"
-        log_info "Set POWERLEVEL10K_INSTALL_DIR to the correct PowerLevel10k installation directory"
+        log_info "Set POWERLEVEL10K_INSTALL_DIR to the correct Powerlevel10k installation directory"
         log_info "Example: POWERLEVEL10K_INSTALL_DIR=/path/to/power-level-10k syskit-cfg install term/power-level-10k"
 
         return "$CONFIG_CHECK_BLOCK"

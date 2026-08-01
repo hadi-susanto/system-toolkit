@@ -142,10 +142,10 @@ System Toolkit Shell Integration (Shell-Dependent)
 Usage:
   syskit-${shell_name} status [all]
   syskit-${shell_name} status loader
-  syskit-${shell_name} status <category/module>
+  syskit-${shell_name} status <module>
 
 Options:
-  No command-specific options.
+  -a, --all  Show status for every available ${shell_name} module.
 
 Description:
   With no target or with "all", shows the complete ${shell_name} module and

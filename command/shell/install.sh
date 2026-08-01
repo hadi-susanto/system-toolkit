@@ -127,17 +127,21 @@ __resolve_modules() {
 ##
 # __check_module_dependencies <shell> <canonical_id>
 #
-# Runs a module's dedicated dependency script in an isolated Bash process when
-# available. Otherwise, checks whether the module-name segment is available as
-# a command.
+# Checks a shell module's dependencies. Runs its dedicated dependency-check
+# script in an isolated Bash process when available; otherwise, checks whether
+# the module-name segment is available as a command.
 #
 # Parameters:
 #   shell           Active shell interface identifier.
 #   canonical_id    Module ID in <category>/<module> format.
 #
+# Output:
+#   Preserves output from the dedicated dependency-check script. Logs an error
+#   when the fallback command is unavailable.
+#
 # Returns:
-#   The dedicated dependency check status, or 1 when the fallback command is
-#   unavailable.
+#   0 when the module dependencies are satisfied.
+#   1 when the dedicated check fails or the fallback command is unavailable.
 #
 __check_module_dependencies() {
     local shell="$1"
