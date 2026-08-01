@@ -1,0 +1,37 @@
+lib/shell/interface/README.md
+  9238f6c3799cb149 121-122,144-147,154,167,217
+payload/shell/README.md
+  9238f6c3799cb149 75-77,181-183
+command/shell/install.sh
+  9238f6c3799cb149 169-170,178-181,183-184,187,208
+command/shell/modules/README.md
+  9238f6c3799cb149 1-24
+lib/shell/interface/zsh.sh
+  9238f6c3799cb149 39-40,42-48,50,54,60,63-64,68,73-77,79-89,113-115,117-119,121-123,125-130,132,155-157,159-161,163-164,166-169,225,230-232,234-236,238-242,346-349,353-361,365
+lib/shell/modules.sh
+  9238f6c3799cb149 1-6,8,10-11,14,17-18,20-29,32-33,35,38,40-42,44-45,47-48,50
+lib/shell/interface/bash.sh
+  9238f6c3799cb149 39-40,42-48,50,54,60,63-64,68,73-77,79-89,113-115,117-119,121-123,125-130,132,155-157,159-161,163-164,166-169,225,230-232,234-236,238-242,346-349,353-361,365
+command/shell/modules/dev/sdkman/.delayed
+  9238f6c3799cb149 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "9f5a202a8e401ab205d1af66b9b25f9a31dad17e",
+  "prompts": {
+    "9238f6c3799cb149": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb84e-2b6b-7401-8f6b-ccbfa2796834",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 1852,
+      "total_deletions": 1655,
+      "accepted_lines": 1852,
+      "overriden_lines": 0
+    }
+  }
+}
