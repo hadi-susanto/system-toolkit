@@ -171,7 +171,7 @@ print_loader_status() {
             ;;
         *)
             log_error "Unable to determine $shell loader status"
-            printf '%s[?] unknown]\n' "$COLOR_YELLOW" "$COLOR_RESET"
+            printf '%s[?] unknown]%s\n' "$COLOR_YELLOW" "$COLOR_RESET"
 
             return 1
             ;;
