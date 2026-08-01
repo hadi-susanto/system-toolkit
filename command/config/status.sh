@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$COMMON_LIB/resolver.sh"
 source "$CONFIG_LIB/metadata.sh"
 
 __parse_args() {
@@ -61,12 +62,45 @@ __validate_options() {
 
         return 1
     fi
+}
 
-    if (( ${#args_ref[@]} > 1 )); then
-        log_error "The status command accepts one configuration module or --all"
+__resolve_modules() {
+    local args_name="$1"
+    local modules_name="$2"
+    local -n args_ref="$args_name"
+    local -n modules_ref="$modules_name"
+    local -A seen=()
+    local requested_module
+    local canonical_id
+    local resolve_status=0
 
-        return 1
-    fi
+    modules_ref=()
+
+    for requested_module in "${args_ref[@]}"; do
+        if canonical_id="$(resolve_module "$CONFIG_MODULES" "$requested_module")"; then
+            :
+        else
+            resolve_status=$?
+
+            case "$resolve_status" in
+                2)
+                    log_error "Ambiguous config module name: $requested_module"
+                    ;;
+                *)
+                    log_error "Unknown config module: $requested_module"
+                    ;;
+            esac
+
+            return "$resolve_status"
+        fi
+
+        if (( seen["$canonical_id"] )); then
+            continue
+        fi
+
+        seen["$canonical_id"]=1
+        modules_ref+=("$canonical_id")
+    done
 }
 
 __print_module_status() {
@@ -130,9 +164,9 @@ main() {
     fi
 
     if (( options[ALL] )); then
-        list_config_modules modules || return $?
+        list_config_modules modules
     else
-        modules=("${args[0]}")
+        __resolve_modules args modules || return $?
     fi
 
     if (( ${#modules[@]} == 0 )); then
