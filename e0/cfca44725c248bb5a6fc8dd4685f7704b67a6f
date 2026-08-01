@@ -1,0 +1,116 @@
+lib/common/common.sh
+  f167686a018875e0 7-8
+command/shell/status.sh
+  20291e40163938bb 98,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "e0cfca44725c248bb5a6fc8dd4685f7704b67a6f",
+  "prompts": {
+    "20291e40163938bb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa6f5-6474-73d0-b2eb-eda456841bb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 14,
+      "overriden_lines": 0
+    },
+    "58a0be92e2b5994f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fabad-6a6c-7d82-82c7-ef5f77a072eb",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2301,
+      "accepted_lines": 18,
+      "overriden_lines": 0
+    },
+    "6f0373ccded9960d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb265-9ca5-7491-9763-c81ca8765972",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 545,
+      "total_deletions": 490,
+      "accepted_lines": 50,
+      "overriden_lines": 0
+    },
+    "76f381841a35d0b7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a4-bb9a-72c1-a145-7d34a9b897fc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    },
+    "9238f6c3799cb149": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb84e-2b6b-7401-8f6b-ccbfa2796834",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 820,
+      "total_deletions": 1005,
+      "accepted_lines": 806,
+      "overriden_lines": 10
+    },
+    "d684cd2b6ee53d60": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa437-0047-78f0-a6a7-9401e8229f5d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 141,
+      "total_deletions": 66,
+      "accepted_lines": 151,
+      "overriden_lines": 0
+    },
+    "eac0cf66088360f8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb651-ac5d-7ff2-a839-277370416455",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 258,
+      "total_deletions": 253,
+      "accepted_lines": 239,
+      "overriden_lines": 0
+    },
+    "f167686a018875e0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f89a5-1e8d-7402-9e5d-b9af6d6c2d3a",
+        "model": "unknown"
+      },
+      "human_author": "Hadi Susanto Lesmana <hadi.lesmana@gdn-commerce.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 59,
+      "overriden_lines": 0
+    }
+  }
+}
