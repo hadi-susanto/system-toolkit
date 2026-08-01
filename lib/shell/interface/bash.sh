@@ -31,46 +31,68 @@ support_module() {
 #   canonical_id    Shell module ID in <category>/<module> format.
 #
 # Returns:
-#   1 when neither a Bash-specific nor generic installed file exists.
+#   1 when the Bash module is not installed in either loading phase.
 #
 module_installed() {
     local canonical_id="$1"
     local installed_name="${canonical_id//\//_}"
+    local path="$BASH_BASE_DIR/module.d/$installed_name.bash"
 
-    if [[ -f "$BASH_BASE_DIR/module.d/$installed_name.bash" ]]; then
+    if [[ -f "$path" ]]; then
         return 0
     fi
 
-    [[ -f "$BASH_BASE_DIR/module.d/$installed_name.sh" ]]
+    [[ -f "$BASH_BASE_DIR/delayed.d/$installed_name.bash" ]]
 }
 
 ##
-# install_module <canonical_id>
+# install_module <canonical_id> [delayed]
 #
 # Installs the preferred Bash-compatible source for a module.
 #
 # Parameters:
 #   canonical_id    Shell module ID in <category>/<module> format.
+#   delayed         Non-zero for delayed loading, or 0 for regular loading.
 #
 # Returns:
-#   1 when no compatible source exists or the file cannot be installed.
+#   1 when no compatible source exists or installation or cleanup fails.
 #
 install_module() {
     local canonical_id="$1"
+    local delayed="${2:-0}"
     local module_name="${canonical_id##*/}"
     local installed_name="${canonical_id//\//_}"
-    local source="$SHELL_PAYLOAD/$canonical_id/$module_name.bash"
-    local install_dir="$BASH_BASE_DIR/module.d"
-    local target="$install_dir/$installed_name.bash"
+    local install_dir
+    local delete_target
+    local install_target
+    local source_file="$SHELL_PAYLOAD/$canonical_id/$module_name.bash"
 
-    if [[ ! -f "$source" ]]; then
-        source="$SHELL_PAYLOAD/$canonical_id/$module_name.sh"
+    if (( delayed )); then
+        install_dir="$BASH_BASE_DIR/delayed.d"
+        delete_target="$BASH_BASE_DIR/module.d/$installed_name.bash"
+    else
+        install_dir="$BASH_BASE_DIR/module.d"
+        delete_target="$BASH_BASE_DIR/delayed.d/$installed_name.bash"
     fi
 
-    if [[ ! -f "$source" ]]; then
+    install_target="$install_dir/$installed_name.bash"
+
+    if [[ ! -f "$source_file" ]]; then
+        source_file="$SHELL_PAYLOAD/$canonical_id/$module_name.sh"
+    fi
+
+    if [[ ! -f "$source_file" ]]; then
         log_error "No Bash-compatible source is available for module: $canonical_id"
 
         return 1
+    fi
+
+    if [[ -f "$delete_target" ]]; then
+        if ! rm -f -- "$delete_target"; then
+            log_error "Failed to remove obsolete Bash module file: $delete_target"
+
+            return 1
+        fi
     fi
 
     if ! install -d -m 0755 -- "$install_dir"; then
@@ -79,11 +101,13 @@ install_module() {
         return 1
     fi
 
-    if ! install -m 0644 -- "$source" "$target"; then
+    if ! install -m 0644 -- "$source_file" "$install_target"; then
         log_error "Failed to install Bash module: $canonical_id"
 
         return 1
     fi
+
+    return 0
 }
 
 ##
@@ -114,7 +138,7 @@ installed_module_path() {
         return 0
     fi
 
-    path="$BASH_BASE_DIR/module.d/$installed_name.sh"
+    path="$BASH_BASE_DIR/delayed.d/$installed_name.bash"
 
     if [[ -f "$path" ]]; then
         printf '%s\n' "$path"
@@ -165,7 +189,7 @@ module_source_path() {
 ##
 # uninstall_module <canonical_id>
 #
-# Removes every installed Bash-compatible file for a module.
+# Removes a Bash module from both regular and delayed loading phases.
 #
 # Parameters:
 #   canonical_id    Shell module ID in <category>/<module> format.
@@ -176,23 +200,24 @@ module_source_path() {
 uninstall_module() {
     local canonical_id="$1"
     local installed_name="${canonical_id//\//_}"
-    local module_dir="$BASH_BASE_DIR/module.d"
-    local extension
-    local file
+    local path="$BASH_BASE_DIR/module.d/$installed_name.bash"
     local failed=0
 
-    for extension in bash sh; do
-        file="$module_dir/$installed_name.$extension"
-
-        if [[ ! -e "$file" ]] && [[ ! -L "$file" ]]; then
-            continue
-        fi
-
-        if ! rm -f -- "$file"; then
-            log_error "Failed to remove Bash module file: $file"
+    if [[ -f "$path" ]]; then
+        if ! rm -f -- "$path"; then
+            log_error "Failed to remove Bash module file: $path"
             failed=1
         fi
-    done
+    fi
+
+    path="$BASH_BASE_DIR/delayed.d/$installed_name.bash"
+
+    if [[ -f "$path" ]]; then
+        if ! rm -f -- "$path"; then
+            log_error "Failed to remove Bash module file: $path"
+            failed=1
+        fi
+    fi
 
     return "$failed"
 }
@@ -295,23 +320,26 @@ activate_loader() {
     fi
 
     if ! cat >"$loader_tmp" <<'EOF'
-for __syskit_module_file in "$HOME/.local/share/syskit/bash/module.d"/*; do
-    if [[ ! -f "$__syskit_module_file" ]]; then
-        continue
-    fi
+for __syskit_module_dir in module.d delayed.d; do
+    for __syskit_module_file in \
+        "$HOME/.local/share/syskit/bash/$__syskit_module_dir"/*; do
+        if [[ ! -f "$__syskit_module_file" ]]; then
+            continue
+        fi
 
-    case "$__syskit_module_file" in
-        *.bash | *.sh)
-            source "$__syskit_module_file"
-            ;;
-        *)
-            printf '\033[0;33m[WARN]\033[0m Found non module file: %s\n' \
-                "$__syskit_module_file" >&2
-            ;;
-    esac
+        case "$__syskit_module_file" in
+            *.bash)
+                source "$__syskit_module_file"
+                ;;
+            *)
+                printf '\033[0;33m[WARN]\033[0m Found non module file: %s\n' \
+                    "$__syskit_module_file" >&2
+                ;;
+        esac
+    done
 done
 
-unset __syskit_module_file
+unset __syskit_module_dir __syskit_module_file
 EOF
     then
         log_error "Failed to write the temporary Bash loader"

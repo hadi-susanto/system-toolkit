@@ -72,7 +72,9 @@ layout and file naming conventions if required by the shell.
 
 Installed Bash and Zsh module filenames flatten the canonical ID by replacing
 `/` with `_`. For example, `cli/git` is installed as `cli_git.bash` for Bash or
-`cli_git.zsh` for Zsh.
+`cli_git.zsh` for Zsh. Regular integrations live in `module.d`; integrations
+whose command module contains a `.delayed` marker live in `delayed.d` and are
+loaded after every regular integration.
 
 ---
 
@@ -176,7 +178,9 @@ SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg install dev/sdkman
 ```
 
 When `SDKMAN_DIR` is empty, the configuration module uses `$HOME/.sdkman`.
-SDKMAN! is loaded in the regular shell-module order.
+SDKMAN! is installed into `delayed.d` and loaded after every regular shell
+module. Existing integrations in `module.d` move to the delayed phase when
+reinstalled with `--force`.
 
 ---
 

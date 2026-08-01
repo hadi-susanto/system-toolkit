@@ -1,4 +1,27 @@
-# Shell Module Dependency Checks
+# Shell Module Policies and Dependency Checks
+
+## Delayed Loading
+
+A shell command module may contain a regular, non-symbolic-link `.delayed`
+marker:
+
+```text
+command/shell/modules/<category>/<module>/.delayed
+```
+
+The shell installer resolves this marker and installs the integration into
+`delayed.d` instead of `module.d`. Shell interfaces receive only the resolved
+numeric `0` or `1` policy and do not read command module metadata directly.
+Loaders source all regular modules before delayed modules.
+
+SDKMAN! declares delayed loading. Existing installations can be migrated with:
+
+```bash
+syskit-bash install --force dev/sdkman
+syskit-zsh install --force dev/sdkman
+```
+
+## Dependency Checks
 
 Shell modules may provide a dedicated dependency script at:
 

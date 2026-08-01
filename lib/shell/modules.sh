@@ -1,3 +1,53 @@
+__valid_shell_module_id() {
+    local canonical_id="$1"
+
+    [[ "$canonical_id" =~ ^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$ ]]
+}
+
+##
+# module_delayed <canonical_id>
+#
+# Checks whether a shell module declares delayed loading through its command
+# module marker.
+#
+# Parameters:
+#   canonical_id    Shell module ID in <category>/<module> format.
+#
+# Returns:
+#   1 when the marker is absent.
+#   2 when the module ID, marker root, or marker type is invalid.
+#
+module_delayed() {
+    local canonical_id="$1"
+    local module_root="${SHELL_MODULES:-}"
+    local marker
+
+    if [[ -z "$module_root" ]] || [[ -L "$module_root" ]] ||
+        [[ ! -d "$module_root" ]]; then
+        log_error "Invalid shell command module directory: ${module_root:-<missing>}"
+
+        return 2
+    fi
+
+    if ! __valid_shell_module_id "$canonical_id"; then
+        log_error "Invalid shell module ID: $canonical_id"
+
+        return 2
+    fi
+
+    marker="$module_root/$canonical_id/.delayed"
+
+    if [[ ! -e "$marker" ]] && [[ ! -L "$marker" ]]; then
+        return 1
+    fi
+
+    if [[ -L "$marker" ]] || [[ ! -f "$marker" ]]; then
+        log_error "Invalid delayed shell module marker: $marker"
+
+        return 2
+    fi
+}
+
 ##
 # list_shell_modules <modules_name>
 #

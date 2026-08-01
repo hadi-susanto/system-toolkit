@@ -166,11 +166,23 @@ __install_module() {
     local shell="$1"
     local module="$2"
     local force="$3"
+    local delayed=0
+    local delayed_status=0
 
     if ! support_module "$module"; then
         log_warn "Module '$module' is not supported by this shell: $shell"
 
         return 1
+    fi
+
+    if module_delayed "$module"; then
+        delayed=1
+    else
+        delayed_status=$?
+
+        if (( delayed_status != 1 )); then
+            return "$delayed_status"
+        fi
     fi
 
     if module_installed "$module"; then
@@ -193,7 +205,7 @@ __install_module() {
         log_warn "Forcing install despite failed dependency checks: $module"
     fi
 
-    if ! install_module "$module"; then
+    if ! install_module "$module" "$delayed"; then
         log_error "Failed to install shell module: $module"
 
         return 1
