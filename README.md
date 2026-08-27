@@ -53,7 +53,9 @@ All of the following forms are supported:
 ./syskit-bin install --help
 ```
 
-The same syntax applies to `syskit-bash`, `syskit-zsh`, and `syskit-cfg`.
+The same syntax applies to `syskit-bash` and `syskit-zsh`. For configuration
+modules, use `syskit-cfg configure <module>` or the shorthand
+`syskit-cfg <module>`.
 
 
 # 🧱 Project Structure
@@ -92,25 +94,27 @@ Each toolkit has a dedicated entrypoint:
 syskit-bin [command] [args...]
 syskit-bash [command] [args...]
 syskit-zsh [command] [args...]
-syskit-cfg [command] [args...]
+syskit-cfg <command> [args...]
+syskit-cfg <module>
 ```
 
 An entrypoint initializes the SysKit paths and invokes its toolkit's
-`command/[toolkit]/main.sh` dispatcher. The dispatcher parses the first
-argument as a command and explicitly routes it to a dedicated script such as
-`install.sh`, `activate.sh`, or `status.sh`.
+`command/[toolkit]/main.sh` dispatcher. The dispatcher routes commands to a
+dedicated script such as `install.sh`, `activate.sh`, or `status.sh`. The
+configuration dispatcher also treats a resolved module argument as a
+`configure` invocation.
 
 Bash and Zsh share the `command/shell/` dispatcher. Their entrypoints pass the
 selected shell as the dispatcher's first internal parameter, allowing
 shell-specific compatibility libraries from `lib/shell/` to be loaded when
 needed.
 
-Configuration and shell `install` and `uninstall` commands accept either a
-canonical `<category>/<module>` ID or a unique module-name segment. For
-example, `kitty` resolves to `term/kitty` for the configuration toolkit, while
-`git` resolves to `cli/git` only for the shell toolkit. Resolution stays within
-the selected toolkit's module directory, and an ambiguous module name is
-rejected instead of selecting one arbitrarily.
+The configuration `configure` command and the shell `install` and `uninstall`
+commands accept either a canonical `<category>/<module>` ID or a unique
+module-name segment. For example, `kitty` resolves to `term/kitty` for the
+configuration toolkit, while `git` resolves to `cli/git` only for the shell
+toolkit. Resolution stays within the selected toolkit's module directory, and
+an ambiguous module name is rejected instead of selecting one arbitrarily.
 
 The binary toolkit installs standalone executable scripts directly into a local
 or global command directory. Other toolkit lifecycle commands establish their
@@ -135,13 +139,12 @@ activation makes the installed integration take effect.
 
 **Configuration toolkit**
 
-The configuration toolkit discovers configuration modules and orchestrates
-their interactive installation one module at a time, along with safe
-uninstallation when a module supports it. It also reports module-defined
-status in independent sections. Install and uninstall accept either a unique
-short name such as `kitty` or its canonical ID, `term/kitty`. Each module owns
-its target handling and may use source files from the `payload/config/`
-directory.
+The configuration toolkit discovers configuration modules and invokes one
+module at a time through its `main.sh`. It also reports module-defined status
+in independent sections. `configure` accepts either a unique short name such
+as `kitty` or its canonical ID, `term/kitty`; `syskit-cfg kitty` is shorthand
+for `syskit-cfg configure kitty`. Each module owns its target handling and may
+use source files from the `payload/config/` directory.
 
 # 🔗 Relationship with Mint Provisioner
 

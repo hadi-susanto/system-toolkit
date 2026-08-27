@@ -2,11 +2,12 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$COMMON_LIB/resolver.sh"
 
 ##
 # __parse_args <options_name> <args_name> [arguments...]
 #
-# Parses the configuration toolkit command and preserves its arguments.
+# Parses the configuration toolkit command or a shorthand module invocation.
 #
 # Parameters:
 #   options_name    Name of the associative array that receives command state.
@@ -14,7 +15,7 @@ source "$COMMON_LIB/common.sh"
 #   arguments       Command-line arguments to parse.
 #
 # Returns:
-#   1 when the first parameter is an option instead of a command.
+#   1 when the first parameter is an option instead of a command or module.
 #
 __parse_args() {
     local options_name="$1"
@@ -55,6 +56,8 @@ __parse_args() {
 main() {
     local -A options
     local -a args
+    local canonical_id
+    local resolve_status=0
 
     __parse_args options args "$@" || return $?
     route_command_help options args
@@ -63,23 +66,34 @@ main() {
         help)
             exec bash "$CONFIG_COMMAND/help.sh" "${args[@]}"
             ;;
-        install)
-            exec bash "$CONFIG_COMMAND/install.sh" "${args[@]}"
+        configure)
+            exec bash "$CONFIG_COMMAND/configure.sh" "${args[@]}"
             ;;
         list)
             exec bash "$CONFIG_COMMAND/list.sh" "${args[@]}"
-            ;;
-        uninstall)
-            exec bash "$CONFIG_COMMAND/uninstall.sh" "${args[@]}"
             ;;
         status)
             exec bash "$CONFIG_COMMAND/status.sh" "${args[@]}"
             ;;
         *)
-            log_error "Unsupported configuration toolkit command: ${options[CMD]}"
+            if canonical_id="$(resolve_module "$CONFIG_MODULES" "${options[CMD]}")"; then
+                exec bash "$CONFIG_COMMAND/configure.sh" "$canonical_id" "${args[@]}"
+            else
+                resolve_status=$?
+            fi
+
+            case "$resolve_status" in
+                2)
+                    log_error "Ambiguous configuration module name: ${options[CMD]}"
+                    ;;
+                *)
+                    log_error "Unknown configuration module: ${options[CMD]}"
+                    ;;
+            esac
+
             bash "$CONFIG_COMMAND/help.sh" >&2
 
-            return 1
+            return "$resolve_status"
             ;;
     esac
 }
