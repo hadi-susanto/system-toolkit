@@ -1,0 +1,31 @@
+command/README.md
+  4c4fd4986379a784 10,13-14,18-25
+command/config/configure.sh
+  4c4fd4986379a784 1-122
+README.md
+  4c4fd4986379a784 56-58,97-98,102-105,112-117,142-147
+command/config/main.sh
+  4c4fd4986379a784 5,10,18,59-60,69-70,79-93,96
+command/config/help.sh
+  4c4fd4986379a784 10-11,16,59,65-66,69-71,108-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "c3ef8f134094cc14a1d742bd76d7539cf2d89cec",
+  "prompts": {
+    "4c4fd4986379a784": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04191-78bd-7302-bccc-7a5a4aef825d",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "Hadi Susanto Lesmana <hd.susanto@yahoo.com>",
+      "messages": [],
+      "total_additions": 499,
+      "total_deletions": 764,
+      "accepted_lines": 188,
+      "overriden_lines": 0
+    }
+  }
+}
