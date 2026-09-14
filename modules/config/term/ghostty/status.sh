@@ -29,9 +29,8 @@ __print_loader_status() {
 }
 
 __print_file_config_status() {
-    local file="$1"
-    local source="$CONFIG_MODULE_PAYLOAD/$file"
-    local target="$__GHOSTTY_CONFIG_DIR/$file"
+    local source="$CONFIG_MODULE_PAYLOAD/$__GHOSTTY_PAYLOAD_FILE"
+    local target="$__GHOSTTY_CONFIG_DIR/$__GHOSTTY_PAYLOAD_FILE"
     local checksum_status=0
 
     if [[ ! -f "$source" ]] || [[ -L "$source" ]]; then
@@ -60,16 +59,19 @@ __print_file_config_status() {
             printf '%s[↑]%s update available\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             ;;
         2)
+            printf '%s[?]%s source checksum fail\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             log_error "Failed to checksum Ghostty configuration payload: $source"
 
             return 1
             ;;
         3)
+            printf '%s[?]%s target checksum fail\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             log_error "Failed to checksum installed Ghostty configuration: $target"
 
             return 1
             ;;
         127)
+            printf '%s[?]%s missing sha256sum binary\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             log_error "Required command is unavailable: sha256sum"
 
             return 1
@@ -85,10 +87,8 @@ main() {
         failed=1
     fi
 
-    printf 'Ghostty Configuration(s):\n'
-    printf '  • syskit.ghostty: '
-    if ! __print_file_config_status "syskit.ghostty"; then
-        printf '%s[?]%s unknown\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
+    printf 'Ghostty Config: '
+    if ! __print_file_config_status; then
         failed=1
     fi
 
