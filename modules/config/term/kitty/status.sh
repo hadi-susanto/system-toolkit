@@ -60,16 +60,19 @@ __print_file_config_status() {
             printf '%s[↑]%s update available\n' "$COLOR_YELLOW" "$COLOR_RESET"
             ;;
         2)
+            printf '%s[?]%s source checksum fail\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             log_error "Failed to checksum Kitty configuration payload: $source"
 
             return 1
             ;;
         3)
+            printf '%s[?]%s target checksum fail\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             log_error "Failed to checksum installed Kitty configuration: $target"
 
             return 1
             ;;
         127)
+            printf '%s[?]%s missing shat256sum binary\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
             log_error "Required command is unavailable: sha256sum"
 
             return 1
@@ -88,13 +91,11 @@ main() {
     printf 'Kitty Configuration(s):\n'
     printf '  • syskit.kitty  : '
     if ! __print_file_config_status "syskit.kitty"; then
-        printf '%s[?]%s unknown\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
         failed=1
     fi
 
     printf '  • syskit.session: '
     if ! __print_file_config_status "syskit.session"; then
-        printf '%s[?]%s unknown\n' "${COLOR_YELLOW}" "${COLOR_RESET}"
         failed=1
     fi
 
