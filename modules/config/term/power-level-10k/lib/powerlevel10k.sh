@@ -12,6 +12,9 @@ readonly __POWERLEVEL10K_STATE_FILE="$__POWERLEVEL10K_STATE_DIR/install-dir"
 #
 # Resolves POWERLEVEL10K_INSTALL_DIR.
 #
+# When POWERLEVEL10K_INSTALL_DIR is empty, falls back to INSTALL_PATH from
+# the Mint Provisioner registry.
+#
 # Output:
 #   Prints an absolute Powerlevel10k installation directory without trailing
 #   slashes.
@@ -21,6 +24,17 @@ readonly __POWERLEVEL10K_STATE_FILE="$__POWERLEVEL10K_STATE_DIR/install-dir"
 #
 resolve_powerlevel10k_install_dir() {
     local install_dir="${POWERLEVEL10K_INSTALL_DIR:-}"
+
+    if [[ -z "$install_dir" ]]; then
+        local registry="$HOME/.local/state/mint-provisioner/registry/term/power-level-10k.registry"
+
+        if [[ -f "$registry" ]]; then
+            install_dir="$(
+                awk -F= '$1 == "INSTALL_PATH" { print substr($0, index($0, "=") + 1); exit }' \
+                    "$registry"
+            )"
+        fi
+    fi
 
     if [[ -z "$install_dir" ]] ||
         [[ "$install_dir" != /* ]] ||
@@ -34,24 +48,6 @@ resolve_powerlevel10k_install_dir() {
     done
 
     printf '%s\n' "$install_dir"
-}
-
-##
-# powerlevel10k_installation_valid <install_dir>
-#
-# Checks whether a Powerlevel10k installation has a readable theme file.
-#
-# Parameters:
-#   install_dir    Absolute Powerlevel10k installation directory.
-#
-# Returns:
-#   1 when the theme file is missing, unreadable, or not regular.
-#
-powerlevel10k_installation_valid() {
-    local install_dir="$1"
-    local theme_file="$install_dir/powerlevel10k.zsh-theme"
-
-    [[ -f "$theme_file" ]] && [[ -r "$theme_file" ]]
 }
 
 ##

@@ -8,6 +8,7 @@ readonly __POWERLEVEL10K_SHELL_MODULE_ID="term/power-level-10k"
 
 __print_state_status() {
     local install_dir
+    local theme_file
 
     if [[ ! -e "$__POWERLEVEL10K_STATE_FILE" ]] &&
         [[ ! -L "$__POWERLEVEL10K_STATE_FILE" ]]; then
@@ -24,7 +25,8 @@ __print_state_status() {
         return 0
     fi
 
-    if ! powerlevel10k_installation_valid "$install_dir"; then
+    theme_file="$install_dir/powerlevel10k.zsh-theme"
+    if ! [[ -f "$theme_file" ]] && ! [[ -r "$theme_file" ]]; then
         printf '%s[theme unavailable]%s %s\n' \
             "$COLOR_RED" "$COLOR_RESET" "$install_dir"
 
