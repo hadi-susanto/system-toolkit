@@ -8,6 +8,7 @@ readonly __SDKMAN_SHELL_MODULE_ID="dev/sdkman"
 
 __print_state_status() {
     local install_dir
+    local init_file
 
     if [[ ! -e "$__SDKMAN_STATE_FILE" ]] && [[ ! -L "$__SDKMAN_STATE_FILE" ]]; then
         printf '%s[missing]%s %s\n' "$COLOR_RED" "$COLOR_RESET" "$__SDKMAN_STATE_FILE"
@@ -21,7 +22,8 @@ __print_state_status() {
         return 0
     fi
 
-    if ! sdkman_installation_valid "$install_dir"; then
+    init_file="$install_dir/bin/sdkman-init.sh"
+    if ! [[ -f "$init_file" ]] && ! [[ -r "$init_file" ]]; then
         printf '%s[SDKMAN! init unavailable]%s %s\n' \
             "$COLOR_RED" "$COLOR_RESET" "$install_dir"
 

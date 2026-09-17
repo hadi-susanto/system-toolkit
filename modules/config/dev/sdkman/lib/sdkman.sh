@@ -10,16 +10,31 @@ readonly __SDKMAN_STATE_FILE="$__SDKMAN_STATE_DIR/install-dir"
 ##
 # resolve_sdkman_install_dir
 #
-# Resolves SDKMAN_DIR, falling back to SDKMAN!'s default installation path.
+# Resolves SDKMAN_DIR.
+#
+# When SDKMAN_DIR is empty, falls back to INSTALL_PATH from the Mint
+# Provisioner registry.
 #
 # Output:
-#   Prints an absolute SDKMAN! installation directory without trailing slashes.
+#   Prints an absolute SDKMAN installation directory without trailing
+#   slashes.
 #
 # Returns:
-#   1 when the resolved path is empty, relative, or contains a line break.
+#   1 when the path is empty, relative, or contains a line break.
 #
 resolve_sdkman_install_dir() {
-    local install_dir="${SDKMAN_DIR:-$HOME/.sdkman}"
+    local install_dir="${SDKMAN_DIR:-}"
+
+    if [[ -z "$install_dir" ]]; then
+        local registry="$HOME/.local/state/mint-provisioner/registry/dev/sdkman.registry"
+
+        if [[ -f "$registry" ]]; then
+            install_dir="$(
+                awk -F= '$1 == "INSTALL_PATH" { print substr($0, index($0, "=") + 1); exit }' \
+                    "$registry"
+            )"
+        fi
+    fi
 
     if [[ -z "$install_dir" ]] ||
         [[ "$install_dir" != /* ]] ||
@@ -33,24 +48,6 @@ resolve_sdkman_install_dir() {
     done
 
     printf '%s\n' "$install_dir"
-}
-
-##
-# sdkman_installation_valid <install_dir>
-#
-# Checks whether an SDKMAN! installation has a readable initialization file.
-#
-# Parameters:
-#   install_dir    Absolute SDKMAN! installation directory.
-#
-# Returns:
-#   1 when the initialization file is missing, unreadable, or not regular.
-#
-sdkman_installation_valid() {
-    local install_dir="$1"
-    local init_file="$install_dir/bin/sdkman-init.sh"
-
-    [[ -f "$init_file" ]] && [[ -r "$init_file" ]]
 }
 
 ##
