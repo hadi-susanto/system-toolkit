@@ -7,13 +7,13 @@ System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg [command] [args...]
+  syskit-cfg <command> [args...]
+  syskit-cfg <module>
 
 Commands:
   help [command]  Show basic help or details for a command.
   list            List available configuration modules.
-  install         Install one configuration module.
-  uninstall       Safely uninstall one configuration module.
+  configure       Configure one configuration module.
   status          Show configuration module status.
 EOF
 }
@@ -56,44 +56,21 @@ Description:
 EOF
 }
 
-__install_help() {
+__configure_help() {
     cat <<'EOF'
 System Toolkit Configuration Integration
 ----------------------------------------
 
 Usage:
-  syskit-cfg install [--force] <module>
+  syskit-cfg configure <module>
+  syskit-cfg <module>
 
 Options:
-  -f, --force  Override supported module skips and existing-target safeguards.
+  -f, --force  Force configuration when supported by the module
 
 Description:
-  Validates and installs exactly one configuration module. The module owns all
-  interactive decisions and target handling. A unique module-name segment or
-  canonical <category/module> ID is accepted. Supporting modules may also
-  require force to overwrite managed targets. Force does not bypass a blocked
-  safety check or automatically approve module prompts.
-EOF
-}
-
-__uninstall_help() {
-    cat <<'EOF'
-System Toolkit Configuration Integration
-----------------------------------------
-
-Usage:
-  syskit-cfg uninstall [--force] <module>
-
-Options:
-  -f, --force  Override supported module skips and checksum safeguards.
-
-Description:
-  Safely uninstalls exactly one configuration module when it provides
-  uninstall.sh. When check_uninstall_requirements.sh is present, it runs before
-  uninstallation. A unique module-name segment or canonical <category/module>
-  ID is accepted. Supporting modules may also require force to remove modified
-  managed files. Force does not bypass a blocked safety check or automatically
-  approve module prompts.
+  Configures exactly one module by directly running its main.sh. A unique
+  module-name segment or canonical <category/module> ID is accepted.
 EOF
 }
 
@@ -130,11 +107,8 @@ main() {
         list)
             __list_help
             ;;
-        install)
-            __install_help
-            ;;
-        uninstall)
-            __uninstall_help
+        configure)
+            __configure_help
             ;;
         status)
             __status_help

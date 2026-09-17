@@ -6,6 +6,9 @@ readonly __SYSKIT_RESOLVER_LOADED=1
 
 readonly -A __RESOLVER_MODULE_ALIASES=(
     [hide-password-asterisks]="sys/password-asterisks"
+    [omp]="term/oh-my-posh"
+    [plvl10k]="term/power-level-10k"
+    [password]="sys/password-asterisks"
     [sys/hide-password-asterisks]="sys/password-asterisks"
 )
 
