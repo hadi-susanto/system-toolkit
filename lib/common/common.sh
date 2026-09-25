@@ -10,12 +10,14 @@ if [[ -z "${NO_COLOR:-}" ]] &&
     readonly COLOR_RED=$'\033[0;31m'
     readonly COLOR_YELLOW=$'\033[0;33m'
     readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_GRAY=$'\033[90m'
     readonly COLOR_RESET=$'\033[0m'
 else
     readonly COLOR_GREEN=''
     readonly COLOR_RED=''
     readonly COLOR_YELLOW=''
     readonly COLOR_CYAN=''
+    readonly COLOR_GRAY=''
     readonly COLOR_RESET=''
 fi
 

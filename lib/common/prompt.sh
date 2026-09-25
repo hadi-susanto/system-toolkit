@@ -200,3 +200,114 @@ confirm_action() {
         esac
     done
 }
+
+__write_simple_question() {
+    local question="$1"
+    local default="${2-}"
+    local minimum="${3-}"
+    local maximum="${4-}"
+
+    printf '%bQuestion:%b %s' "$COLOR_CYAN" "$COLOR_RESET" "$question" >/dev/tty
+
+    if [[ -n "$minimum" || -n "$maximum" || -n "$default" ]]; then
+        printf '\n   %bRules:%b' "$COLOR_YELLOW" "$COLOR_RESET" >/dev/tty
+    fi
+
+    if [[ -n "$minimum" ]]; then
+        printf ' %b[min: %s]%b' "$COLOR_GRAY" "$minimum" "$COLOR_RESET" >/dev/tty
+    fi
+    if [[ -n "$maximum" ]]; then
+        printf ' %b[max: %s]%b' "$COLOR_GRAY" "$maximum" "$COLOR_RESET" >/dev/tty
+    fi
+    if [[ -n "$default" ]]; then
+        printf ' %b[default: %s]%b' "$COLOR_GRAY" "$default" "$COLOR_RESET" >/dev/tty
+    fi
+
+    printf '\n\n' >/dev/tty
+}
+
+__read_text() {
+    local default_value="${1-}"
+    local input
+
+    while true; do
+        printf 'Answer: ' >/dev/tty
+        if ! IFS= read -r input </dev/tty; then
+            printf 'Unable to read text input\n'
+
+            return 1
+        fi
+
+        if [[ -z "$input" && -n "$default_value" ]]; then
+            printf '%s\n' "$default_value"
+
+            return 0
+        fi
+
+        if [[ -z "$input" ]]; then
+            show_temporary_input_error 'A value is required.'
+
+            continue
+        fi
+
+        printf '%s\n' "$input"
+
+        return 0
+    done
+}
+
+##
+# ask_text
+#
+# Prompts for and confirms non-empty text.
+#
+# Parameters:
+#   question - Question displayed before the input field.
+#   default_value - Optional value used when the user submits empty input.
+#
+# Output:
+#   Prints the confirmed trimmed text to standard output.
+#
+# Return:
+#   0 - A non-empty text value was entered and confirmed.
+#   1 - Input is invalid or reading from the terminal failed.
+#
+ask_text() {
+    local question="${1:-}"
+    local default_value="${2-}"
+    local selected_value
+    local confirmation_status
+
+    if (( $# < 1 || $# > 2 )); then
+        printf 'ask_text accepts a question and optional default' >&2
+
+        return 1
+    fi
+
+    if [[ -z "$question" ]]; then
+        printf 'The text question must not be empty' >&2
+
+        return 1
+    fi
+
+    while true; do
+        __write_simple_question "$question" "$default_value"
+        selected_value="$(__read_text "$default_value")" || return $?
+        __prompt_clear_line
+
+        if confirm_action "You input '$selected_value'. Use this value?"; then
+            __prompt_clear_line
+            printf '%s\n' "$selected_value"
+
+            return 0
+        else
+            confirmation_status=$?
+        fi
+
+        if (( confirmation_status != 1 )); then
+            return 1
+        fi
+
+        printf '\n' >/dev/tty
+    done
+}
