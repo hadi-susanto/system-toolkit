@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
+source "$SHELL_LIB/interface_loader.sh"
 
 main() {
     local state_file="$HOME/.local/state/syskit/dev/sdkman/install-dir"
@@ -37,6 +38,14 @@ main() {
     if [[ ! -f "$install_dir/bin/sdkman-init.sh" ]] ||
         [[ ! -r "$install_dir/bin/sdkman-init.sh" ]]; then
         log_error "SDKMAN! initialization is missing or unreadable: $install_dir/bin/sdkman-init.sh"
+
+        return 1
+    fi
+
+    load_shell_interface "$shell" "module_installed" || return $?
+
+    if module_installed "dev/mise"; then
+        log_error "Mise integration is already installed for this shell; use --force to install SDKMAN! anyway"
 
         return 1
     fi
