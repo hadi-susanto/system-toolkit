@@ -3,7 +3,7 @@ set -euo pipefail
 
 source "$COMMON_LIB/prompt.sh"
 source "$COMMON_LIB/runner.sh"
-source "$CONFIG_MODULE_DIR/lib/sdkman.sh"
+source "$CONFIG_MODULE_DIR/lib.sh"
 
 readonly __SDKMAN_SHELL_MODULE_ID="dev/sdkman"
 

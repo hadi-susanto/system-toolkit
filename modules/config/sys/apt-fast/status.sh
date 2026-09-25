@@ -2,7 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$CONFIG_MODULE_DIR/lib/apt-fast.sh"
+source "$CONFIG_MODULE_DIR/lib.sh"
 
 __print_completion_status() {
     local shell="$1"

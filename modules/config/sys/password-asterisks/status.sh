@@ -2,7 +2,7 @@
 set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
-source "$CONFIG_MODULE_DIR/lib/password-asterisks.sh"
+source "$CONFIG_MODULE_DIR/lib.sh"
 
 main() {
     local state=0

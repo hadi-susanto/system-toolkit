@@ -3,7 +3,7 @@ set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/prompt.sh"
-source "$CONFIG_MODULE_DIR/lib/apt-fast.sh"
+source "$CONFIG_MODULE_DIR/lib.sh"
 
 main() {
     local selected
