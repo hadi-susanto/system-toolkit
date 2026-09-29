@@ -3,7 +3,7 @@ set -euo pipefail
 
 source "$COMMON_LIB/common.sh"
 source "$COMMON_LIB/checksum.sh"
-source "$CONFIG_MODULE_DIR/lib/ghostty.sh"
+source "$CONFIG_MODULE_DIR/lib.sh"
 
 __print_loader_status() {
     local loader_status=0

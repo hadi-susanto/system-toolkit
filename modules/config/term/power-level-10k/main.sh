@@ -3,7 +3,7 @@ set -euo pipefail
 
 source "$COMMON_LIB/prompt.sh"
 source "$COMMON_LIB/runner.sh"
-source "$CONFIG_MODULE_DIR/lib/powerlevel10k.sh"
+source "$CONFIG_MODULE_DIR/lib.sh"
 
 readonly __POWERLEVEL10K_SHELL_MODULE_ID="term/power-level-10k"
 

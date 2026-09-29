@@ -1,30 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "$COMMON_LIB/path.sh"
 source "$COMMON_LIB/prompt.sh"
 source "$COMMON_LIB/runner.sh"
 source "$CONFIG_MODULE_DIR/lib.sh"
 
-readonly __SDKMAN_SHELL_MODULE_ID="dev/sdkman"
+readonly __MISE_SHELL_MODULE_ID="dev/mise"
 
-__install_sdkman_state() {
-    local install_dir
+__install_data_dir_state() {
+    local current_data_dir
+    local new_data_dir
 
-    if ! install_dir="$(resolve_sdkman_install_dir)"; then
-        log_error "SDKMAN_DIR must be an absolute path without line breaks"
+    if ! current_data_dir="$(read_mise_data_dir_state)"; then
+        current_data_dir=""
+    fi
+
+    if ! new_data_dir="$(ask_text "Where should mise install their runtimes?" "$current_data_dir")"; then
+        log_warn "Fail to obtain user concern, prevent write mise state file"
+
+        return 0
+    fi
+
+    new_data_dir="$(expand_path "$new_data_dir")" || return $?
+    if ! can_write "$new_data_dir"; then
+        log_error "Unable $new_data_dir is not writable with current user privilege, please use other path."
 
         return 1
     fi
 
-    write_sdkman_state "$install_dir" || return $?
-    log_info "Configured SDKMAN! installation directory: $install_dir"
+    write_mise_data_dir_state "$new_data_dir"
 }
 
 main() {
     local selected
     local force=0
     local -a options=()
-    local state_installed=0
     local bash_integration_installed=0
     local zsh_integration_installed=0
     local bash_loader_installed=0
@@ -35,27 +46,20 @@ main() {
     fi
 
     while true; do
-        printf 'Current SDKMAN! Status:\n-----------------------\n'
+        printf 'Current Mise Status:\n-----------------------\n'
         bash "$CONFIG_MODULE_DIR/status.sh" || return $?
         printf '\n' >/dev/tty
 
         # Dynamically change the option based on integration status(es)
-        options=()
-        if [[ -e "$__SDKMAN_STATE_FILE" ]]; then
-            state_installed=1
-            options+=("Remove SDKMAN! state file (Will break shell integration when enabled)")
-        else
-            state_installed=0
-            options+=("Install SDKMAN! state file (Required for shell integration)")
-        fi
-        if run_shell_status bash "$__SDKMAN_SHELL_MODULE_ID"; then
+        options=("Override Mise data dir (MISE_DATA_DIR)" "Remove MISE_DATA_DIR override")
+        if run_shell_status bash "$__MISE_SHELL_MODULE_ID"; then
             bash_integration_installed=1
             options+=("Disable Bash integration")
         else
             bash_integration_installed=0
             options+=("Enable Bash integration")
         fi
-        if run_shell_status zsh "$__SDKMAN_SHELL_MODULE_ID"; then
+        if run_shell_status zsh "$__MISE_SHELL_MODULE_ID"; then
             zsh_integration_installed=1
             options+=("Disable Zsh integration")
         else
@@ -78,7 +82,7 @@ main() {
         fi
 
         if ! selected="$(
-            choose_option $'SDKMAN! Configuration:\n----------------------' "${options[@]}"
+            choose_option $'Mise Configuration:\n----------------------' "${options[@]}"
         )"; then
             return 1
         fi
@@ -87,38 +91,37 @@ main() {
 
         case "$selected" in
             1)
-                if (( state_installed )); then
-                    remove_sdkman_state
-                else
-                    __install_sdkman_state
-                fi
+                __install_data_dir_state
                 ;;
             2)
-                if (( bash_integration_installed )); then
-                    uninstall_shell_integration \
-                        bash "$__SDKMAN_SHELL_MODULE_ID" "$force" || return $?
-                else
-                    install_shell_integration \
-                        bash "$__SDKMAN_SHELL_MODULE_ID" "$force" || return $?
-                fi
+                remove_mise_data_dir_state
                 ;;
             3)
-                if (( zsh_integration_installed )); then
+                if (( bash_integration_installed )); then
                     uninstall_shell_integration \
-                        zsh "$__SDKMAN_SHELL_MODULE_ID" "$force" || return $?
+                        bash "$__MISE_SHELL_MODULE_ID" "$force" || return $?
                 else
                     install_shell_integration \
-                        zsh "$__SDKMAN_SHELL_MODULE_ID" "$force" || return $?
+                        bash "$__MISE_SHELL_MODULE_ID" "$force" || return $?
                 fi
                 ;;
             4)
+                if (( zsh_integration_installed )); then
+                    uninstall_shell_integration \
+                        zsh "$__MISE_SHELL_MODULE_ID" "$force" || return $?
+                else
+                    install_shell_integration \
+                        zsh "$__MISE_SHELL_MODULE_ID" "$force" || return $?
+                fi
+                ;;
+            5)
                 if (( bash_loader_installed )); then
                     uninstall_shell_loader bash "$force" || return $?
                 else
                     install_shell_loader bash "$force" || return $?
                 fi
                 ;;
-            5)
+            6)
                 if (( zsh_loader_installed )); then
                     uninstall_shell_loader zsh "$force" || return $?
                 else
