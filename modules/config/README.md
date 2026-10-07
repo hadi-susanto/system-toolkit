@@ -177,9 +177,10 @@ installed into `delayed.d` and loaded after every regular shell module.
 
 ## Current Miscellaneous Modules
 
-| Canonical ID       | Managed behavior                                                                                                                 |
-|---------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| Canonical ID       | Managed behavior                                                                                                                   |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `misc/claude-code` | Enables or disables the Claude Code auto-updater, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
+| `misc/junie`       | Enables or disables the Junie CLI auto-update check.                                                                                |
 
 Auto-update is toggled by setting `autoUpdaterStatus` to `enabled` or
 `disabled` in `~/.claude/settings.json`. The module edits only that key
@@ -187,6 +188,11 @@ through `jq`, writing the result to a swap file created alongside the
 settings file and renaming it into place, so an existing settings file is
 never truncated or left partially written. The `claude` alias resolves to
 `misc/claude-code`.
+
+Junie's auto-update check is toggled the same way, by setting the boolean
+`auto-update` key to `true` or `false` in `~/.junie/config.json` through the
+same `jq` swap-file technique. Junie has no shell initialization and does not
+participate in the shell toolkit.
 
 ## Current System Modules
 
