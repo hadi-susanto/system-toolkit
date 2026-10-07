@@ -10,13 +10,13 @@ Every module uses a canonical `<category>/<module>` ID represented by its
 directory path:
 
 ```text
-command/config/modules/<category>/<module>/
+modules/config/<category>/<module>/
 ```
 
 For example, the canonical ID `term/kitty` uses:
 
 ```text
-command/config/modules/term/kitty/
+modules/config/term/kitty/
 ```
 
 Module IDs use lowercase letters, numbers, and hyphens.
@@ -31,7 +31,7 @@ syskit-cfg install kitty
 syskit-cfg uninstall term/kitty
 ```
 
-The resolver searches only `command/config/modules/`. A name that exists only
+The resolver searches only `modules/config/`. A name that exists only
 in another toolkit is not accepted; for example, `git` does not resolve here
 even though `cli/git` exists in the shell payload. If the same module-name
 segment exists under multiple configuration categories, the command fails as
@@ -136,14 +136,14 @@ Install and uninstall lifecycle scripts also receive `CONFIG_FORCE`, which is
 A module's optional payload mirrors its canonical command path:
 
 ```text
-command/config/modules/<category>/<module>/
+modules/config/<category>/<module>/
 payload/config/<category>/<module>/
 ```
 
 For example:
 
 ```text
-command/config/modules/term/kitty/
+modules/config/term/kitty/
 payload/config/term/kitty/
 ```
 
@@ -156,6 +156,7 @@ directory.
 
 | Canonical ID | Managed behavior                                                                                                               |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `dev/mise`   | Persists an optional Mise data directory override, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
 | `dev/sdkman` | Persists the SDKMAN! installation directory, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
 
 Set `SDKMAN_DIR` when SDKMAN! uses a custom installation directory:
@@ -168,6 +169,24 @@ When the variable is empty, the module checks `$HOME/.sdkman`. The resolved
 directory can be stored through the first interactive action in
 `~/.local/state/syskit/dev/sdkman/install-dir`. Replacing a different or invalid
 stored path requires `--force`.
+
+Mise's `MISE_DATA_DIR` override, when set, is persisted through the module's
+own interactive action in `~/.local/state/syskit/dev/mise/data-dir` and is
+optional; without it, Mise uses its own default data directory. Mise is
+installed into `delayed.d` and loaded after every regular shell module.
+
+## Current Miscellaneous Modules
+
+| Canonical ID       | Managed behavior                                                                                                                 |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `misc/claude-code` | Enables or disables the Claude Code auto-updater, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
+
+Auto-update is toggled by setting `autoUpdaterStatus` to `enabled` or
+`disabled` in `~/.claude/settings.json`. The module edits only that key
+through `jq`, writing the result to a swap file created alongside the
+settings file and renaming it into place, so an existing settings file is
+never truncated or left partially written. The `claude` alias resolves to
+`misc/claude-code`.
 
 ## Current System Modules
 
