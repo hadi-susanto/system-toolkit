@@ -3,11 +3,16 @@
 # ------------------------------------------------------------------
 
 # Theme
-theme = GitHub Dark
+theme = 3024 Night
 
 # Never restore previous tabs/splits/windows
 # (works on macOS, ignored on Linux)
 window-save-state = never
+
+# Default window size
+window-width = 110
+window-height = 28
+font-size = 10
 
 # ------------------------------------------------------------------
 # Split creation

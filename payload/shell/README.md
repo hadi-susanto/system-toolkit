@@ -81,8 +81,10 @@ loaded after every regular integration.
 # Contents
 
 - [Bat](#bat-clibat)
+- [Claude Code](#claude-code-miscclaude-code)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [Mise](#mise-devmise)
 - [SDKMAN!](#sdkman-devsdkman)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Powerlevel10k](#powerlevel10k-termpower-level-10k)
@@ -105,6 +107,22 @@ loaded after every regular integration.
 | Alias     | Description                                                        |
 |-----------|--------------------------------------------------------------------|
 | `bat-cat` | Runs `bat --paging=never` so output is never displayed in a pager. |
+
+---
+
+# Claude Code (`misc/claude-code`)
+
+Provides one shared initialization payload for Bash and Zsh. The payload
+requires the `claude` command to be installed; otherwise it logs an error and
+skips activation without interrupting shell startup. When available, it
+exports `DISABLE_AUTOUPDATER=1` so Claude Code skips its background
+auto-update check.
+
+The corresponding configuration module can additionally enable or disable
+Claude Code's own auto-updater by setting `autoUpdaterStatus` in
+`~/.claude/settings.json`, install either shell integration, or activate
+either SysKit shell loader. The `claude` alias resolves to `misc/claude-code`
+for both the configuration and shell toolkits.
 
 ---
 
@@ -153,6 +171,31 @@ loaded after every regular integration.
 | `gswc` | **Expands to:** `git switch --create`<br><br>Creates a new branch and switches to it.                                                   |
 | `gf`   | **Expands to:** `git fetch`<br><br>Downloads commits, branches, and tags from the configured remote without modifying the working tree. |
 | `gfo`  | **Expands to:** `git fetch origin`<br><br>Fetches updates from the `origin` remote only.                                                |
+
+---
+
+# Mise (`dev/mise`)
+
+Provides one shared initialization payload for Bash and Zsh. The payload
+requires the `mise` command to be installed; otherwise it logs an error and
+skips activation without interrupting shell startup.
+
+The payload reads an optional data directory override from:
+
+```text
+~/.local/state/syskit/dev/mise/data-dir
+```
+
+When the state file holds a valid absolute path, the payload exports
+`MISE_DATA_DIR` before activating Mise. An invalid (non-absolute) stored path
+is reported without interrupting shell startup, and a missing state file means
+Mise uses its own default data directory. The payload then evaluates `mise
+activate bash` or `mise activate zsh` depending on the running shell.
+
+The corresponding configuration module provides interactive actions to set or
+remove the `MISE_DATA_DIR` override, install either shell integration, or
+activate either SysKit shell loader. Mise is installed into `delayed.d` and
+loaded after every regular shell module.
 
 ---
 

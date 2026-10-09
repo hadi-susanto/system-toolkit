@@ -6,7 +6,7 @@ A shell command module may contain a regular, non-symbolic-link `.delayed`
 marker:
 
 ```text
-command/shell/modules/<category>/<module>/.delayed
+modules/shell/<category>/<module>/.delayed
 ```
 
 The shell installer resolves this marker and installs the integration into
@@ -19,7 +19,7 @@ Loaders source all regular modules before delayed modules.
 Shell modules may provide a dedicated dependency script at:
 
 ```text
-command/shell/modules/<category>/<module>/check_dependencies.sh
+modules/shell/<category>/<module>/check_dependencies.sh
 ```
 
 The shell installer runs this script in a separate Bash process before copying

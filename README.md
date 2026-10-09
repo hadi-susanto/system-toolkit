@@ -75,6 +75,9 @@ system-toolkit/
 │   ├── bin/               Reusable binary toolkit libraries
 │   ├── config/            Configuration metadata and module helpers
 │   └── shell/             Reusable shell toolkit libraries and interfaces
+├── modules/
+│   ├── config/            Configuration module definitions
+│   └── shell/             Shell module definitions
 └── payload/
     ├── bin/               Standalone executable scripts
     ├── config/            Configuration and preference assets

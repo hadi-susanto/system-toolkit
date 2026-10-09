@@ -5,6 +5,7 @@ fi
 readonly __SYSKIT_RESOLVER_LOADED=1
 
 readonly -A __RESOLVER_MODULE_ALIASES=(
+    [claude]="misc/claude-code"
     [hide-password-asterisks]="sys/password-asterisks"
     [omp]="term/oh-my-posh"
     [plvl10k]="term/power-level-10k"
