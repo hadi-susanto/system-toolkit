@@ -86,6 +86,7 @@ loaded after every regular integration.
 - [Git](#git-cligit)
 - [Mise](#mise-devmise)
 - [SDKMAN!](#sdkman-devsdkman)
+- [Partial CD](#partial-cd-clipartial-cd)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Powerlevel10k](#powerlevel10k-termpower-level-10k)
 - [Starship](#starship-termstarship)
@@ -224,6 +225,25 @@ When `SDKMAN_DIR` is empty, the configuration module uses `$HOME/.sdkman`.
 SDKMAN! is installed into `delayed.d` and loaded after every regular shell
 module. Existing integrations in `module.d` move to the delayed phase when
 reinstalled with `--force`.
+
+---
+
+# Partial CD (`cli/partial-cd`)
+
+Provides a Bash-only completion function for `cd` and `pushd` that expands
+every typed path segment as a prefix, similar to Zsh's partial path
+completion. For example, `cd /mn/d/p<Tab>` completes to `/mnt/data/programs/`
+when it is the only match. When several directories match (`programs` and
+`posters`), Readline completes only their longest common prefix,
+`/mnt/data/p`; pressing Tab again lists the candidates.
+
+Absolute, relative, and `~` paths are supported. A trailing `/` lists the
+child directories. When nothing matches, Bash falls back to its default
+completion. The function replaces any existing `cd` and `pushd` completion,
+including the `bash-completion` package's `CDPATH` support, so the module is
+installed into `delayed.d` and loaded after every regular shell module. Zsh is
+not supported because it provides this behavior natively. The shell dependency
+check rejects installation for any shell other than Bash.
 
 ---
 
