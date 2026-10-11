@@ -175,6 +175,25 @@ own interactive action in `~/.local/state/syskit/dev/mise/data-dir` and is
 optional; without it, Mise uses its own default data directory. Mise is
 installed into `delayed.d` and loaded after every regular shell module.
 
+## Current IDE Modules
+
+| Canonical ID    | Managed behavior                                                                          |
+|-----------------|-------------------------------------------------------------------------------------------|
+| `ide/jetbrains` | Sets or removes the `fs.inotify.max_user_watches` limit through a sysctl drop-in file.   |
+
+JetBrains IDEs need one inotify watch per project directory and fall back to
+slow recursive scans when the limit is reached. Following the
+[JetBrains guide](https://youtrack.jetbrains.com/articles/SUPPORT-A-1715/Inotify-Watches-Limit-Linux),
+the first menu action asks for a limit (default `1048576`, a positive integer
+up to `2147483647`), writes `fs.inotify.max_user_watches = <limit>` to
+`/etc/sysctl.d/idea.conf` with `sudo`, and applies it with
+`sudo sysctl --system`. The second action removes that file and reloads sysctl.
+The running kernel value is not reset by removal; it changes only when another
+sysctl file sets it or after a reboot. Restart the IDE after changing the limit.
+Status shows the configured value and the running kernel limit. A symbolic link,
+non-regular file, or file without exactly one valid limit is reported as
+`[invalid]`.
+
 ## Current Miscellaneous Modules
 
 | Canonical ID       | Managed behavior                                                                                                                   |
