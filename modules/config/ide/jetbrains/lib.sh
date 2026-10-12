@@ -109,6 +109,8 @@ jetbrains_inotify_state() {
 #   1 when sysctl fails.
 #
 __jetbrains_reload_sysctl() {
+    log_info "Administrator privileges are required to reload the sysctl configuration"
+
     if ! sudo sysctl --system >/dev/null; then
         log_error "Failed to reload sysctl configuration"
 
@@ -158,6 +160,8 @@ write_jetbrains_inotify_limit() {
         return 1
     fi
 
+    log_info "Administrator privileges are required to install $__JETBRAINS_SYSCTL_FILE"
+
     if ! sudo install -m 0644 -o root -g root -- "$tmp_file" "$__JETBRAINS_SYSCTL_FILE"; then
         log_error "Failed to install sysctl file: $__JETBRAINS_SYSCTL_FILE"
         rm -f -- "$tmp_file"
@@ -186,6 +190,8 @@ remove_jetbrains_inotify_limit() {
 
         return 0
     fi
+
+    log_info "Administrator privileges are required to remove $__JETBRAINS_SYSCTL_FILE"
 
     if ! sudo rm -f -- "$__JETBRAINS_SYSCTL_FILE"; then
         log_error "Failed to remove sysctl file: $__JETBRAINS_SYSCTL_FILE"
