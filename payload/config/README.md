@@ -12,7 +12,7 @@ payload/config/<category>/<module>/
 The corresponding lifecycle logic lives under:
 
 ```text
-command/config/modules/<category>/<module>/
+modules/config/<category>/<module>/
 ```
 
 ## System Assets
@@ -22,16 +22,16 @@ command/config/modules/<category>/<module>/
 Provides local Bash and Zsh completion files mirrored from the apt-fast vendor
 repository. The module can install either bundled file or download the
 corresponding current vendor source. Existing completion targets require
-`syskit-cfg install --force apt-fast` (or the canonical `sys/apt-fast` ID)
+`syskit-cfg configure --force apt-fast` (or the canonical `sys/apt-fast` ID)
 before they can be overwritten.
 
 ## Terminal Assets
 
 ### Ghostty (`term/ghostty`)
 
-Provides `syskit.ghostty`, which configures the GitHub Dark theme, disables
-window-state restoration, and defines split creation, navigation, and zoom
-shortcuts.
+Provides `syskit.ghostty`, which configures the 3024 Night theme, disables
+window-state restoration, sets the default window size, font size, and working
+directory behavior, and defines split creation, navigation, and zoom shortcuts.
 
 The module manages an optional `config-file = ?syskit.ghostty` include inside
 `~/.config/ghostty/config.ghostty`. Its status compares the installed asset
@@ -50,9 +50,7 @@ The module manages `globinclude syskit.kitty` inside
 including checksum-based update availability.
 
 Both terminal modules preserve existing payload targets during normal
-installation. Running `syskit-cfg install --force kitty`, or using the
-canonical `term/kitty` ID, allows its file-install action to overwrite existing
-targets. File uninstallation checks every installed payload against its source
-before removing any of them. Checksum failures are all reported and prevent
-removal unless `syskit-cfg uninstall --force kitty` (or its canonical ID) is
-used.
+installation. Running `syskit-cfg configure --force kitty` (or `syskit-cfg
+kitty --force`, or the canonical `term/kitty` ID) allows the file-install
+action to overwrite existing targets. The same applies to Ghostty. File
+uninstallation removes the installed payload files without a checksum check.

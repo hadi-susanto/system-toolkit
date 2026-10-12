@@ -46,11 +46,15 @@ __set_plymouth() {
         return 1
     fi
 
+    log_info "Administrator privileges are required to update $__PLYMOUTH_GRUB_FILE"
+
     if ! sudo sed -i "s|$search|$replacement|" "$__PLYMOUTH_GRUB_FILE"; then
         log_error "Failed to update the GRUB Plymouth configuration"
 
         return 1
     fi
+
+    log_info "Administrator privileges are required to regenerate the GRUB configuration"
 
     if ! sudo update-grub; then
         log_error "Plymouth was changed, but the GRUB configuration could not be regenerated"

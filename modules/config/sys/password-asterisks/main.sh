@@ -49,6 +49,8 @@ __set_password_asterisks() {
         target="$__PASSWORD_ASTERISKS_DISABLED_FILE"
     fi
 
+    log_info "Administrator privileges are required to move the password-feedback sudoers file"
+
     if ! sudo mv -- "$source" "$target"; then
         log_error "Failed to update the password-feedback sudoers file"
 

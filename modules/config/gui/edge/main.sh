@@ -52,6 +52,8 @@ __set_edge_cron() {
             continue
         fi
 
+        log_info "Administrator privileges are required to change the permissions of $path"
+
         if sudo chmod "$mode" -- "$path"; then
             changed=1
         else

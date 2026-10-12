@@ -75,6 +75,8 @@ install_local_completion() {
 
     __validate_completion_target "$shell" "$target" || return $?
 
+    log_info "Administrator privileges are required to install the apt-fast $shell completion: $target"
+
     if ! sudo install -Dm0644 -- "$source" "$target"; then
         log_error "Failed to install local apt-fast $shell completion: $target"
 
@@ -140,6 +142,8 @@ install_vendor_completion() {
         return 1
     fi
 
+    log_info "Administrator privileges are required to install the apt-fast $shell completion: $target"
+
     if ! sudo install -Dm0644 -- "$temporary_file" "$target"; then
         log_error "Failed to install vendor apt-fast $shell completion: $target"
 
@@ -186,6 +190,8 @@ uninstall_completion() {
 
         return 1
     fi
+
+    log_info "Administrator privileges are required to uninstall the apt-fast $shell completion: $target"
 
     if ! sudo rm -f -- "$target"; then
         log_error "Failed to uninstall apt-fast $shell completion: $target"

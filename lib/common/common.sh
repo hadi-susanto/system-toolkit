@@ -58,6 +58,26 @@ log_error() {
 }
 
 ##
+# sudo <command...>
+#
+# Shadows the sudo binary for every SysKit script that sources this library.
+# Logs the exact command and warns that a password may be requested, then runs
+# the real sudo. Direct calls such as /usr/bin/sudo or `command sudo` bypass it.
+# Precede each call with a log_info that states the human reason.
+#
+# Parameters:
+#   command    Arguments passed through to sudo unchanged.
+#
+# Returns:
+#   The exit status of the real sudo.
+#
+sudo() {
+    log_info "Running: sudo $(printf '%q ' "$@")(sudo may ask for your password)"
+
+    command sudo "$@"
+}
+
+##
 # route_command_help <options_name> <args_name>
 #
 # Rewrites "<command> help", "<command> -h", and "<command> --help" to the

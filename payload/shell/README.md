@@ -86,6 +86,7 @@ loaded after every regular integration.
 - [Git](#git-cligit)
 - [Mise](#mise-devmise)
 - [SDKMAN!](#sdkman-devsdkman)
+- [Partial CD](#partial-cd-clipartial-cd)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Powerlevel10k](#powerlevel10k-termpower-level-10k)
 - [Starship](#starship-termstarship)
@@ -171,6 +172,11 @@ for both the configuration and shell toolkits.
 | `gswc` | **Expands to:** `git switch --create`<br><br>Creates a new branch and switches to it.                                                   |
 | `gf`   | **Expands to:** `git fetch`<br><br>Downloads commits, branches, and tags from the configured remote without modifying the working tree. |
 | `gfo`  | **Expands to:** `git fetch origin`<br><br>Fetches updates from the `origin` remote only.                                                |
+| `gwa`  | **Expands to:** `git worktree add`<br><br>Creates a new worktree.                                                                       |
+| `gwl`  | **Expands to:** `git worktree list`<br><br>Lists the worktrees of the repository.                                                       |
+| `gwp`  | **Expands to:** `git worktree prune`<br><br>Prunes stale worktree administrative data.                                                  |
+| `gwd`  | **Expands to:** `git worktree remove`<br><br>Removes a worktree.                                                                        |
+| `gwr`  | **Expands to:** `git worktree repair`<br><br>Repairs worktree administrative files.                                                     |
 
 ---
 
@@ -217,13 +223,34 @@ the state file, install either shell integration, or activate either SysKit
 shell loader. Set `SDKMAN_DIR` for a custom installation:
 
 ```bash
-SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg install dev/sdkman
+SDKMAN_DIR="/absolute/sdkman/path" syskit-cfg configure dev/sdkman
 ```
 
-When `SDKMAN_DIR` is empty, the configuration module uses `$HOME/.sdkman`.
+When `SDKMAN_DIR` is empty, the configuration module falls back to
+`INSTALL_PATH` from the Mint Provisioner registry
+(`~/.local/state/mint-provisioner/registry/dev/sdkman.registry`).
 SDKMAN! is installed into `delayed.d` and loaded after every regular shell
 module. Existing integrations in `module.d` move to the delayed phase when
 reinstalled with `--force`.
+
+---
+
+# Partial CD (`cli/partial-cd`)
+
+Provides a Bash-only completion function for `cd` and `pushd` that expands
+every typed path segment as a prefix, similar to Zsh's partial path
+completion. For example, `cd /mn/d/p<Tab>` completes to `/mnt/data/programs/`
+when it is the only match. When several directories match (`programs` and
+`posters`), Readline completes only their longest common prefix,
+`/mnt/data/p`; pressing Tab again lists the candidates.
+
+Absolute, relative, and `~` paths are supported. A trailing `/` lists the
+child directories. When nothing matches, Bash falls back to its default
+completion. The function replaces any existing `cd` and `pushd` completion,
+including the `bash-completion` package's `CDPATH` support, so the module is
+installed into `delayed.d` and loaded after every regular shell module. Zsh is
+not supported because it provides this behavior natively. The shell dependency
+check rejects installation for any shell other than Bash.
 
 ---
 
@@ -258,7 +285,7 @@ the state file, install the Zsh integration, or activate the SysKit Zsh loader:
 
 ```bash
 POWERLEVEL10K_INSTALL_DIR="/absolute/powerlevel10k/path" \
-    syskit-cfg install term/power-level-10k
+    syskit-cfg configure term/power-level-10k
 ```
 
 Powerlevel10k is loaded in the regular shell-module order.

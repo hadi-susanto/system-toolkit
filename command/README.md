@@ -26,4 +26,4 @@ target must still be a valid, existing canonical ID under the caller's root.
 
 Configuration modules have their own directory contract, metadata format, and
 lifecycle rules. See the
-[configuration module guide](config/modules/README.md) for details.
+[configuration module guide](../modules/config/README.md) for details.
