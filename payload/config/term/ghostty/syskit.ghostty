@@ -41,3 +41,12 @@ keybind = ctrl+down=goto_split:down
 # ------------------------------------------------------------------
 
 keybind = ctrl+shift+x=toggle_split_zoom
+
+# ------------------------------------------------------------------
+# New Window and Split Tab behavior
+# ------------------------------------------------------------------
+
+working-directory = home
+window-inherit-working-directory = false
+tab-inherit-working-directory = false
+split-inherit-working-directory = false
