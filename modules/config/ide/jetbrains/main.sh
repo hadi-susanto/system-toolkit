@@ -33,9 +33,8 @@ main() {
     local -a options=()
 
     while true; do
-        printf 'Current JetBrains Status:\n-----------------------\n'
-        bash "$CONFIG_MODULE_DIR/status.sh" || return $?
-        printf '\n' >/dev/tty
+        show_status $'Current JetBrains Status:\n-----------------------' \
+            bash "$CONFIG_MODULE_DIR/status.sh" || return $?
 
         options=(
             "Set inotify watches limit (default $__JETBRAINS_DEFAULT_WATCHES)"
@@ -63,7 +62,7 @@ main() {
                 ;;
         esac
 
-        printf '\n' >/dev/tty
+        pause_prompt
     done
 }
 

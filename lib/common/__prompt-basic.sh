@@ -308,3 +308,42 @@ ask_text() {
         printf '\n' >/dev/tty
     done
 }
+
+##
+# show_status <heading> <command...>
+#
+# Prints a heading, then runs a status command so its output appears in the
+# terminal above the next prompt.
+#
+# Parameters:
+#   heading    Heading text, may contain an underline line.
+#   command    Command (and arguments) that prints the status.
+#
+# Output:
+#   Prints the heading and the command output.
+#
+# Returns:
+#   The exit status of the status command.
+#
+show_status() {
+    local heading="$1"
+    local status=0
+
+    shift
+
+    printf '%s\n' "$heading"
+    "$@" || status=$?
+    printf '\n' >/dev/tty
+
+    return "$status"
+}
+
+##
+# pause_prompt
+#
+# Marks the end of a menu iteration. Output is already visible in the plain
+# terminal, so only a blank line is written.
+#
+pause_prompt() {
+    printf '\n' >/dev/tty
+}

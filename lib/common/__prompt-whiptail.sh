@@ -34,7 +34,7 @@ __prompt_terminal_available() {
 # whiptail's result (written to stderr) is forwarded to stdout.
 __whiptail() {
     env -u NEWT_COLORS_FILE NEWT_COLORS="$__prompt_whiptail_colors" \
-        whiptail --backtitle "SysKit" "$@" 2>&1 >/dev/tty </dev/tty
+        whiptail "$@" 2>&1 >/dev/tty </dev/tty
 }
 
 # Prints "<rows> <columns>" of the terminal, defaulting to 24x80.
@@ -107,6 +107,57 @@ __whiptail_clean_question() {
     printf '%s\n' "$result"
 }
 
+# Status text captured by show_status and rendered by the next choose_option.
+# choose_option normally runs in a command substitution, so it cannot clear
+# this; callers are expected to run show_status before every menu.
+__prompt_status_text=""
+
+##
+# show_status <heading> <command...>
+#
+# Runs a status command and keeps its output for the next choose_option, which
+# displays it inside the menu dialog. The command runs without colors and with
+# stderr merged into its output, because the dialog hides the normal screen.
+#
+# Parameters:
+#   heading    Heading text, may contain an underline line.
+#   command    Command (and arguments) that prints the status.
+#
+# Returns:
+#   The exit status of the status command.
+#
+show_status() {
+    local heading="$1"
+    local output
+    local status=0
+
+    shift
+
+    output="$(NO_COLOR=1 FORCE_COLOR= "$@" 2>&1)" || status=$?
+    __prompt_status_text="$(__whiptail_clean_question "$heading")"$'\n\n'"$output"
+
+    if (( status != 0 )); then
+        # The caller is expected to abort, so no dialog will show this text.
+        printf '%s\n' "$output" >&2
+    fi
+
+    return "$status"
+}
+
+##
+# pause_prompt
+#
+# Waits for Enter so action output stays readable before the next dialog
+# replaces the screen.
+#
+pause_prompt() {
+    local _
+
+    printf 'Press Enter to continue...' >/dev/tty
+    IFS= read -r _ </dev/tty || true
+    printf '\n' >/dev/tty
+}
+
 ##
 # show_temporary_input_error <message>
 #
@@ -177,8 +228,23 @@ choose_option() {
         fi
     done
 
-    read -r height width text_lines < <(__whiptail_dimensions "$text" 0 "$longest")
     read -r rows _ < <(__whiptail_screen_size)
+
+    if [[ -n "$__prompt_status_text" ]]; then
+        local combined="$__prompt_status_text"$'\n\n'"$text"
+        local combined_lines
+
+        read -r _ _ combined_lines < <(__whiptail_dimensions "$combined" 0 "$longest")
+
+        if (( combined_lines + $# + 7 <= rows )); then
+            text="$combined"
+        else
+            __whiptail --title "Status" --scrolltext --msgbox -- \
+                "$__prompt_status_text" "$((rows - 2))" "$(__whiptail_dimensions "$__prompt_status_text" 0 "$longest" | cut -d' ' -f2)" || true
+        fi
+    fi
+
+    read -r height width text_lines < <(__whiptail_dimensions "$text" 0 "$longest")
 
     list_height=$#
     if (( list_height > rows - text_lines - 8 )); then
