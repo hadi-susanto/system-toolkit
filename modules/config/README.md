@@ -157,6 +157,36 @@ Module directories contain logic. Payload directories contain only files or
 templates that the module may install or use while configuring the system.
 Modules that do not require source assets may omit their payload directory.
 
+## Current CLI Modules
+
+| Canonical ID | Managed behavior                                                                      |
+|--------------|---------------------------------------------------------------------------------------|
+| `cli/rclone` | Creates or deletes systemd user services that automatically mount rclone remotes.     |
+
+Managed services are written to `~/.config/systemd/user/rclone-<name>.service`;
+no `sudo` is needed. The add action asks for:
+
+- a service name (letters, digits, `-`, `_`), used for the unit name and
+  `--volname`; an existing unit with that name is never replaced,
+- the remote as `<remote>:` or `<remote>:<path>`, checked against
+  `rclone listremotes`,
+- the local mount location and `--cache-dir` (default `~/.cache/rclone`); both
+  must be real, writable directories and are created after confirmation when
+  missing,
+- `--vfs-cache-mode` (default `writes`), `--vfs-cache-max-size` (default `1G`)
+  and `--vfs-cache-max-age` (default `720h`).
+
+The unit runs `rclone mount` as a `Type=notify` service, unmounts with
+`fusermount3` (or `fusermount`), and is wanted by `default.target`, so it
+starts when the user manager starts at login. It has no
+`After=`/`Wants=network-online.target`: that target exists only in the system
+manager and is ignored by user units, so `Restart=on-failure` retries when the
+network is not ready yet. After the
+file is written the module reloads the user manager and offers to run
+`systemctl --user enable --now`. The delete action stops, disables, and removes
+a selected unit. Status lists every `rclone-*.service` unit with its enabled
+and active state.
+
 ## Current Development Modules
 
 | Canonical ID | Managed behavior                                                                                                                      |
