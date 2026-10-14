@@ -87,6 +87,7 @@ loaded after every regular integration.
 - [Mise](#mise-devmise)
 - [SDKMAN!](#sdkman-devsdkman)
 - [Partial CD](#partial-cd-clipartial-cd)
+- [Partial Complete](#partial-complete-clipartial-complete)
 - [Oh My Posh](#oh-my-posh-termoh-my-posh)
 - [Powerlevel10k](#powerlevel10k-termpower-level-10k)
 - [Starship](#starship-termstarship)
@@ -250,7 +251,26 @@ completion. The function replaces any existing `cd` and `pushd` completion,
 including the `bash-completion` package's `CDPATH` support, so the module is
 installed into `delayed.d` and loaded after every regular shell module. Zsh is
 not supported because it provides this behavior natively. The shell dependency
-check rejects installation for any shell other than Bash.
+check rejects installation for any shell other than Bash. It cannot be
+installed alongside `cli/partial-complete` unless `--force` is used.
+
+---
+
+# Partial Complete (`cli/partial-complete`)
+
+Bash-only variant of Partial CD that applies the same per-segment prefix
+expansion to every command and alias without its own completion spec, by
+registering a default completion (`complete -D`). `cd` and `pushd` keep
+directory-only matching; other commands match files and directories.
+
+Only words containing `/` or starting with `~` are expanded; everything else
+uses normal Bash completion. Commands with a `bash-completion` spec (git, ssh,
+...) keep it: the function calls `_completion_loader` first and drops the no-op
+`_minimal` spec it registers for spec-less commands, so later Tab presses reach
+this function again. Option values after `=` or `:` work because Bash splits
+those words. The module is installed into `delayed.d`; another `complete -D`
+registered later replaces it. Zsh is not supported. It cannot be installed
+alongside `cli/partial-cd` unless `--force` is used.
 
 ---
 
