@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 
 # Theme
-theme = 3024 Night
+theme = Builtin Tango Dark
 
 # Never restore previous tabs/splits/windows
 # (works on macOS, ignored on Linux)
