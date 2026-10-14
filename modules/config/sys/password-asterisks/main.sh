@@ -68,9 +68,8 @@ main() {
     local selected
 
     while true; do
-        printf 'Current Password Asterisks Status:\n----------------------------------\n'
-        bash "$CONFIG_MODULE_DIR/status.sh" || return $?
-        printf '\n' >/dev/tty
+        show_status $'Current Password Asterisks Status:\n----------------------------------' \
+            bash "$CONFIG_MODULE_DIR/status.sh" || return $?
 
         if ! selected="$(
             choose_option \
@@ -95,7 +94,7 @@ main() {
                 ;;
         esac
 
-        printf '\n' >/dev/tty
+        pause_prompt
     done
 }
 

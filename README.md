@@ -71,7 +71,7 @@ system-toolkit/
 │   ├── config/            Configuration command dispatcher and scripts
 │   └── shell/             Shared Bash and Zsh command dispatcher and scripts
 ├── lib/
-│   ├── common/            Shared logging, prompts, and process helpers
+│   ├── common/            Shared logging, prompts (whiptail or plain), and process helpers
 │   ├── bin/               Reusable binary toolkit libraries
 │   ├── config/            Configuration metadata and module helpers
 │   └── shell/             Reusable shell toolkit libraries and interfaces

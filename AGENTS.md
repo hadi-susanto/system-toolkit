@@ -5,6 +5,7 @@
 - Use Bash with `#!/usr/bin/env bash`.
 - Every executable entrypoint and module phase script must enable strict mode immediately after the shebang using `set -euo pipefail`.
 - Sourced libraries, helpers, and shell-integration payloads must not change the caller's shell options. They must remain compatible with `set -euo pipefail`.
+- Public libraries must have a load-once guard (`__SYSKIT_<NAME>_LOADED`). Exception: private implementation libraries named `__<name>.sh` (for example `lib/common/__prompt-basic.sh`) must not have a guard. They are sourced only by a single public loader that owns the guard and selects the implementation; callers must never source them directly.
 - Quote variable expansions unless word splitting or pathname expansion is intentional.
 - Use `1` and `0` for internal Boolean variables and associative-array options.
   Use `true` and `false` strings only for Boolean values originating from

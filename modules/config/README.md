@@ -87,6 +87,18 @@ typically show their current status, then loop over a menu of actions that
 adapt to the detected state (for example, enable versus disable). The module
 decides how to handle existing targets and whether they can be changed safely.
 
+Menu loops use the helpers from `$COMMON_LIB/prompt.sh` so they work with both
+the plain-terminal and whiptail backends (set `DISABLE_WHIPTAIL=true` to force
+the plain one). whiptail hides the normal screen while a dialog is open, so do
+not print status or results with bare `printf`/`bash status.sh` around a menu:
+
+- `show_status <heading> <command...>` runs the status command. Plain mode
+  prints it; whiptail mode renders it inside the next menu dialog. Call it at
+  the top of every loop iteration and keep `|| return $?`.
+- `choose_option`, `confirm_action` and `ask_text` are the prompts.
+- `pause_prompt` goes at the end of each loop iteration so action output stays
+  readable (whiptail waits for Enter; plain mode just prints a blank line).
+
 ### `status.sh`
 
 Inspects the module without changing the system. Each module owns its status

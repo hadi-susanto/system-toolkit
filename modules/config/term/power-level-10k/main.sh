@@ -34,9 +34,8 @@ main() {
 
 
     while true; do
-        printf 'Current Powerlevel10k Status:\n-----------------------------\n'
-        bash "$CONFIG_MODULE_DIR/status.sh" || return $?
-        printf '\n' >/dev/tty
+        show_status $'Current Powerlevel10k Status:\n-----------------------------' \
+            bash "$CONFIG_MODULE_DIR/status.sh" || return $?
 
         # Dynamically change the option based on integration status(es)
         options=()
@@ -99,7 +98,7 @@ main() {
                 ;;
         esac
 
-        printf '\n' >/dev/tty
+        pause_prompt
     done
 }
 

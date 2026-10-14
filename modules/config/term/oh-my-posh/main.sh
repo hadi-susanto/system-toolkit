@@ -20,9 +20,8 @@ main() {
     fi
 
     while true; do
-        printf 'Current Oh My Posh Status:\n--------------------------\n'
-        bash "$CONFIG_MODULE_DIR/status.sh" || return $?
-        printf '\n' >/dev/tty
+        show_status $'Current Oh My Posh Status:\n--------------------------' \
+            bash "$CONFIG_MODULE_DIR/status.sh" || return $?
 
         # Dynamically change the option based on integration status(es)
         options=()
@@ -101,7 +100,7 @@ main() {
                 ;;
         esac
 
-        printf '\n' >/dev/tty
+        pause_prompt
     done
 }
 

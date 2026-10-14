@@ -12,9 +12,8 @@ main() {
     local ghostty_config_installed=0
 
     while true; do
-        printf 'Current Ghostty Status:\n-----------------------\n'
-        bash "$CONFIG_MODULE_DIR/status.sh" || return $?
-        printf '\n' >/dev/tty
+        show_status $'Current Ghostty Status:\n-----------------------' \
+            bash "$CONFIG_MODULE_DIR/status.sh" || return $?
 
         # Dynamically change the option based on integration status(es)
         options=()
@@ -61,7 +60,7 @@ main() {
                 ;;
         esac
 
-        printf '\n' >/dev/tty
+        pause_prompt
     done
 }
 
