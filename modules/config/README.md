@@ -46,6 +46,7 @@ canonical IDs are rejected. Current aliases:
 | Alias                         | Resolves to              |
 |-------------------------------|--------------------------|
 | `claude`                      | `misc/claude-code`       |
+| `kvm`                         | `misc/kvm-autoload`      |
 | `omp`                         | `term/oh-my-posh`        |
 | `plvl10k`                     | `term/power-level-10k`   |
 | `password`                    | `sys/password-asterisks` |
@@ -247,6 +248,7 @@ non-regular file, or file without exactly one valid limit is reported as
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `misc/claude-code` | Enables or disables the Claude Code auto-updater, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
 | `misc/junie`       | Enables or disables the Junie CLI auto-update check.                                                                                |
+| `misc/kvm-autoload`| Enables or disables KVM module autoload at boot so VT-x/AMD-V stays free for other hypervisors.                                    |
 
 Auto-update is toggled by setting `autoUpdaterStatus` to `enabled` or
 `disabled` in `~/.claude/settings.json`. The module edits only that key
@@ -259,6 +261,14 @@ Junie's auto-update check is toggled the same way, by setting the boolean
 `auto-update` key to `true` or `false` in `~/.junie/config.json` through the
 same `jq` swap-file technique. Junie has no shell initialization and does not
 participate in the shell toolkit.
+
+`misc/kvm-autoload` manages `/etc/modprobe.d/syskit-kvm-autoload.conf`, which
+contains `blacklist kvm_intel` and `blacklist kvm_amd`. Disabling autoload
+creates the file with `sudo`; enabling removes it. A blacklist only stops
+alias-based autoload at boot, so an explicit `modprobe kvm_intel` still works.
+Disabling offers to unload the loaded KVM modules immediately. Status reads
+`lsmod` to report which hypervisor module holds VT-x/AMD-V (`kvm_intel`,
+`kvm_amd`, VirtualBox `vboxdrv`, or VMware `vmmon`) and what uses it. No initramfs refresh is normally needed.
 
 ## Current System Modules
 
