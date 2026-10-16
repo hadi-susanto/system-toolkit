@@ -47,18 +47,50 @@ __enable_autoload() {
     log_info "Enabled KVM autoload at boot"
 }
 
+##
+# __unload_kvm
+#
+# Unloads the loaded KVM modules for the current boot only. Makes no
+# persistent change.
+#
+# Returns:
+#   1 when a module could not be unloaded.
+#
 __unload_kvm() {
     local module
+    local loaded=0
+    local failed=0
+
+    for module in "${__KVM_MODULES[@]}"; do
+        if grep -q "^$module " /proc/modules 2>/dev/null; then
+            loaded=1
+        fi
+    done
+
+    if (( ! loaded )); then
+        log_warn "No KVM modules are loaded"
+
+        return 0
+    fi
 
     log_info "Administrator privileges are required to unload KVM modules"
 
     for module in "${__KVM_MODULES[@]}"; do
-        if grep -q "^$module " /proc/modules 2>/dev/null; then
-            if ! sudo modprobe -r "$module"; then
-                log_warn "Could not unload $module (still in use?)"
-            fi
+        if ! grep -q "^$module " /proc/modules 2>/dev/null; then
+            continue
+        fi
+
+        if ! sudo modprobe -r "$module"; then
+            log_error "Could not unload $module (still in use?)"
+            failed=1
         fi
     done
+
+    if (( failed )); then
+        return 1
+    fi
+
+    log_info "Unloaded KVM modules (until the next module load or reboot)"
 }
 
 __disable_autoload() {
@@ -90,7 +122,9 @@ __disable_autoload() {
     log_info "Disabled KVM autoload at boot"
 
     if confirm_action "Unload KVM modules now?"; then
-        __unload_kvm
+        if ! __unload_kvm; then
+            log_warn "Autoload stays disabled; KVM modules remain loaded for this boot"
+        fi
     fi
 }
 
@@ -104,6 +138,7 @@ main() {
         if ! selected="$(
             choose_option \
                 $'KVM Autoload Configuration:\n----------------------------' \
+                "Unload KVM modules now (this boot only)" \
                 "Enable KVM load at boot" \
                 "Disable KVM load at boot"
         )"; then
@@ -114,9 +149,12 @@ main() {
 
         case "$selected" in
             1)
-                __enable_autoload || return $?
+                __unload_kvm || return $?
                 ;;
             2)
+                __enable_autoload || return $?
+                ;;
+            3)
                 __disable_autoload || return $?
                 ;;
             X)

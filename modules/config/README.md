@@ -266,7 +266,8 @@ participate in the shell toolkit.
 contains `blacklist kvm_intel` and `blacklist kvm_amd`. Disabling autoload
 creates the file with `sudo`; enabling removes it. A blacklist only stops
 alias-based autoload at boot, so an explicit `modprobe kvm_intel` still works.
-Disabling offers to unload the loaded KVM modules immediately. Status reads
+Disabling offers to unload the loaded KVM modules immediately, and a separate
+menu entry unloads them for the current boot without changing the blacklist. Status reads
 `lsmod` to report which hypervisor module holds VT-x/AMD-V (`kvm_intel`,
 `kvm_amd`, VirtualBox `vboxdrv`, or VMware `vmmon`) and what uses it. No initramfs refresh is normally needed.
 
