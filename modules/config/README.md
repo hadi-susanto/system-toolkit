@@ -278,7 +278,7 @@ menu entry unloads them for the current boot without changing the blacklist. Sta
 | `sys/apt-fast`           | Installs Bash or Zsh completion from the apt-fast vendor source or bundled local payloads.        |
 | `sys/password-asterisks` | Enables or disables Linux Mint sudo password feedback by moving its managed sudoers file.         |
 | `sys/plymouth`           | Enables the Plymouth splash or disables it for verbose boot output, then regenerates GRUB config. |
-| `sys/zram`               | Configures zram swap (`/etc/default/zramswap`) and enables or disables `zramswap.service`.        |
+| `sys/zram`               | Configures zram swap, `vm.swappiness`/`vm.page-cluster`, and enables or disables zram.            |
 
 The apt-fast module also supports interactive removal of either installed
 completion. Existing completion targets are preserved unless the module is run
@@ -287,7 +287,9 @@ with `--force` (for example, `syskit-cfg configure --force apt-fast`).
 `sys/zram` targets the `zram-tools` package and never installs it. Status shows
 whether zram swap is active and its size. The menu can rewrite
 `/etc/default/zramswap` (algorithm, fixed MiB or percent of RAM, priority) and
-enable or disable `zramswap.service`. A fixed size and a percentage are
+enable or disable `zramswap.service`. It also manages `vm.swappiness` and
+`vm.page-cluster` in `/etc/sysctl.d/99-zram.conf` (other lines in that file are
+kept) and applies them immediately with `sysctl -w`. A fixed size and a percentage are
 mutually exclusive because zramswap lets `PERCENT` override `SIZE`.
 
 ## Current Terminal Modules
