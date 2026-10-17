@@ -5,11 +5,14 @@ fi
 readonly __SYSKIT_ZRAM_LOADED=1
 
 __ZRAM_CONF="${__ZRAM_CONF:-/etc/default/zramswap}"
+__ZRAM_SYSCTL_CONF="${__ZRAM_SYSCTL_CONF:-/etc/sysctl.d/99-zram.conf}"
 readonly __ZRAM_SERVICE="zramswap.service"
 readonly __ZRAM_ALGOS=(lzo lzo-rle lz4 lz4hc zstd deflate 842)
 readonly __ZRAM_DEFAULT_ALGO="zstd"
 readonly __ZRAM_DEFAULT_SIZE="4096"
 readonly __ZRAM_DEFAULT_PRIORITY="100"
+readonly __ZRAM_DEFAULT_SWAPPINESS="150"
+readonly __ZRAM_DEFAULT_PAGE_CLUSTER="0"
 
 ##
 # zram_installed
@@ -215,4 +218,113 @@ write_zram_conf() {
     fi
 
     rm -f -- "$tmp"
+}
+
+zram_valid_swappiness() {
+    [[ "$1" =~ ^([0-9]|[1-9][0-9]|1[0-9][0-9]|200)$ ]]
+}
+
+zram_valid_page_cluster() {
+    [[ "$1" =~ ^([0-9]|1[0-5])$ ]]
+}
+
+##
+# zram_sysctl_live <name>
+#
+# Output:
+#   Prints the running value of a sysctl (for example vm.swappiness).
+#
+# Returns:
+#   1 when the value cannot be read.
+#
+zram_sysctl_live() {
+    sysctl -n "$1" 2>/dev/null
+}
+
+##
+# zram_sysctl_conf_get <name>
+#
+# Reads a persisted sysctl value from the managed sysctl file (last one wins)
+# without sourcing it.
+#
+# Output:
+#   Prints the value, or nothing when the key is not set.
+#
+zram_sysctl_conf_get() {
+    local name="$1"
+    local line
+    local value=""
+
+    if [[ ! -f "$__ZRAM_SYSCTL_CONF" ]]; then
+        return 0
+    fi
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^[[:space:]]*"$name"[[:space:]]*=[[:space:]]*([^#[:space:]]*) ]]; then
+            value="${BASH_REMATCH[1]}"
+        fi
+    done <"$__ZRAM_SYSCTL_CONF"
+
+    printf '%s\n' "$value"
+}
+
+##
+# write_zram_sysctl <swappiness> <page_cluster>
+#
+# Persists vm.swappiness and vm.page-cluster in the managed sysctl file,
+# keeping any other lines in it, then applies the file to the running kernel.
+#
+# Returns:
+#   1 when the target is invalid or the write or apply fails.
+#
+write_zram_sysctl() {
+    local swappiness="$1"
+    local page_cluster="$2"
+    local tmp
+    local line
+
+    if [[ -L "$__ZRAM_SYSCTL_CONF" ]] ||
+        { [[ -e "$__ZRAM_SYSCTL_CONF" ]] && [[ ! -f "$__ZRAM_SYSCTL_CONF" ]]; }; then
+        log_error "Invalid sysctl file: $__ZRAM_SYSCTL_CONF"
+
+        return 1
+    fi
+
+    if ! tmp="$(mktemp)"; then
+        log_error "Failed to create a temporary file"
+
+        return 1
+    fi
+
+    {
+        if [[ -f "$__ZRAM_SYSCTL_CONF" ]]; then
+            while IFS= read -r line; do
+                if [[ ! "$line" =~ ^[[:space:]]*vm\.(swappiness|page-cluster)[[:space:]]*= ]]; then
+                    printf '%s\n' "$line"
+                fi
+            done <"$__ZRAM_SYSCTL_CONF"
+        fi
+
+        printf 'vm.swappiness=%s\n' "$swappiness"
+        printf 'vm.page-cluster=%s\n' "$page_cluster"
+    } >"$tmp"
+
+    log_info "Administrator privileges are required to write $__ZRAM_SYSCTL_CONF"
+
+    if ! sudo install -Dm0644 -- "$tmp" "$__ZRAM_SYSCTL_CONF"; then
+        rm -f -- "$tmp"
+        log_error "Failed to write $__ZRAM_SYSCTL_CONF"
+
+        return 1
+    fi
+
+    rm -f -- "$tmp"
+
+    log_info "Administrator privileges are required to apply the sysctl values"
+
+    if ! sudo sysctl -w "vm.swappiness=$swappiness" "vm.page-cluster=$page_cluster" >/dev/null; then
+        log_error "Saved $__ZRAM_SYSCTL_CONF but failed to apply it to the running kernel"
+
+        return 1
+    fi
 }

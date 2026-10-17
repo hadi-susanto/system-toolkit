@@ -53,6 +53,12 @@ main() {
 
     printf 'Configured Algo  : %s\n' "$(zram_conf_get ALGO)"
     printf 'Configured Prio  : %s\n' "$(zram_conf_get PRIORITY)"
+    printf 'vm.swappiness    : %s (saved: %s)\n' \
+        "$(zram_sysctl_live vm.swappiness || printf '?')" \
+        "$(zram_sysctl_conf_get vm.swappiness | sed 's/^$/-/')"
+    printf 'vm.page-cluster  : %s (saved: %s)\n' \
+        "$(zram_sysctl_live vm.page-cluster || printf '?')" \
+        "$(zram_sysctl_conf_get vm.page-cluster | sed 's/^$/-/')"
 }
 
 main "$@"

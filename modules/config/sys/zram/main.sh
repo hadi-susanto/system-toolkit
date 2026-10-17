@@ -121,6 +121,48 @@ __configure() {
     fi
 }
 
+__configure_swappiness() {
+    local swappiness
+    local page_cluster
+    local current_swappiness
+    local current_page_cluster
+    local summary
+
+    current_swappiness="$(zram_sysctl_conf_get vm.swappiness)"
+    current_page_cluster="$(zram_sysctl_conf_get vm.page-cluster)"
+
+    if [[ -z "$current_swappiness" ]]; then
+        current_swappiness="$(zram_sysctl_live vm.swappiness || printf '%s' "$__ZRAM_DEFAULT_SWAPPINESS")"
+    fi
+
+    if [[ -z "$current_page_cluster" ]]; then
+        current_page_cluster="$(zram_sysctl_live vm.page-cluster || printf '%s' "$__ZRAM_DEFAULT_PAGE_CLUSTER")"
+    fi
+
+    swappiness="$(__ask_validated "vm.swappiness (0-200; 100+ favors swapping, suits zram)?" \
+        "$current_swappiness" zram_valid_swappiness \
+        "Swappiness must be between 0 and 200")" || return 1
+
+    page_cluster="$(__ask_validated "vm.page-cluster (0-15; pages read ahead = 2^N, 0 suits zram)?" \
+        "$current_page_cluster" zram_valid_page_cluster \
+        "Page cluster must be between 0 and 15")" || return 1
+
+    summary="The following values will be saved to $__ZRAM_SYSCTL_CONF and applied now:"$'\n'
+    summary+="  vm.swappiness  : $swappiness"$'\n'
+    summary+="  vm.page-cluster: $page_cluster"$'\n\n'
+    summary+="Apply these values?"
+
+    if ! confirm_action "$summary"; then
+        log_info "The sysctl values were not changed"
+
+        return 0
+    fi
+
+    write_zram_sysctl "$swappiness" "$page_cluster" || return 1
+
+    log_info "Set vm.swappiness=$swappiness and vm.page-cluster=$page_cluster"
+}
+
 __enable() {
     log_info "Administrator privileges are required to enable and start $__ZRAM_SERVICE"
 
@@ -171,6 +213,7 @@ main() {
         if ! selected="$(
             choose_option $'zram Configuration:\n-------------------' \
                 "Configure zram" \
+                "Configure swappiness" \
                 "Enable/Disable zram"
         )"; then
             return 1
@@ -184,6 +227,9 @@ main() {
                 __configure || true
                 ;;
             2)
+                __configure_swappiness || true
+                ;;
+            3)
                 __toggle || true
                 ;;
             X)
