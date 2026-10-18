@@ -17,6 +17,7 @@ Local installation uses `~/.local/bin`, while global installation uses
 - [`bat-help`](#bat-help)
 - [`git-bat-diff`](#git-bat-diff)
 - [`git-delta-diff`](#git-delta-diff)
+- [`git-meld-diff`](#git-meld-diff)
 - [`gpsup`](#gpsup)
 - [`mkvmerge-extract-info`](#mkvmerge-extract-info)
 - [`mkvmerge-process`](#mkvmerge-process)
@@ -149,6 +150,63 @@ git-delta-diff --dark -- src/main.sh
 | `--`             | Stop parsing tool options and pass the separator and remaining arguments to Git Diff. |
 
 All other arguments are forwarded directly to `git diff`.
+
+## Environment Variables
+
+| ENV           | Description                                                                                               |
+|---------------|-----------------------------------------------------------------------------------------------------------|
+| `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                      |
+| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
+
+---
+
+# `git-meld-diff`
+
+Displays Git differences in Meld using `git difftool`.
+
+All changed files open in a single Meld directory comparison by default. Unrecognized arguments are forwarded directly
+to `git difftool`, so revisions, `--staged`, and paths work as they do with `git diff`. Meld is selected for this
+command only; the user's Git configuration is not changed.
+
+When comparing against the working tree, the right-hand side of the directory comparison links to the working-tree
+files, so edits saved in Meld are written back to the repository.
+
+Requires `git` and `meld`. The command must be run inside a Git working tree.
+
+Compare unstaged changes in one Meld window:
+
+```bash
+git-meld-diff
+```
+
+Compare staged changes:
+
+```bash
+git-meld-diff --staged
+```
+
+Compare revisions:
+
+```bash
+git-meld-diff HEAD~1
+git-meld-diff main..feature
+```
+
+Open each changed file in its own Meld window, restricted to specific paths:
+
+```bash
+git-meld-diff --per-file -- src/main.sh
+```
+
+## Options
+
+| Option       | Description                                                                               |
+|--------------|-------------------------------------------------------------------------------------------|
+| `--per-file` | Open each changed file in its own Meld window. Default: one directory comparison.         |
+| `-h, --help` | Print usage information and exit.                                                         |
+| `--`         | Stop parsing tool options and pass the separator and remaining arguments to Git Difftool. |
+
+All other arguments are forwarded directly to `git difftool`.
 
 ## Environment Variables
 

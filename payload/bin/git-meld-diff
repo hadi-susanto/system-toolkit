@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=""
+    readonly COLOR_CYAN=""
+    readonly COLOR_RESET=""
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$*" >&2
+}
+
+__usage() {
+    cat <<EOF
+${COLOR_CYAN}Usage:${COLOR_RESET}
+  git-meld-diff [OPTIONS] [GIT_DIFFTOOL_ARGS...]
+
+Display Git differences in Meld.
+
+All changed files open in a single Meld directory comparison by default.
+Arguments not recognized as git-meld-diff options are forwarded directly
+to git difftool.
+
+${COLOR_CYAN}Options:${COLOR_RESET}
+  --per-file      Open each changed file in its own Meld window
+  -h, --help      Display this help message
+  --              Stop parsing git-meld-diff options
+
+${COLOR_CYAN}Examples:${COLOR_RESET}
+  git-meld-diff
+  git-meld-diff --staged
+  git-meld-diff HEAD~1
+  git-meld-diff main..feature
+  git-meld-diff --per-file -- src/main.sh
+EOF
+}
+
+__parse_args() {
+    local options_name="$1"
+    local difftool_args_name="$2"
+    shift 2
+
+    local -n options_ref="$options_name"
+    local -n difftool_args_ref="$difftool_args_name"
+
+    options_ref=(
+        [PER_FILE]=0
+    )
+    difftool_args_ref=()
+
+    while (($# > 0)); do
+        case "$1" in
+            --per-file)
+                options_ref[PER_FILE]=1
+                ;;
+
+            -h | --help)
+                __usage
+
+                exit 0
+                ;;
+
+            --)
+                shift
+                difftool_args_ref+=("--" "$@")
+
+                return 0
+                ;;
+
+            *)
+                difftool_args_ref+=("$1")
+                ;;
+        esac
+
+        shift
+    done
+}
+
+main() {
+    local -A options=()
+    local -a difftool_args=()
+    local -a difftool_options=()
+    local -a git_config_args=(
+        -c diff.tool=meld
+        -c difftool.prompt=false
+    )
+
+    __parse_args options difftool_args "$@"
+
+    if ! command -v git >/dev/null 2>&1; then
+        __log_error "git is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! command -v meld >/dev/null 2>&1; then
+        __log_error "meld is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        __log_error "The current directory is not inside a Git repository."
+
+        return 1
+    fi
+
+    if ((options[PER_FILE] == 0)); then
+        difftool_options+=(--dir-diff)
+    fi
+
+    exec git \
+        "${git_config_args[@]}" \
+        difftool "${difftool_options[@]}" "${difftool_args[@]}"
+}
+
+main "$@"
