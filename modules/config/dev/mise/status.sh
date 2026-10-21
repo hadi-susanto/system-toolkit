@@ -31,6 +31,31 @@ __print_data_dir_status() {
     printf '%s[configured]%s %s\n' "$COLOR_GREEN" "$COLOR_RESET" "$data_dir"
 }
 
+__print_profile_status() {
+    local state=0
+    local shims_dir
+
+    mise_profile_state || state=$?
+
+    if (( state == 1 )); then
+        printf '%s[not-installed]%s\n' "$COLOR_CYAN" "$COLOR_RESET"
+
+        return 0
+    fi
+
+    if (( state == 2 )); then
+        printf '%s[unmanaged]%s not written by SysKit\n' "$COLOR_RED" "$COLOR_RESET"
+
+        return 0
+    fi
+
+    if ! shims_dir="$(read_mise_profile_shims_dir)"; then
+        shims_dir="(unknown shims directory)"
+    fi
+
+    printf '%s[installed]%s %s\n' "$COLOR_GREEN" "$COLOR_RESET" "$shims_dir"
+}
+
 main() {
     local failed=0
 
@@ -59,6 +84,10 @@ main() {
     if ! print_loader_status zsh; then
         failed=1
     fi
+
+    printf 'System Shims:\n'
+    printf '  %s: ' "$__MISE_PROFILE_FILE"
+    __print_profile_status
 
     return "$failed"
 }

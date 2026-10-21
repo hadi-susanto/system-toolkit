@@ -29,7 +29,40 @@ __install_data_dir_state() {
         return 1
     fi
 
-    write_mise_data_dir_state "$new_data_dir"
+    write_mise_data_dir_state "$new_data_dir" || return $?
+    __warn_stale_profile
+}
+
+__warn_stale_profile() {
+    if mise_profile_state; then
+        log_warn "$__MISE_PROFILE_FILE still uses the previous shims directory; remove and add the mise shims again to update it"
+    fi
+}
+
+__install_profile() {
+    local shims_dir
+    local confirmation_status
+
+    shims_dir="$(resolve_mise_shims_dir)" || return $?
+
+    printf 'The following file will be written to %s:\n\n%s\n' \
+        "$__MISE_PROFILE_FILE" "$(render_mise_profile "$shims_dir")" >&2
+
+    if confirm_action "Apply these changes?"; then
+        :
+    else
+        confirmation_status=$?
+
+        if (( confirmation_status == 1 )); then
+            log_info "Mise shims profile changes were cancelled"
+
+            return 0
+        fi
+
+        return "$confirmation_status"
+    fi
+
+    write_mise_profile "$shims_dir"
 }
 
 main() {
@@ -40,6 +73,7 @@ main() {
     local zsh_integration_installed=0
     local bash_loader_installed=0
     local zsh_loader_installed=0
+    local profile_installed=0
 
     if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
         force=1
@@ -79,6 +113,13 @@ main() {
             zsh_loader_installed=0
             options+=("Install Zsh loader")
         fi
+        if mise_profile_state; then
+            profile_installed=1
+            options+=("Remove mise shims from $__MISE_PROFILE_FILE")
+        else
+            profile_installed=0
+            options+=("Add mise shims into $__MISE_PROFILE_FILE (login shells and GUI apps)")
+        fi
 
         if ! selected="$(
             choose_option $'Mise Configuration:\n----------------------' "${options[@]}"
@@ -93,7 +134,8 @@ main() {
                 __install_data_dir_state
                 ;;
             2)
-                remove_mise_data_dir_state
+                remove_mise_data_dir_state || return $?
+                __warn_stale_profile
                 ;;
             3)
                 if (( bash_integration_installed )); then
@@ -125,6 +167,13 @@ main() {
                     uninstall_shell_loader zsh "$force" || return $?
                 else
                     install_shell_loader zsh "$force" || return $?
+                fi
+                ;;
+            7)
+                if (( profile_installed )); then
+                    remove_mise_profile || return $?
+                else
+                    __install_profile || return $?
                 fi
                 ;;
             X)

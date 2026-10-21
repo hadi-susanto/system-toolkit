@@ -190,10 +190,10 @@ and active state.
 
 ## Current Development Modules
 
-| Canonical ID | Managed behavior                                                                                                                      |
-|--------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `dev/mise`   | Persists an optional Mise data directory override, installs Bash or Zsh initialization, and can activate either SysKit shell loader.  |
-| `dev/sdkman` | Persists the SDKMAN! installation directory, installs Bash or Zsh initialization, and can activate either SysKit shell loader.        |
+| Canonical ID | Managed behavior                                                                                                                                                                    |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dev/mise`   | Persists an optional Mise data directory override, installs Bash or Zsh initialization, can activate either SysKit shell loader, and can add Mise shims to `PATH` for login shells. |
+| `dev/sdkman` | Persists the SDKMAN! installation directory, installs Bash or Zsh initialization, and can activate either SysKit shell loader.                                                      |
 
 Set `SDKMAN_DIR` when SDKMAN! uses a custom installation directory:
 
@@ -212,11 +212,21 @@ own interactive action in `~/.local/state/syskit/dev/mise/data-dir` and is
 optional; without it, Mise uses its own default data directory. Mise is
 installed into `delayed.d` and loaded after every regular shell module.
 
+The Mise module can also install `/etc/profile.d/99-dev-mise.sh` (requires
+`sudo`), a POSIX `sh` script that prepends the Mise shims directory to `PATH`
+for login shells so desktop-launched editors and IDEs find Mise tools. It
+records `<data-dir>/shims` when the data-dir override is set, otherwise the
+literal `$HOME/.local/share/mise/shims` so each user resolves their own
+directory. The file is marked `# Managed by SysKit (dev/mise)`; an unmanaged
+file at that path is never overwritten or removed. After changing the data-dir
+override, remove and re-add the shims to update the file. Changes apply after
+logging out and back in.
+
 ## Current GUI Modules
 
 | Canonical ID | Managed behavior                                                                                       |
 |--------------|--------------------------------------------------------------------------------------------------------|
-| `gui/edge`   | Enables or disables the Microsoft Edge package cron jobs for every installed release channel.         |
+| `gui/edge`   | Enables or disables the Microsoft Edge package cron jobs for every installed release channel.          |
 
 Edge cron jobs live under `/opt/microsoft/msedge*/cron/`. A job is enabled
 while its script is executable, because `run-parts` skips non-executable files;
@@ -227,7 +237,7 @@ the module toggles that mode with `sudo chmod`. The supported channels are
 
 | Canonical ID    | Managed behavior                                                                          |
 |-----------------|-------------------------------------------------------------------------------------------|
-| `ide/jetbrains` | Sets or removes the `fs.inotify.max_user_watches` limit through a sysctl drop-in file.   |
+| `ide/jetbrains` | Sets or removes the `fs.inotify.max_user_watches` limit through a sysctl drop-in file.    |
 
 JetBrains IDEs need one inotify watch per project directory and fall back to
 slow recursive scans when the limit is reached. Following the
@@ -248,7 +258,7 @@ non-regular file, or file without exactly one valid limit is reported as
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `misc/claude-code` | Enables or disables the Claude Code auto-updater, installs Bash or Zsh initialization, and can activate either SysKit shell loader. |
 | `misc/junie`       | Enables or disables the Junie CLI auto-update check.                                                                                |
-| `misc/kvm-autoload`| Enables or disables KVM module autoload at boot so VT-x/AMD-V stays free for other hypervisors.                                    |
+| `misc/kvm-autoload`| Enables or disables KVM module autoload at boot so VT-x/AMD-V stays free for other hypervisors.                                     |
 
 Auto-update is toggled by setting `autoUpdaterStatus` to `enabled` or
 `disabled` in `~/.claude/settings.json`. The module edits only that key
