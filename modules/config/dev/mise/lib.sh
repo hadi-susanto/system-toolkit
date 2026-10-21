@@ -159,77 +159,28 @@ mise_profile_state() {
 }
 
 ##
-# read_mise_profile_shims_dir
-#
-# Reads the shims directory recorded in the managed profile script.
+# render_mise_profile
 #
 # Output:
-#   Prints the recorded shims directory as written (it may reference $HOME).
-#
-# Returns:
-#   1 when the profile script is not managed or has no shims directory.
-#
-read_mise_profile_shims_dir() {
-    local line
-
-    mise_profile_state || return 1
-
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^__syskit_mise_shims=\"(.*)\"$ ]]; then
-            printf '%s\n' "${BASH_REMATCH[1]}"
-
-            return 0
-        fi
-    done <"$__MISE_PROFILE_FILE"
-
-    return 1
-}
-
-##
-# resolve_mise_shims_dir
-#
-# Resolves the shims directory to record in the profile script. Uses the
-# persisted data-dir override when present; otherwise prints the Mise default
-# with a literal $HOME so it resolves per user at login.
-#
-# Output:
-#   Prints the shims directory.
-#
-# Returns:
-#   1 when the data-dir override contains characters that are unsafe inside a
-#   double-quoted shell string.
-#
-resolve_mise_shims_dir() {
-    local data_dir
-
-    if ! data_dir="$(read_mise_data_dir_state)"; then
-        # shellcheck disable=SC2016 # $HOME must stay literal for login shells
-        printf '%s\n' '$HOME/.local/share/mise/shims'
-
-        return 0
-    fi
-
-    if [[ "$data_dir" == *[\"\$\`\\]* ]]; then
-        log_error "Mise data directory contains characters unsupported in a profile script: $data_dir"
-
-        return 1
-    fi
-
-    printf '%s/shims\n' "${data_dir%/}"
-}
-
-##
-# render_mise_profile <shims_dir>
-#
-# Output:
-#   Prints the POSIX sh profile script that prepends <shims_dir> to PATH.
+#   Prints the POSIX sh profile script. At login it exports the user's
+#   persisted MISE_DATA_DIR override (unless MISE_DATA_DIR is already set) and
+#   prepends the matching Mise shims directory to PATH.
 #
 render_mise_profile() {
-    local shims_dir="$1"
-
     printf '%s\n' "$__MISE_PROFILE_MARKER"
-    printf '__syskit_mise_shims="%s"\n' "$shims_dir"
     cat <<'PROFILE'
+__syskit_mise_state_file="$HOME/.local/state/syskit/dev/mise/data-dir"
+if [ -z "${MISE_DATA_DIR:-}" ] && [ -f "$__syskit_mise_state_file" ] && [ -r "$__syskit_mise_state_file" ]; then
+    __syskit_mise_data_dir=""
+    IFS= read -r __syskit_mise_data_dir <"$__syskit_mise_state_file" || :
+    case "$__syskit_mise_data_dir" in
+        /*) MISE_DATA_DIR="$__syskit_mise_data_dir"; export MISE_DATA_DIR ;;
+    esac
+    unset __syskit_mise_data_dir
+fi
+unset __syskit_mise_state_file
+
+__syskit_mise_shims="${MISE_DATA_DIR:-$HOME/.local/share/mise}/shims"
 if [ -d "$__syskit_mise_shims" ]; then
     case ":$PATH:" in
         *":$__syskit_mise_shims:"*) ;;
@@ -241,7 +192,7 @@ PROFILE
 }
 
 ##
-# write_mise_profile <shims_dir>
+# write_mise_profile
 #
 # Installs the managed profile script that adds Mise shims to PATH for login
 # shells.
@@ -250,7 +201,6 @@ PROFILE
 #   1 when an unmanaged file occupies the target or the write fails.
 #
 write_mise_profile() {
-    local shims_dir="$1"
     local tmp
     local state=0
 
@@ -268,7 +218,7 @@ write_mise_profile() {
         return 1
     fi
 
-    if ! render_mise_profile "$shims_dir" >"$tmp"; then
+    if ! render_mise_profile >"$tmp"; then
         rm -f -- "$tmp"
         log_error "Failed to render the Mise profile script"
 

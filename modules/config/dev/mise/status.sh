@@ -33,7 +33,6 @@ __print_data_dir_status() {
 
 __print_profile_status() {
     local state=0
-    local shims_dir
 
     mise_profile_state || state=$?
 
@@ -49,11 +48,7 @@ __print_profile_status() {
         return 0
     fi
 
-    if ! shims_dir="$(read_mise_profile_shims_dir)"; then
-        shims_dir="(unknown shims directory)"
-    fi
-
-    printf '%s[installed]%s %s\n' "$COLOR_GREEN" "$COLOR_RESET" "$shims_dir"
+    printf '%s[installed]%s\n' "$COLOR_GREEN" "$COLOR_RESET"
 }
 
 main() {

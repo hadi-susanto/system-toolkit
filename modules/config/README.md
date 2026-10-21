@@ -213,14 +213,18 @@ optional; without it, Mise uses its own default data directory. Mise is
 installed into `delayed.d` and loaded after every regular shell module.
 
 The Mise module can also install `/etc/profile.d/99-dev-mise.sh` (requires
-`sudo`), a POSIX `sh` script that prepends the Mise shims directory to `PATH`
-for login shells so desktop-launched editors and IDEs find Mise tools. It
-records `<data-dir>/shims` when the data-dir override is set, otherwise the
-literal `$HOME/.local/share/mise/shims` so each user resolves their own
-directory. The file is marked `# Managed by SysKit (dev/mise)`; an unmanaged
-file at that path is never overwritten or removed. After changing the data-dir
-override, remove and re-add the shims to update the file. Changes apply after
-logging out and back in.
+`sudo`), a POSIX `sh` script so desktop-launched editors and IDEs find Mise
+tools. At login it reads each user's own
+`~/.local/state/syskit/dev/mise/data-dir`, exports `MISE_DATA_DIR` from it
+when the value is absolute and `MISE_DATA_DIR` is not already set, then
+prepends `${MISE_DATA_DIR:-$HOME/.local/share/mise}/shims` to `PATH` when that
+directory exists. The file content does not depend on the override, so changing
+the data directory needs no reinstall. The file is marked
+`# Managed by SysKit (dev/mise)`; an unmanaged file at that path is never
+overwritten or removed. Changes apply after logging out and back in.
+
+The Mise shell integration also leaves a pre-set `MISE_DATA_DIR` untouched and
+reads the data-dir state only when the variable is empty.
 
 ## Current GUI Modules
 
