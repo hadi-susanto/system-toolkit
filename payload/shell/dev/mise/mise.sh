@@ -5,21 +5,27 @@ if ! command -v mise >/dev/null 2>&1; then
     return 0
 fi
 
-__syskit_mise_state_file="$HOME/.local/state/syskit/dev/mise/data-dir"
-__syskit_mise_data_dir=""
+# A pre-set MISE_DATA_DIR (for example from /etc/profile.d) takes precedence
+if [[ -z "${MISE_DATA_DIR:-}" ]]; then
+    __syskit_mise_state_file="$HOME/.local/state/syskit/dev/mise/data-dir"
+    __syskit_mise_data_dir=""
 
-if [[ -r "$__syskit_mise_state_file" ]]; then
-    __syskit_mise_data_dir="$(<"$__syskit_mise_state_file")"
-fi
+    if [[ -r "$__syskit_mise_state_file" ]]; then
+        __syskit_mise_data_dir="$(<"$__syskit_mise_state_file")"
+    fi
 
-if [[ -n "$__syskit_mise_data_dir" ]]; then
-    if [[ "$__syskit_mise_data_dir" != /* ]]; then
+    if [[ -n "$__syskit_mise_data_dir" ]] && [[ "$__syskit_mise_data_dir" != /* ]]; then
         printf '\033[31m[ERROR]\033[0m Invalid mise data directory config, please rerun syskit-cfg mise\n' >&2
+        unset __syskit_mise_state_file __syskit_mise_data_dir
 
         return 0
     fi
 
-    export MISE_DATA_DIR="$__syskit_mise_data_dir"
+    if [[ -n "$__syskit_mise_data_dir" ]]; then
+        export MISE_DATA_DIR="$__syskit_mise_data_dir"
+    fi
+
+    unset __syskit_mise_state_file __syskit_mise_data_dir
 fi
 
 if [[ -n "$BASH_VERSION" ]]; then

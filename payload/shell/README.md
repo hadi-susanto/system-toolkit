@@ -193,15 +193,18 @@ The payload reads an optional data directory override from:
 ~/.local/state/syskit/dev/mise/data-dir
 ```
 
-When the state file holds a valid absolute path, the payload exports
-`MISE_DATA_DIR` before activating Mise. An invalid (non-absolute) stored path
+When `MISE_DATA_DIR` is already set (for example by
+`/etc/profile.d/99-dev-mise.sh` or the user's environment), the payload keeps
+it and skips the state file. Otherwise, when the state file holds a valid
+absolute path, the payload exports `MISE_DATA_DIR` before activating Mise. An invalid (non-absolute) stored path
 is reported without interrupting shell startup, and a missing state file means
 Mise uses its own default data directory. The payload then evaluates `mise
 activate bash` or `mise activate zsh` depending on the running shell.
 
 The corresponding configuration module provides interactive actions to set or
-remove the `MISE_DATA_DIR` override, install either shell integration, or
-activate either SysKit shell loader. Mise is installed into `delayed.d` and
+remove the `MISE_DATA_DIR` override, install either shell integration,
+activate either SysKit shell loader, or add the Mise shims to `PATH` for login
+shells through `/etc/profile.d/99-dev-mise.sh`. Mise is installed into `delayed.d` and
 loaded after every regular shell module.
 
 ---

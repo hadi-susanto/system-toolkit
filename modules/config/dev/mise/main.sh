@@ -32,6 +32,26 @@ __install_data_dir_state() {
     write_mise_data_dir_state "$new_data_dir"
 }
 
+__install_profile() {
+    local confirmation_status
+
+    if confirm_action "Write $__MISE_PROFILE_FILE to add mise shims to PATH for login shells?"; then
+        :
+    else
+        confirmation_status=$?
+
+        if (( confirmation_status == 1 )); then
+            log_info "Mise shims profile changes were cancelled"
+
+            return 0
+        fi
+
+        return "$confirmation_status"
+    fi
+
+    write_mise_profile
+}
+
 main() {
     local selected
     local force=0
@@ -40,6 +60,7 @@ main() {
     local zsh_integration_installed=0
     local bash_loader_installed=0
     local zsh_loader_installed=0
+    local profile_installed=0
 
     if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
         force=1
@@ -78,6 +99,13 @@ main() {
         else
             zsh_loader_installed=0
             options+=("Install Zsh loader")
+        fi
+        if mise_profile_state; then
+            profile_installed=1
+            options+=("Remove mise shims from $__MISE_PROFILE_FILE")
+        else
+            profile_installed=0
+            options+=("Add mise shims into $__MISE_PROFILE_FILE (login shells and GUI apps)")
         fi
 
         if ! selected="$(
@@ -125,6 +153,13 @@ main() {
                     uninstall_shell_loader zsh "$force" || return $?
                 else
                     install_shell_loader zsh "$force" || return $?
+                fi
+                ;;
+            7)
+                if (( profile_installed )); then
+                    remove_mise_profile || return $?
+                else
+                    __install_profile || return $?
                 fi
                 ;;
             X)
