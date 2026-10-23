@@ -84,6 +84,7 @@ loaded after every regular integration.
 - [Claude Code](#claude-code-miscclaude-code)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [Pay Respects](#pay-respects-clipay-respects)
 - [Mise](#mise-devmise)
 - [SDKMAN!](#sdkman-devsdkman)
 - [Partial CD](#partial-cd-clipartial-cd)
@@ -178,6 +179,23 @@ for both the configuration and shell toolkits.
 | `gwp`  | **Expands to:** `git worktree prune`<br><br>Prunes stale worktree administrative data.                                                  |
 | `gwd`  | **Expands to:** `git worktree remove`<br><br>Removes a worktree.                                                                        |
 | `gwr`  | **Expands to:** `git worktree repair`<br><br>Repairs worktree administrative files.                                                     |
+
+---
+
+# Pay Respects (`cli/pay-respects`)
+
+Provides separate Bash and Zsh initialization payloads for
+[pay-respects](https://github.com/iffse/pay-respects). Each payload requires
+the `pay-respects` command; otherwise it logs an error and skips activation
+without interrupting shell startup. When available, it runs
+`pay-respects <shell> --alias`, which defines the default `f` alias for
+correcting the previous command and enables the command-not-found handler.
+It also exports `_PR_AI_DISABLE=1` to disable pay-respects' AI suggestions
+unless `_PR_AI_DISABLE` is already set.
+
+The shell dependency check requires `pay-respects` to be installed before the
+integration can be installed unless `--force` is used. There is no
+corresponding configuration module.
 
 ---
 
