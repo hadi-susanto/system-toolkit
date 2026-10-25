@@ -18,16 +18,31 @@ readonly SYSKIT_HTTPS_URL="https://github.com/hadi-susanto/system-toolkit.git"
 readonly SYSKIT_SSH_URL="git@github.com:hadi-susanto/system-toolkit.git"
 readonly -a SYSKIT_ENTRYPOINTS=(syskit-bin syskit-bash syskit-zsh syskit-cfg)
 
+# Colors follow the SysKit convention: NO_COLOR disables, FORCE_COLOR forces.
+# Logs go to stderr, so stderr decides whether colors are used by default.
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 2 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_YELLOW=$'\033[0;33m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=''
+    readonly COLOR_YELLOW=''
+    readonly COLOR_CYAN=''
+    readonly COLOR_RESET=''
+fi
+
 __log_info() {
-    printf '[INFO] %s\n' "$*" >&2
+    printf '%b[INFO]%b %s\n' "$COLOR_CYAN" "$COLOR_RESET" "$*" >&2
 }
 
 __log_warn() {
-    printf '[WARN] %s\n' "$*" >&2
+    printf '%b[WARN]%b %s\n' "$COLOR_YELLOW" "$COLOR_RESET" "$*" >&2
 }
 
 __log_error() {
-    printf '[ERROR] %s\n' "$*" >&2
+    printf '%b[ERROR]%b %s\n' "$COLOR_RED" "$COLOR_RESET" "$*" >&2
 }
 
 __validate_environment() {

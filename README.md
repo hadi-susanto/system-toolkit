@@ -41,6 +41,8 @@ curl -fsSL https://raw.githubusercontent.com/hadi-susanto/system-toolkit/main/bo
 | `SYSKIT_BRANCH` | Branch to check out on a fresh clone. Default: the remote default branch.           |
 | `SYSKIT_FORCE`  | Set to `true` to replace existing entrypoint links. Default: `false`.               |
 | `SYSKIT_GLOBAL` | Set to `true` to link into `/usr/local/bin` with `sudo` instead of `~/.local/bin`. Default: `false`. |
+| `NO_COLOR`      | Disable colored log tags when set to a non-empty value. Default: unset.             |
+| `FORCE_COLOR`   | Enable colors when stderr is not a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
 
 For a system-wide install, pass `SYSKIT_GLOBAL=true` to `bash` (not `sudo`):
 
