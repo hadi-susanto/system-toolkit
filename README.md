@@ -21,6 +21,40 @@ remains independently installable and usable.
 
 # 📥 Installation
 
+## 🚀 Bootstrap
+
+`bootstrap.sh` clones SysKit into `./system-toolkit` (or fast-forwards an
+existing clone) and symlinks the `syskit-bin`, `syskit-bash`, `syskit-zsh`, and
+`syskit-cfg` entrypoints into `~/.local/bin`. Keep the clone in place, because
+the entrypoints resolve their symlink to find the toolkit. It installs only
+`git` when missing (`sudo apt-get install git`) and refuses to run as root. SSH
+is used for cloning when GitHub accepts it; otherwise HTTPS is used. Use
+`syskit-bin install --all` afterwards to install the payload executables.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/hadi-susanto/system-toolkit/main/bootstrap.sh | bash
+```
+
+| ENV             | Description                                                                         |
+|-----------------|-------------------------------------------------------------------------------------|
+| `SYSKIT_DIR`    | Clone destination. Default: `./system-toolkit`.                                     |
+| `SYSKIT_BRANCH` | Branch to check out on a fresh clone. Default: the remote default branch.           |
+| `SYSKIT_FORCE`  | Set to `true` to replace existing entrypoint links. Default: `false`.               |
+| `SYSKIT_GLOBAL` | Set to `true` to link into `/usr/local/bin` with `sudo` instead of `~/.local/bin`. Default: `false`. |
+| `NO_COLOR`      | Disable colored log tags when set to a non-empty value. Default: unset.             |
+| `FORCE_COLOR`   | Enable colors when stderr is not a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
+
+For a system-wide install, pass `SYSKIT_GLOBAL=true` to `bash` (not `sudo`):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/hadi-susanto/system-toolkit/main/bootstrap.sh | SYSKIT_GLOBAL=true bash
+```
+
+For a local install, make sure `~/.local/bin` is in `PATH`; the bootstrap only
+warns when it is not.
+
+## 📋 Manual Clone
+
 Clone the latest project state without downloading its full Git history:
 
 ```bash
@@ -28,8 +62,8 @@ git clone --depth 1 https://github.com/hadi-susanto/system-toolkit.git
 cd system-toolkit
 ```
 
-Until installation automation is available, the toolkit entrypoints can be run
-directly from the cloned repository with Bash.
+The toolkit entrypoints can be run directly from the cloned repository with
+Bash.
 
 ## 📖 Help Examples
 
@@ -62,6 +96,7 @@ modules, use `syskit-cfg configure <module>` or the shorthand
 
 ```text
 system-toolkit/
+├── bootstrap.sh           Clone and link the syskit-* entrypoints
 ├── syskit-bin             Binary toolkit entrypoint
 ├── syskit-bash            Bash toolkit entrypoint
 ├── syskit-zsh             Zsh toolkit entrypoint
