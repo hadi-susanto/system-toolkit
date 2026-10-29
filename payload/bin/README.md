@@ -17,6 +17,9 @@ Local installation uses `~/.local/bin`, while global installation uses
 - [`bat-help`](#bat-help)
 - [`git-bat-diff`](#git-bat-diff)
 - [`git-delta-diff`](#git-delta-diff)
+- [`git-difft-diff`](#git-difft-diff)
+- [`git-difft-log`](#git-difft-log)
+- [`git-difft-show`](#git-difft-show)
 - [`git-meld-diff`](#git-meld-diff)
 - [`gpsup`](#gpsup)
 - [`mkvmerge-extract-info`](#mkvmerge-extract-info)
@@ -157,6 +160,100 @@ All other arguments are forwarded directly to `git diff`.
 |---------------|-----------------------------------------------------------------------------------------------------------|
 | `NO_COLOR`    | Disable colored help and error labels when set to a non-empty value. Default: unset.                      |
 | `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
+
+---
+
+# `git-difft-diff`
+
+Displays Git differences using Difftastic (`difft`).
+
+Unrecognized arguments are forwarded directly to `git diff`. Difftastic is selected for this command only through
+`diff.external`; the user's Git configuration is not changed.
+
+Requires `git` and `difft`. The command must be run inside a Git working tree.
+
+```bash
+git-difft-diff
+git-difft-diff --dark --inline
+git-difft-diff --staged
+git-difft-diff HEAD~1
+git-difft-diff main..feature
+git-difft-diff -- src/main.sh
+```
+
+## Options
+
+| Option       | Description                                                                           |
+|--------------|---------------------------------------------------------------------------------------|
+| `--dark`     | Use Difftastic's dark background mode (`DFT_BACKGROUND=dark`). Default: disabled.     |
+| `--inline`   | Display differences inline (`DFT_DISPLAY=inline`). Default: side by side.             |
+| `-h, --help` | Print usage information and exit.                                                     |
+| `--`         | Stop parsing tool options and pass the separator and remaining arguments to Git Diff. |
+
+All other arguments are forwarded directly to `git diff`.
+
+## Environment Variables
+
+| ENV           | Description                                                                                               |
+|---------------|-----------------------------------------------------------------------------------------------------------|
+| `NO_COLOR`    | Disable colors in help, errors, and Difftastic output when set to a non-empty value. Default: unset.      |
+| `FORCE_COLOR` | Enable colors when output is not connected to a terminal. Ignored when `NO_COLOR` is set. Default: unset. |
+
+---
+
+# `git-difft-log`
+
+Displays Git history with patches rendered by Difftastic.
+
+Runs `git log -p --ext-diff`; unrecognized arguments are forwarded directly to `git log`.
+
+Requires `git` and `difft`. The command must be run inside a Git working tree.
+
+```bash
+git-difft-log
+git-difft-log -n 5
+git-difft-log --dark --inline main..feature
+git-difft-log -- src/main.sh
+```
+
+## Options
+
+| Option       | Description                                                                          |
+|--------------|--------------------------------------------------------------------------------------|
+| `--dark`     | Use Difftastic's dark background mode (`DFT_BACKGROUND=dark`). Default: disabled.    |
+| `--inline`   | Display differences inline (`DFT_DISPLAY=inline`). Default: side by side.            |
+| `-h, --help` | Print usage information and exit.                                                    |
+| `--`         | Stop parsing tool options and pass the separator and remaining arguments to Git Log. |
+
+All other arguments are forwarded directly to `git log`. Environment variables are the same as `git-difft-diff`.
+
+---
+
+# `git-difft-show`
+
+Displays a Git object (a commit by default) with the patch rendered by Difftastic.
+
+Runs `git show --ext-diff`; unrecognized arguments are forwarded directly to `git show`.
+
+Requires `git` and `difft`. The command must be run inside a Git working tree.
+
+```bash
+git-difft-show
+git-difft-show HEAD~1
+git-difft-show --dark --inline abc1234
+git-difft-show HEAD -- src/main.sh
+```
+
+## Options
+
+| Option       | Description                                                                           |
+|--------------|---------------------------------------------------------------------------------------|
+| `--dark`     | Use Difftastic's dark background mode (`DFT_BACKGROUND=dark`). Default: disabled.     |
+| `--inline`   | Display differences inline (`DFT_DISPLAY=inline`). Default: side by side.             |
+| `-h, --help` | Print usage information and exit.                                                     |
+| `--`         | Stop parsing tool options and pass the separator and remaining arguments to Git Show. |
+
+All other arguments are forwarded directly to `git show`. Environment variables are the same as `git-difft-diff`.
 
 ---
 

@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${NO_COLOR:-}" ]] &&
+    { [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 ]]; }; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_CYAN=$'\033[0;36m'
+    readonly COLOR_RESET=$'\033[0m'
+    readonly DFT_COLOR_MODE="always"
+else
+    readonly COLOR_RED=""
+    readonly COLOR_CYAN=""
+    readonly COLOR_RESET=""
+    readonly DFT_COLOR_MODE="never"
+fi
+
+__log_error() {
+    printf '%s[ERROR]%s %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$*" >&2
+}
+
+__usage() {
+    cat <<EOF
+${COLOR_CYAN}Usage:${COLOR_RESET}
+  git-difft-show [OPTIONS] [GIT_SHOW_ARGS...]
+
+Display a Git object (commit by default) with the patch rendered by
+Difftastic.
+
+Arguments not recognized as git-difft-show options are forwarded directly
+to git show.
+
+${COLOR_CYAN}Options:${COLOR_RESET}
+  --dark          Use Difftastic's dark background mode
+  --inline        Display differences inline instead of side by side
+  -h, --help      Display this help message
+  --              Stop parsing git-difft-show options
+
+${COLOR_CYAN}Examples:${COLOR_RESET}
+  git-difft-show
+  git-difft-show HEAD~1
+  git-difft-show --dark --inline abc1234
+  git-difft-show HEAD -- src/main.sh
+EOF
+}
+
+__parse_args() {
+    local options_name="$1"
+    local show_args_name="$2"
+    shift 2
+
+    local -n options_ref="$options_name"
+    local -n show_args_ref="$show_args_name"
+
+    options_ref=(
+        [DARK]=0
+        [INLINE]=0
+    )
+    show_args_ref=()
+
+    while (($# > 0)); do
+        case "$1" in
+            --dark)
+                options_ref[DARK]=1
+                ;;
+
+            --inline)
+                options_ref[INLINE]=1
+                ;;
+
+            -h | --help)
+                __usage
+
+                exit 0
+                ;;
+
+            --)
+                shift
+                show_args_ref+=("--" "$@")
+
+                return 0
+                ;;
+
+            *)
+                show_args_ref+=("$1")
+                ;;
+        esac
+
+        shift
+    done
+}
+
+main() {
+    local -A options=()
+    local -a show_args=()
+
+    __parse_args options show_args "$@"
+
+    if ! command -v git >/dev/null 2>&1; then
+        __log_error "git is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! command -v difft >/dev/null 2>&1; then
+        __log_error "difft is not installed or is not available in PATH."
+
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        __log_error "The current directory is not inside a Git repository."
+
+        return 1
+    fi
+
+    export DFT_COLOR="$DFT_COLOR_MODE"
+
+    if ((options[DARK])); then
+        export DFT_BACKGROUND=dark
+    fi
+
+    if ((options[INLINE])); then
+        export DFT_DISPLAY=inline
+    fi
+
+    exec git \
+        -c diff.external=difft \
+        show --ext-diff "${show_args[@]}"
+}
+
+main "$@"
