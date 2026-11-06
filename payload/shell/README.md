@@ -84,6 +84,7 @@ loaded after every regular integration.
 - [Claude Code](#claude-code-miscclaude-code)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [kubectl](#kubectl-clikubectl)
 - [Pay Respects](#pay-respects-clipay-respects)
 - [Mise](#mise-devmise)
 - [SDKMAN!](#sdkman-devsdkman)
@@ -179,6 +180,22 @@ for both the configuration and shell toolkits.
 | `gwp`  | **Expands to:** `git worktree prune`<br><br>Prunes stale worktree administrative data.                                                  |
 | `gwd`  | **Expands to:** `git worktree remove`<br><br>Removes a worktree.                                                                        |
 | `gwr`  | **Expands to:** `git worktree repair`<br><br>Repairs worktree administrative files.                                                     |
+
+---
+
+# kubectl (`cli/kubectl`)
+
+Provides separate Bash and Zsh payloads that enable kubectl shell completion
+using `source <(kubectl completion <shell>)`. Each payload requires the
+`kubectl` command; otherwise it logs an error and skips activation without
+interrupting shell startup. The Bash payload works best with the
+`bash-completion` package installed. The Zsh payload runs `compinit` when no
+other module has initialized completion. Both payloads are loaded after
+regular modules.
+
+The shell dependency check requires `kubectl` to be installed before the
+integration can be installed unless `--force` is used. There is no
+corresponding configuration module.
 
 ---
 
