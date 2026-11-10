@@ -134,12 +134,12 @@ ui_confirm() {
 #   1 when the checklist was cancelled.
 #
 ui_choose_options() {
-    local command_label="$1"
+    local __ui_command_label="$1"
     local -n __ui_options_ref="$2"
     shift 2
 
-    local output
-    local option
+    local __ui_output
+    local __ui_option
 
     __ui_options_ref=()
 
@@ -147,14 +147,14 @@ ui_choose_options() {
         return 0
     fi
 
-    output="$(ui_dialog --separate-output --checklist "Options for $command_label:" \
+    __ui_output="$(ui_dialog --separate-output --checklist "Options for $__ui_command_label:" \
         15 "$UI_WIDTH" $(( $# / 3 )) "$@")" || return 1
 
-    while IFS= read -r option; do
-        if [[ -n "$option" ]]; then
-            __ui_options_ref+=("--$option")
+    while IFS= read -r __ui_option; do
+        if [[ -n "$__ui_option" ]]; then
+            __ui_options_ref+=("--$__ui_option")
         fi
-    done <<<"$output"
+    done <<<"$__ui_output"
 }
 
 ##
@@ -362,102 +362,102 @@ __ui_pick_items() {
 #   1 when the menu was cancelled or no item is offered.
 #
 ui_choose_items() {
-    local verb="$1"
+    local __ui_verb="$1"
     local -n __ui_offered_ref="$2"
     local -n __ui_labels_ref="$3"
     local -n __ui_search_ref="$4"
     local -n __ui_chosen_ref="$5"
-    local item="${6:-module}"
+    local __ui_item="${6:-module}"
     local -A __ui_selected=()
-    local -A category_offered=()
-    local -A category_selected=()
-    local -a categories=()
-    local -a selected_ids=()
-    local -a menu_items=()
-    local -a pick_ids=()
-    local -a pick_items=()
-    local id
-    local category
-    local label
-    local done_label
-    local pick_prompt
-    local query
-    local choice="Search..."
+    local -A __ui_category_offered=()
+    local -A __ui_category_selected=()
+    local -a __ui_categories=()
+    local -a __ui_selected_ids=()
+    local -a __ui_menu_items=()
+    local -a __ui_pick_ids=()
+    local -a __ui_pick_items=()
+    local __ui_id
+    local __ui_category
+    local __ui_label
+    local __ui_done_label
+    local __ui_pick_prompt
+    local __ui_query
+    local __ui_choice="Search..."
 
     if (( ${#__ui_offered_ref[@]} == 0 )); then
-        ui_message "No ${item}s to $verb."
+        ui_message "No ${__ui_item}s to $__ui_verb."
 
         return 1
     fi
 
-    __ui_count_categories __ui_offered_ref category_offered categories
+    __ui_count_categories __ui_offered_ref __ui_category_offered __ui_categories
 
     while true; do
-        selected_ids=("${!__ui_selected[@]}")
-        __ui_count_categories selected_ids category_selected
+        __ui_selected_ids=("${!__ui_selected[@]}")
+        __ui_count_categories __ui_selected_ids __ui_category_selected
 
-        menu_items=(
-            "Search..." "Find ${item}s by keyword"
-            "All" "All ${item}s (${#__ui_offered_ref[@]})"
+        __ui_menu_items=(
+            "Search..." "Find ${__ui_item}s by keyword"
+            "All" "All ${__ui_item}s (${#__ui_offered_ref[@]})"
         )
 
-        for category in "${categories[@]}"; do
-            label="$(__ui_count "${category_offered[$category]}" "$item")"
-            if [[ -v "category_selected[$category]" ]]; then
-                label+=", ${category_selected[$category]} selected"
+        for __ui_category in "${__ui_categories[@]}"; do
+            __ui_label="$(__ui_count "${__ui_category_offered[$__ui_category]}" "$__ui_item")"
+            if [[ -v "__ui_category_selected[$__ui_category]" ]]; then
+                __ui_label+=", ${__ui_category_selected[$__ui_category]} selected"
             fi
 
-            menu_items+=("$category" "$label")
+            __ui_menu_items+=("$__ui_category" "$__ui_label")
         done
 
-        done_label="Select at least one $item first"
+        __ui_done_label="Select at least one $__ui_item first"
         if (( ${#__ui_selected[@]} > 0 )); then
-            done_label="Continue with $(__ui_count "${#__ui_selected[@]}" "selected $item")"
+            __ui_done_label="Continue with $(__ui_count "${#__ui_selected[@]}" "selected $__ui_item")"
         fi
 
-        menu_items+=("Done" "$done_label")
+        __ui_menu_items+=("Done" "$__ui_done_label")
 
-        choice="$(ui_dialog --default-item "$choice" --cancel-button "Back" --menu \
-            "Pick ${item}s to $verb. Selections are kept until Done." \
-            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${menu_items[@]}")" || return 1
+        __ui_choice="$(ui_dialog --default-item "$__ui_choice" --cancel-button "Back" --menu \
+            "Pick ${__ui_item}s to $__ui_verb. Selections are kept until Done." \
+            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${__ui_menu_items[@]}")" || return 1
 
-        case "$choice" in
+        case "$__ui_choice" in
             "Search...")
-                __ui_search_ids "$item" __ui_offered_ref __ui_search_ref pick_ids query || continue
-                pick_prompt="Results for '$query' (${#pick_ids[@]}):"
+                __ui_search_ids "$__ui_item" __ui_offered_ref __ui_search_ref __ui_pick_ids __ui_query || continue
+                __ui_pick_prompt="Results for '$__ui_query' (${#__ui_pick_ids[@]}):"
                 ;;
             All)
-                pick_ids=("${__ui_offered_ref[@]}")
-                pick_prompt="All ${item}s to $verb:"
+                __ui_pick_ids=("${__ui_offered_ref[@]}")
+                __ui_pick_prompt="All ${__ui_item}s to $__ui_verb:"
                 ;;
             Done)
                 if (( ${#__ui_selected[@]} == 0 )); then
-                    ui_message "Select at least one $item."
+                    ui_message "Select at least one $__ui_item."
 
                     continue
                 fi
 
                 __ui_chosen_ref=()
-                for id in "${__ui_offered_ref[@]}"; do
-                    if [[ -v "__ui_selected[$id]" ]]; then
-                        __ui_chosen_ref+=("$id")
+                for __ui_id in "${__ui_offered_ref[@]}"; do
+                    if [[ -v "__ui_selected[$__ui_id]" ]]; then
+                        __ui_chosen_ref+=("$__ui_id")
                     fi
                 done
 
                 return 0
                 ;;
             *)
-                __ui_category_ids __ui_offered_ref "$choice" pick_ids
-                pick_prompt="$choice ${item}s to $verb:"
+                __ui_category_ids __ui_offered_ref "$__ui_choice" __ui_pick_ids
+                __ui_pick_prompt="$__ui_choice ${__ui_item}s to $__ui_verb:"
                 ;;
         esac
 
-        pick_items=()
-        for id in "${pick_ids[@]}"; do
-            pick_items+=("$id" "${__ui_labels_ref[$id]:-}")
+        __ui_pick_items=()
+        for __ui_id in "${__ui_pick_ids[@]}"; do
+            __ui_pick_items+=("$__ui_id" "${__ui_labels_ref[$__ui_id]:-}")
         done
 
-        __ui_pick_items "$item" "$pick_prompt" __ui_selected "${pick_items[@]}"
+        __ui_pick_items "$__ui_item" "$__ui_pick_prompt" __ui_selected "${__ui_pick_items[@]}"
     done
 }
 
@@ -486,88 +486,88 @@ ui_choose_items() {
 #   1 when the menu was cancelled or nothing is offered.
 #
 ui_choose_item() {
-    local verb="$1"
+    local __ui_verb="$1"
     local -n __ui_one_offered_ref="$2"
     local -n __ui_one_labels_ref="$3"
     local -n __ui_one_search_ref="$4"
     local -n __ui_one_chosen_ref="$5"
-    local item="$6"
-    local cancel_label="$7"
+    local __ui_item="$6"
+    local __ui_cancel_label="$7"
     shift 7
 
-    local -a extra_items=("$@")
-    local -A extra_tags=()
-    local -A category_offered=()
-    local -a categories=()
-    local -a menu_items=()
-    local -a pick_ids=()
-    local -a pick_items=()
-    local id
-    local index
-    local category
-    local pick_prompt
-    local query
-    local picked
-    local choice="Search..."
+    local -a __ui_extra_items=("$@")
+    local -A __ui_extra_tags=()
+    local -A __ui_category_offered=()
+    local -a __ui_categories=()
+    local -a __ui_menu_items=()
+    local -a __ui_pick_ids=()
+    local -a __ui_pick_items=()
+    local __ui_id
+    local __ui_index
+    local __ui_category
+    local __ui_pick_prompt
+    local __ui_query
+    local __ui_picked
+    local __ui_choice="Search..."
 
-    if (( ${#__ui_one_offered_ref[@]} == 0 && ${#extra_items[@]} == 0 )); then
-        ui_message "No ${item}s to $verb."
+    if (( ${#__ui_one_offered_ref[@]} == 0 && ${#__ui_extra_items[@]} == 0 )); then
+        ui_message "No ${__ui_item}s to $__ui_verb."
 
         return 1
     fi
 
-    for (( index = 0; index < ${#extra_items[@]}; index += 2 )); do
-        extra_tags["${extra_items[index]}"]=1
+    for (( __ui_index = 0; __ui_index < ${#__ui_extra_items[@]}; __ui_index += 2 )); do
+        __ui_extra_tags["${__ui_extra_items[__ui_index]}"]=1
     done
 
-    __ui_count_categories __ui_one_offered_ref category_offered categories
+    __ui_count_categories __ui_one_offered_ref __ui_category_offered __ui_categories
 
     while true; do
-        menu_items=(
-            "Search..." "Find ${item}s by keyword"
-            "All" "All ${item}s (${#__ui_one_offered_ref[@]})"
+        __ui_menu_items=(
+            "Search..." "Find ${__ui_item}s by keyword"
+            "All" "All ${__ui_item}s (${#__ui_one_offered_ref[@]})"
         )
 
-        for category in "${categories[@]}"; do
-            menu_items+=("$category" "$(__ui_count "${category_offered[$category]}" "$item")")
+        for __ui_category in "${__ui_categories[@]}"; do
+            __ui_menu_items+=("$__ui_category" "$(__ui_count "${__ui_category_offered[$__ui_category]}" "$__ui_item")")
         done
 
-        menu_items+=("${extra_items[@]}")
+        __ui_menu_items+=("${__ui_extra_items[@]}")
 
-        choice="$(ui_dialog --default-item "$choice" --cancel-button "$cancel_label" --menu \
-            "Pick a $item to $verb by category or search." \
-            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${menu_items[@]}")" || return 1
+        __ui_choice="$(ui_dialog --default-item "$__ui_choice" --cancel-button "$__ui_cancel_label" --menu \
+            "Pick a $__ui_item to $__ui_verb by category or search." \
+            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${__ui_menu_items[@]}")" || return 1
 
-        if [[ -v "extra_tags[$choice]" ]]; then
-            __ui_one_chosen_ref="$choice"
+        if [[ -v "__ui_extra_tags[$__ui_choice]" ]]; then
+            __ui_one_chosen_ref="$__ui_choice"
 
             return 0
         fi
 
-        case "$choice" in
+        case "$__ui_choice" in
             "Search...")
-                __ui_search_ids "$item" __ui_one_offered_ref __ui_one_search_ref pick_ids query || continue
-                pick_prompt="Results for '$query' (${#pick_ids[@]}):"
+                __ui_search_ids "$__ui_item" __ui_one_offered_ref __ui_one_search_ref __ui_pick_ids __ui_query || continue
+                __ui_pick_prompt="Results for '$__ui_query' (${#__ui_pick_ids[@]}):"
                 ;;
             All)
-                pick_ids=("${__ui_one_offered_ref[@]}")
-                pick_prompt="All ${item}s:"
+                __ui_pick_ids=("${__ui_one_offered_ref[@]}")
+                __ui_pick_prompt="All ${__ui_item}s:"
                 ;;
             *)
-                __ui_category_ids __ui_one_offered_ref "$choice" pick_ids
-                pick_prompt="$choice ${item}s:"
+                __ui_category_ids __ui_one_offered_ref "$__ui_choice" __ui_pick_ids
+                __ui_pick_prompt="$__ui_choice ${__ui_item}s:"
                 ;;
         esac
 
-        pick_items=()
-        for id in "${pick_ids[@]}"; do
-            pick_items+=("$id" "${__ui_one_labels_ref[$id]:-}")
+        __ui_pick_items=()
+        for __ui_id in "${__ui_pick_ids[@]}"; do
+            __ui_pick_items+=("$__ui_id" "${__ui_one_labels_ref[$__ui_id]:-}")
         done
 
-        picked="$(ui_dialog --cancel-button "Back" --menu "$pick_prompt\nPick a $item to $verb." \
-            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${pick_items[@]}")" || continue
+        __ui_picked="$(ui_dialog --cancel-button "Back" --menu "$__ui_pick_prompt\nPick a $__ui_item to $__ui_verb." \
+            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${__ui_pick_items[@]}")" || continue
 
-        __ui_one_chosen_ref="$picked"
+        __ui_one_chosen_ref="$__ui_picked"
 
         return 0
     done
