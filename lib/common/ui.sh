@@ -460,3 +460,137 @@ ui_choose_items() {
         __ui_pick_items "$item" "$pick_prompt" __ui_selected "${pick_items[@]}"
     done
 }
+
+##
+# ui_choose_item <verb> <offered_name> <labels_name> <search_name> <chosen_name> <item> <cancel_label> [<tag> <label>]...
+#
+# Shows the item menu (search, all items, one entry per category, and any
+# extra entries) and stores the one item picked from the matching list. An
+# extra entry is stored as its tag instead; its tag must not collide with an
+# offered category, "Search...", or "All".
+#
+# Parameters:
+#   verb            Action shown in the dialog texts, such as "configure".
+#   offered_name    Name of the indexed array of offered IDs, in display
+#                   order.
+#   labels_name     Name of the associative array mapping an ID to its menu
+#                   label.
+#   search_name     Name of the associative array mapping an ID to the text
+#                   searched; the ID itself when absent.
+#   chosen_name     Name of the variable that receives the ID or extra tag.
+#   item            Singular item noun used in the texts, such as "module".
+#   cancel_label    Label of the cancel button, such as "Quit" or "Back".
+#   tag, label      Extra top-level menu entries.
+#
+# Returns:
+#   1 when the menu was cancelled or nothing is offered.
+#
+ui_choose_item() {
+    local verb="$1"
+    local -n __ui_one_offered_ref="$2"
+    local -n __ui_one_labels_ref="$3"
+    local -n __ui_one_search_ref="$4"
+    local -n __ui_one_chosen_ref="$5"
+    local item="$6"
+    local cancel_label="$7"
+    shift 7
+
+    local -a extra_items=("$@")
+    local -A extra_tags=()
+    local -A category_offered=()
+    local -a categories=()
+    local -a menu_items=()
+    local -a pick_ids=()
+    local -a pick_items=()
+    local id
+    local index
+    local category
+    local pick_prompt
+    local query
+    local picked
+    local choice="Search..."
+
+    if (( ${#__ui_one_offered_ref[@]} == 0 && ${#extra_items[@]} == 0 )); then
+        ui_message "No ${item}s to $verb."
+
+        return 1
+    fi
+
+    for (( index = 0; index < ${#extra_items[@]}; index += 2 )); do
+        extra_tags["${extra_items[index]}"]=1
+    done
+
+    __ui_count_categories __ui_one_offered_ref category_offered categories
+
+    while true; do
+        menu_items=(
+            "Search..." "Find ${item}s by keyword"
+            "All" "All ${item}s (${#__ui_one_offered_ref[@]})"
+        )
+
+        for category in "${categories[@]}"; do
+            menu_items+=("$category" "$(__ui_count "${category_offered[$category]}" "$item")")
+        done
+
+        menu_items+=("${extra_items[@]}")
+
+        choice="$(ui_dialog --default-item "$choice" --cancel-button "$cancel_label" --menu \
+            "Pick a $item to $verb by category or search." \
+            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${menu_items[@]}")" || return 1
+
+        if [[ -v "extra_tags[$choice]" ]]; then
+            __ui_one_chosen_ref="$choice"
+
+            return 0
+        fi
+
+        case "$choice" in
+            "Search...")
+                __ui_search_ids "$item" __ui_one_offered_ref __ui_one_search_ref pick_ids query || continue
+                pick_prompt="Results for '$query' (${#pick_ids[@]}):"
+                ;;
+            All)
+                pick_ids=("${__ui_one_offered_ref[@]}")
+                pick_prompt="All ${item}s:"
+                ;;
+            *)
+                __ui_category_ids __ui_one_offered_ref "$choice" pick_ids
+                pick_prompt="$choice ${item}s:"
+                ;;
+        esac
+
+        pick_items=()
+        for id in "${pick_ids[@]}"; do
+            pick_items+=("$id" "${__ui_one_labels_ref[$id]:-}")
+        done
+
+        picked="$(ui_dialog --cancel-button "Back" --menu "$pick_prompt\nPick a $item to $verb." \
+            "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${pick_items[@]}")" || continue
+
+        __ui_one_chosen_ref="$picked"
+
+        return 0
+    done
+}
+
+##
+# ui_show_text <text>
+#
+# Shows text in a scrollable message box sized to the terminal.
+#
+ui_show_text() {
+    ui_dialog --scrolltext --msgbox -- "$1" "$UI_HEIGHT" "$UI_WIDTH" || true
+}
+
+##
+# ui_pause
+#
+# Waits for Enter on the terminal so output printed between dialogs stays
+# readable before the next dialog covers it.
+#
+ui_pause() {
+    local _
+
+    printf '\nPress Enter to return to %s...' "$UI_TITLE" >/dev/tty
+    IFS= read -r _ </dev/tty || true
+}
