@@ -106,7 +106,7 @@ system-toolkit/
 │   ├── config/            Configuration command dispatcher and scripts
 │   └── shell/             Shared Bash and Zsh command dispatcher and scripts
 ├── lib/
-│   ├── common/            Shared logging, prompts (whiptail or plain), and process helpers
+│   ├── common/            Shared logging, prompts (whiptail or plain), whiptail UI, and process helpers
 │   ├── bin/               Reusable binary toolkit libraries
 │   ├── config/            Configuration metadata and module helpers
 │   └── shell/             Reusable shell toolkit libraries and interfaces
@@ -173,7 +173,10 @@ The shell toolkit manages Bash and Zsh integrations sourced from the
 `payload/shell/` directory. Shell modules use canonical `<category>/<module>`
 IDs internally; install and uninstall also accept unique short names such as
 `git`. Installation places the integration in its designated location, while
-activation makes the installed integration take effect.
+activation makes the installed integration take effect. `syskit-bash ui` and
+`syskit-zsh ui` open a whiptail menu that shows the shell and loader state,
+lets you pick modules by search or category, choose options, and then runs the
+equivalent command (requires whiptail and a terminal of at least 80x24).
 
 **Configuration toolkit**
 
