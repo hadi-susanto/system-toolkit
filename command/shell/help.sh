@@ -18,6 +18,7 @@ Commands:
   activate               Activate ${shell_name} module loader.
   deactivate             Deactivate ${shell_name} module loader.
   status [target]        Show the full report or one loader/module status.
+  ui                     Open the interactive menu (requires whiptail).
 
 Supported shells: Bash and Zsh.
 EOF
@@ -155,6 +156,28 @@ Description:
 EOF
 }
 
+__ui_help() {
+    local shell_name="$1"
+
+    cat <<EOF
+System Toolkit Shell Integration (Shell-Dependent)
+--------------------------------------------------
+
+Usage:
+  syskit-${shell_name} ui
+
+Description:
+  Opens an interactive whiptail menu for ${shell_name}. It shows whether
+  ${shell_name} is installed and its loader is active, then guides through
+  install, uninstall, activate, deactivate, or status: pick modules by search
+  or category (with their installed and update state), choose options, and
+  confirm. The equivalent syskit-${shell_name} command is then run.
+
+  Only modules that support ${shell_name} are offered; uninstall offers only
+  installed modules. Requires whiptail and a terminal of at least 80x24.
+EOF
+}
+
 main() {
     local shell="${1:-}"
     local help_type="${2:-basic}"
@@ -186,6 +209,9 @@ main() {
             ;;
         status)
             __status_help "$shell"
+            ;;
+        ui)
+            __ui_help "$shell"
             ;;
         *)
             printf 'Unknown executable help topic: %s\n\n' "$help_type" >&2
