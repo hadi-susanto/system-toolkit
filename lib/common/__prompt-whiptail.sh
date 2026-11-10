@@ -1,30 +1,7 @@
 # Private whiptail backend for prompt.sh. Sourced only by prompt.sh, which owns
 # the load-once guard. Public functions mirror __prompt-basic.sh.
 
-# Forced theme so the dialogs stay blue on systems with another default palette.
-__prompt_whiptail_colors='root=white,blue
-roottext=white,blue
-shadow=,black
-window=black,lightgray
-border=black,lightgray
-title=blue,lightgray
-label=black,lightgray
-textbox=black,lightgray
-acttextbox=black,lightgray
-listbox=black,lightgray
-actlistbox=white,blue
-sellistbox=black,lightgray
-actsellistbox=white,blue
-checkbox=black,lightgray
-actcheckbox=white,blue
-entry=black,cyan
-disentry=gray,lightgray
-button=black,cyan
-actbutton=white,blue
-compactbutton=black,lightgray
-helpline=white,blue
-emptyscale=,lightgray
-fullscale=,blue'
+source "$COMMON_LIB/whiptail-theme.sh"
 
 __prompt_terminal_available() {
     [[ -r /dev/tty && -w /dev/tty ]]
@@ -33,7 +10,7 @@ __prompt_terminal_available() {
 # Runs whiptail on the terminal device. The dialog is drawn on /dev/tty and
 # whiptail's result (written to stderr) is forwarded to stdout.
 __whiptail() {
-    env -u NEWT_COLORS_FILE NEWT_COLORS="$__prompt_whiptail_colors" \
+    env -u NEWT_COLORS_FILE NEWT_COLORS="$SYSKIT_WHIPTAIL_COLORS" \
         whiptail "$@" 2>&1 >/dev/tty </dev/tty
 }
 
