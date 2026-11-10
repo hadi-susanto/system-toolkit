@@ -100,6 +100,10 @@ not print status or results with bare `printf`/`bash status.sh` around a menu:
 - `pause_prompt` goes at the end of each loop iteration so action output stays
   readable (whiptail waits for Enter; plain mode just prints a blank line).
 
+`syskit-cfg ui` launches `main.sh` through `configure` as a child process and
+returns to its own menu afterwards, so `main.sh` must return when the user
+picks Finish (`choose_option` prints `X`) instead of looping forever.
+
 ### `status.sh`
 
 Inspects the module without changing the system. Each module owns its status

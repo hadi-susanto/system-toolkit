@@ -132,3 +132,32 @@ resolve_module() {
 
     __resolver_resolve_module_alias "$module_root" "$module"
 }
+
+##
+# resolve_module_aliases <canonical_id> <aliases_name>
+#
+# Lists the internal aliases that map to a canonical module ID.
+#
+# Parameters:
+#   canonical_id    Module ID in <category>/<module> format.
+#   aliases_name    Name of the indexed array that receives the aliases,
+#                   sorted.
+#
+resolve_module_aliases() {
+    local canonical_id="$1"
+    local -n __resolver_aliases_ref="$2"
+    local alias
+    local LC_ALL=C
+
+    __resolver_aliases_ref=()
+
+    for alias in "${!__RESOLVER_MODULE_ALIASES[@]}"; do
+        if [[ "${__RESOLVER_MODULE_ALIASES[$alias]}" == "$canonical_id" ]]; then
+            __resolver_aliases_ref+=("$alias")
+        fi
+    done
+
+    if (( ${#__resolver_aliases_ref[@]} > 1 )); then
+        mapfile -t __resolver_aliases_ref < <(printf '%s\n' "${__resolver_aliases_ref[@]}" | sort)
+    fi
+}

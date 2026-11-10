@@ -71,6 +71,9 @@ main() {
         status)
             exec bash "$BIN_COMMAND/status.sh" "${args[@]}"
             ;;
+        ui)
+            exec bash "$BIN_COMMAND/ui.sh" "${args[@]}"
+            ;;
         *)
             log_error "Unsupported binary toolkit command: ${options[CMD]}"
             bash "$BIN_COMMAND/help.sh" >&2

@@ -106,7 +106,7 @@ system-toolkit/
 │   ├── config/            Configuration command dispatcher and scripts
 │   └── shell/             Shared Bash and Zsh command dispatcher and scripts
 ├── lib/
-│   ├── common/            Shared logging, prompts (whiptail or plain), and process helpers
+│   ├── common/            Shared logging, prompts (whiptail or plain), whiptail UI, and process helpers
 │   ├── bin/               Reusable binary toolkit libraries
 │   ├── config/            Configuration metadata and module helpers
 │   └── shell/             Reusable shell toolkit libraries and interfaces
@@ -166,6 +166,9 @@ The binary toolkit manages standalone executable scripts sourced from the
 `payload/bin/` directory. It installs and uninstalls exact executable names in
 `~/.local/bin` by default or `/usr/local/bin` with global scope. Its status
 command compares SHA-256 checksums to report local and global state.
+`syskit-bin ui` opens a whiptail menu that shows both directories' state, asks
+for the scope, lets you pick executables, and then runs the equivalent command
+(through `sudo` for global operations).
 
 **Shell toolkit**
 
@@ -173,7 +176,10 @@ The shell toolkit manages Bash and Zsh integrations sourced from the
 `payload/shell/` directory. Shell modules use canonical `<category>/<module>`
 IDs internally; install and uninstall also accept unique short names such as
 `git`. Installation places the integration in its designated location, while
-activation makes the installed integration take effect.
+activation makes the installed integration take effect. `syskit-bash ui` and
+`syskit-zsh ui` open a whiptail menu that shows the shell and loader state,
+lets you pick modules by search or category, choose options, and then runs the
+equivalent command (requires whiptail and a terminal of at least 80x24).
 
 **Configuration toolkit**
 
@@ -182,7 +188,10 @@ module at a time through its `main.sh`. It also reports module-defined status
 in independent sections. `configure` accepts either a unique short name such
 as `kitty` or its canonical ID, `term/kitty`; `syskit-cfg kitty` is shorthand
 for `syskit-cfg configure kitty`. Each module owns its target handling and may
-use source files from the `payload/config/` directory.
+use source files from the `payload/config/` directory. `syskit-cfg ui` opens a
+whiptail menu to pick one module by search or category, then configure it
+(optionally with `--force`) or view its status; after the module's own menu
+finishes, it returns to the UI.
 
 # 🔗 Relationship with Mint Provisioner
 

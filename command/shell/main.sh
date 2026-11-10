@@ -90,6 +90,9 @@ main() {
         status)
             exec bash "$SHELL_COMMAND/status.sh" "$shell" "${args[@]}"
             ;;
+        ui)
+            exec bash "$SHELL_COMMAND/ui.sh" "$shell" "${args[@]}"
+            ;;
         *)
             log_error "Unsupported $shell toolkit command: ${options[CMD]}"
             bash "$SHELL_COMMAND/help.sh" "$shell" >&2
