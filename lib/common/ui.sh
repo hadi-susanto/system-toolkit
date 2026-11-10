@@ -193,6 +193,96 @@ __ui_count() {
 }
 
 ##
+# __ui_count_categories <ids_name> <counts_name> [categories_name]
+#
+# Counts the IDs in <category>/<name> form per category, optionally listing
+# the categories in first-seen order. Other IDs are ignored.
+#
+__ui_count_categories() {
+    local -n __ui_cc_ids_ref="$1"
+    local -n __ui_cc_counts_ref="$2"
+    local categories_name="${3:-}"
+    local -a found=()
+    local id
+    local category
+
+    __ui_cc_counts_ref=()
+
+    for id in "${__ui_cc_ids_ref[@]}"; do
+        [[ "$id" == */* ]] || continue
+
+        category="${id%%/*}"
+        if [[ ! -v "__ui_cc_counts_ref[$category]" ]]; then
+            found+=("$category")
+        fi
+
+        __ui_cc_counts_ref["$category"]=$(( ${__ui_cc_counts_ref[$category]:-0} + 1 ))
+    done
+
+    if [[ -n "$categories_name" ]]; then
+        local -n __ui_cc_categories_ref="$categories_name"
+
+        __ui_cc_categories_ref=("${found[@]}")
+    fi
+}
+
+##
+# __ui_category_ids <ids_name> <category> <matches_name>
+#
+# Lists the IDs of one category, in order.
+#
+__ui_category_ids() {
+    local -n __ui_ci_ids_ref="$1"
+    local category="$2"
+    local -n __ui_ci_matches_ref="$3"
+    local id
+
+    __ui_ci_matches_ref=()
+
+    for id in "${__ui_ci_ids_ref[@]}"; do
+        if [[ "$id" == "$category/"* ]]; then
+            __ui_ci_matches_ref+=("$id")
+        fi
+    done
+}
+
+##
+# __ui_search_ids <item> <ids_name> <search_name> <matches_name> <query_name>
+#
+# Asks for a search query and lists the IDs whose search text matches it.
+#
+# Returns:
+#   1 when the search was cancelled, the query is blank, or nothing matches
+#   (after telling the user).
+#
+__ui_search_ids() {
+    local item="$1"
+    local -n __ui_si_ids_ref="$2"
+    local -n __ui_si_search_ref="$3"
+    local -n __ui_si_matches_ref="$4"
+    local -n __ui_si_query_ref="$5"
+    local id
+
+    __ui_si_matches_ref=()
+
+    __ui_si_query_ref="$(ui_dialog --inputbox "Search ${item}s (every word must match):" \
+        10 "$UI_WIDTH")" || return 1
+    [[ -n "${__ui_si_query_ref//[[:space:]]/}" ]] || return 1
+
+    for id in "${__ui_si_ids_ref[@]}"; do
+        if __ui_text_matches "$__ui_si_query_ref" "${__ui_si_search_ref[$id]:-$id}"; then
+            __ui_si_matches_ref+=("$id")
+        fi
+    done
+
+    if (( ${#__ui_si_matches_ref[@]} == 0 )); then
+        ui_message "No ${item}s match '$__ui_si_query_ref'."
+
+        return 1
+    fi
+}
+
+##
 # __ui_pick_items <item> <prompt> <selected_name> [<id> <label>]...
 #
 # Shows a checklist of the given items, checked when already selected, and
@@ -282,6 +372,7 @@ ui_choose_items() {
     local -A category_offered=()
     local -A category_selected=()
     local -a categories=()
+    local -a selected_ids=()
     local -a menu_items=()
     local -a pick_ids=()
     local -a pick_items=()
@@ -299,25 +390,11 @@ ui_choose_items() {
         return 1
     fi
 
-    for id in "${__ui_offered_ref[@]}"; do
-        [[ "$id" == */* ]] || continue
-
-        category="${id%%/*}"
-        if [[ ! -v "category_offered[$category]" ]]; then
-            categories+=("$category")
-        fi
-
-        category_offered["$category"]=$(( ${category_offered[$category]:-0} + 1 ))
-    done
+    __ui_count_categories __ui_offered_ref category_offered categories
 
     while true; do
-        category_selected=()
-        for id in "${!__ui_selected[@]}"; do
-            [[ "$id" == */* ]] || continue
-
-            category="${id%%/*}"
-            category_selected["$category"]=$(( ${category_selected[$category]:-0} + 1 ))
-        done
+        selected_ids=("${!__ui_selected[@]}")
+        __ui_count_categories selected_ids category_selected
 
         menu_items=(
             "Search..." "Find ${item}s by keyword"
@@ -344,25 +421,9 @@ ui_choose_items() {
             "Pick ${item}s to $verb. Selections are kept until Done." \
             "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${menu_items[@]}")" || return 1
 
-        pick_ids=()
         case "$choice" in
             "Search...")
-                query="$(ui_dialog --inputbox "Search ${item}s (every word must match):" \
-                    10 "$UI_WIDTH")" || continue
-                [[ -n "${query//[[:space:]]/}" ]] || continue
-
-                for id in "${__ui_offered_ref[@]}"; do
-                    if __ui_text_matches "$query" "${__ui_search_ref[$id]:-$id}"; then
-                        pick_ids+=("$id")
-                    fi
-                done
-
-                if (( ${#pick_ids[@]} == 0 )); then
-                    ui_message "No ${item}s match '$query'."
-
-                    continue
-                fi
-
+                __ui_search_ids "$item" __ui_offered_ref __ui_search_ref pick_ids query || continue
                 pick_prompt="Results for '$query' (${#pick_ids[@]}):"
                 ;;
             All)
@@ -386,12 +447,7 @@ ui_choose_items() {
                 return 0
                 ;;
             *)
-                for id in "${__ui_offered_ref[@]}"; do
-                    if [[ "$id" == "$choice/"* ]]; then
-                        pick_ids+=("$id")
-                    fi
-                done
-
+                __ui_category_ids __ui_offered_ref "$choice" pick_ids
                 pick_prompt="$choice ${item}s to $verb:"
                 ;;
         esac
