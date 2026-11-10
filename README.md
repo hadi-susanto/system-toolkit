@@ -188,7 +188,10 @@ module at a time through its `main.sh`. It also reports module-defined status
 in independent sections. `configure` accepts either a unique short name such
 as `kitty` or its canonical ID, `term/kitty`; `syskit-cfg kitty` is shorthand
 for `syskit-cfg configure kitty`. Each module owns its target handling and may
-use source files from the `payload/config/` directory.
+use source files from the `payload/config/` directory. `syskit-cfg ui` opens a
+whiptail menu to pick one module by search or category, then configure it
+(optionally with `--force`) or view its status; after the module's own menu
+finishes, it returns to the UI.
 
 # 🔗 Relationship with Mint Provisioner
 
