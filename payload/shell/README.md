@@ -85,6 +85,7 @@ loaded after every regular integration.
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
 - [gocatcli](#gocatcli-cligocatcli)
+- [gocatcli-ex](#gocatcli-ex-cligocatcli-ex)
 - [kubectl](#kubectl-clikubectl)
 - [Pay Respects](#pay-respects-clipay-respects)
 - [Mise](#mise-devmise)
@@ -195,6 +196,24 @@ installed. The Zsh payload runs `compinit` when no other module has
 initialized completion. Both payloads are loaded after regular modules.
 
 The shell dependency check requires `gocatcli` to be installed before the
+integration can be installed unless `--force` is used. There is no
+corresponding configuration module.
+
+---
+
+# gocatcli-ex (`cli/gocatcli-ex`)
+
+Provides separate Bash and Zsh payloads that enable shell completion for
+[gocatcli-ex](https://github.com/hadi-susanto/gocatcli-ex), the `gocatcli-ex`
+binary built from the gocatcli fork, using
+`source <(gocatcli-ex completion <shell>)`. It registers completion for the
+`gocatcli-ex` command and is independent of `cli/gocatcli`. Each payload
+requires the `gocatcli-ex` command; otherwise it logs an error and skips
+activation without interrupting shell startup. The Zsh payload runs `compinit`
+when no other module has initialized completion. Both payloads are loaded
+after regular modules.
+
+The shell dependency check requires `gocatcli-ex` to be installed before the
 integration can be installed unless `--force` is used. There is no
 corresponding configuration module.
 
