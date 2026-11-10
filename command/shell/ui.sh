@@ -263,7 +263,7 @@ main() {
         modules=()
         case "$command" in
             install)
-                ui_choose_modules install supported labels search modules || continue
+                ui_choose_items install supported labels search modules || continue
                 ;;
             uninstall)
                 if (( ${#installed[@]} == 0 )); then
@@ -272,7 +272,7 @@ main() {
                     continue
                 fi
 
-                ui_choose_modules uninstall installed labels search modules || continue
+                ui_choose_items uninstall installed labels search modules || continue
                 ;;
         esac
 

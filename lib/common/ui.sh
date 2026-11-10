@@ -178,86 +178,106 @@ __ui_text_matches() {
     done
 }
 
+# Prints "<count> <noun>", pluralizing the noun with "s" unless count is 1.
+__ui_count() {
+    local count="$1"
+    local noun="$2"
+
+    if (( count == 1 )); then
+        printf '1 %s\n' "$noun"
+
+        return 0
+    fi
+
+    printf '%d %ss\n' "$count" "$noun"
+}
+
 ##
-# __ui_pick_modules <prompt> <selected_name> [<canonical_id> <label>]...
+# __ui_pick_items <item> <prompt> <selected_name> [<id> <label>]...
 #
-# Shows a checklist of the given modules, checked when already selected, and
+# Shows a checklist of the given items, checked when already selected, and
 # updates the selection set for them. Cancel leaves the selection unchanged.
 #
 # Parameters:
+#   item             Singular item noun, such as "module".
 #   prompt           Checklist text.
 #   selected_name    Name of the associative array holding the selection
-#                    (canonical ID -> 1).
+#                    (ID -> 1).
 #
-__ui_pick_modules() {
-    local prompt="$1"
-    local -n __ui_pick_selected_ref="$2"
-    shift 2
+__ui_pick_items() {
+    local item="$1"
+    local prompt="$2"
+    local -n __ui_pick_selected_ref="$3"
+    shift 3
 
     local -a checklist_items=()
-    local -a canonical_ids=()
+    local -a ids=()
     local -A checked=()
-    local canonical_id
+    local id
     local state
     local output
 
     while (( $# >= 2 )); do
-        canonical_id="$1"
+        id="$1"
         state="OFF"
-        if [[ -v "__ui_pick_selected_ref[$canonical_id]" ]]; then
+        if [[ -v "__ui_pick_selected_ref[$id]" ]]; then
             state="ON"
         fi
 
-        checklist_items+=("$canonical_id" "$2" "$state")
-        canonical_ids+=("$canonical_id")
+        checklist_items+=("$id" "$2" "$state")
+        ids+=("$id")
         shift 2
     done
 
-    output="$(ui_dialog --separate-output --checklist "$prompt\nSpace toggles a module, Enter confirms." \
+    output="$(ui_dialog --separate-output --checklist "$prompt\nSpace toggles the highlighted $item, Enter confirms." \
         "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${checklist_items[@]}")" || return 0
 
-    while IFS= read -r canonical_id; do
-        if [[ -n "$canonical_id" ]]; then
-            checked["$canonical_id"]=1
+    while IFS= read -r id; do
+        if [[ -n "$id" ]]; then
+            checked["$id"]=1
         fi
     done <<<"$output"
 
-    # Only the shown modules change, so unchecking one removes it from the selection.
-    for canonical_id in "${canonical_ids[@]}"; do
-        if [[ -v "checked[$canonical_id]" ]]; then
-            __ui_pick_selected_ref["$canonical_id"]=1
+    # Only the shown items change, so unchecking one removes it from the selection.
+    for id in "${ids[@]}"; do
+        if [[ -v "checked[$id]" ]]; then
+            __ui_pick_selected_ref["$id"]=1
         else
-            unset "__ui_pick_selected_ref[$canonical_id]"
+            unset "__ui_pick_selected_ref[$id]"
         fi
     done
 }
 
 ##
-# ui_choose_modules <verb> <offered_name> <labels_name> <search_name> <modules_name>
+# ui_choose_items <verb> <offered_name> <labels_name> <search_name> <selected_name> [item]
 #
-# Shows the module menu (search, all modules, one entry per category, done)
-# and stores the selected canonical IDs in offered order. Selections are kept
-# across the menu entries until Done, which requires at least one module.
+# Shows the item menu (search, all items, one entry per category, done) and
+# stores the selected IDs in offered order. IDs in <category>/<name> form are
+# grouped by category; other IDs only appear under search and all. Selections
+# are kept across the menu entries until Done, which requires at least one
+# item.
 #
 # Parameters:
-#   verb            Action shown in the dialog texts, such as "install".
-#   offered_name    Name of the indexed array of offered canonical IDs, in
-#                   display order.
-#   labels_name     Name of the associative array mapping a canonical ID to
-#                   its checklist label.
-#   search_name     Name of the associative array mapping a canonical ID to
-#                   the text searched; the ID itself when absent.
-#   modules_name    Name of the indexed array that receives the selection.
+#   verb             Action shown in the dialog texts, such as "install".
+#   offered_name     Name of the indexed array of offered IDs, in display
+#                    order.
+#   labels_name      Name of the associative array mapping an ID to its
+#                    checklist label.
+#   search_name      Name of the associative array mapping an ID to the text
+#                    searched; the ID itself when absent.
+#   selected_name    Name of the indexed array that receives the selection.
+#   item             Singular item noun used in the texts (default: module).
 #
 # Returns:
-#   1 when the menu was cancelled or no module is offered.
+#   1 when the menu was cancelled or no item is offered.
 #
-ui_choose_modules() {
+ui_choose_items() {
     local verb="$1"
     local -n __ui_offered_ref="$2"
     local -n __ui_labels_ref="$3"
     local -n __ui_search_ref="$4"
-    local -n __ui_modules_ref="$5"
+    local -n __ui_chosen_ref="$5"
+    local item="${6:-module}"
     local -A __ui_selected=()
     local -A category_offered=()
     local -A category_selected=()
@@ -265,7 +285,7 @@ ui_choose_modules() {
     local -a menu_items=()
     local -a pick_ids=()
     local -a pick_items=()
-    local canonical_id
+    local id
     local category
     local label
     local done_label
@@ -274,13 +294,15 @@ ui_choose_modules() {
     local choice="Search..."
 
     if (( ${#__ui_offered_ref[@]} == 0 )); then
-        ui_message "No modules to $verb."
+        ui_message "No ${item}s to $verb."
 
         return 1
     fi
 
-    for canonical_id in "${__ui_offered_ref[@]}"; do
-        category="${canonical_id%%/*}"
+    for id in "${__ui_offered_ref[@]}"; do
+        [[ "$id" == */* ]] || continue
+
+        category="${id%%/*}"
         if [[ ! -v "category_offered[$category]" ]]; then
             categories+=("$category")
         fi
@@ -290,18 +312,20 @@ ui_choose_modules() {
 
     while true; do
         category_selected=()
-        for canonical_id in "${!__ui_selected[@]}"; do
-            category="${canonical_id%%/*}"
+        for id in "${!__ui_selected[@]}"; do
+            [[ "$id" == */* ]] || continue
+
+            category="${id%%/*}"
             category_selected["$category"]=$(( ${category_selected[$category]:-0} + 1 ))
         done
 
         menu_items=(
-            "Search..." "Find modules by keyword"
-            "All" "All modules (${#__ui_offered_ref[@]})"
+            "Search..." "Find ${item}s by keyword"
+            "All" "All ${item}s (${#__ui_offered_ref[@]})"
         )
 
         for category in "${categories[@]}"; do
-            label="${category_offered[$category]} modules"
+            label="$(__ui_count "${category_offered[$category]}" "$item")"
             if [[ -v "category_selected[$category]" ]]; then
                 label+=", ${category_selected[$category]} selected"
             fi
@@ -309,32 +333,32 @@ ui_choose_modules() {
             menu_items+=("$category" "$label")
         done
 
-        done_label="Select at least one module first"
+        done_label="Select at least one $item first"
         if (( ${#__ui_selected[@]} > 0 )); then
-            done_label="Continue with ${#__ui_selected[@]} selected module(s)"
+            done_label="Continue with $(__ui_count "${#__ui_selected[@]}" "selected $item")"
         fi
 
         menu_items+=("Done" "$done_label")
 
         choice="$(ui_dialog --default-item "$choice" --cancel-button "Back" --menu \
-            "Pick modules to $verb by category or search. Selections are kept until Done." \
+            "Pick ${item}s to $verb. Selections are kept until Done." \
             "$UI_HEIGHT" "$UI_WIDTH" "$UI_LIST_HEIGHT" "${menu_items[@]}")" || return 1
 
         pick_ids=()
         case "$choice" in
             "Search...")
-                query="$(ui_dialog --inputbox "Search modules (every word must match):" \
+                query="$(ui_dialog --inputbox "Search ${item}s (every word must match):" \
                     10 "$UI_WIDTH")" || continue
                 [[ -n "${query//[[:space:]]/}" ]] || continue
 
-                for canonical_id in "${__ui_offered_ref[@]}"; do
-                    if __ui_text_matches "$query" "${__ui_search_ref[$canonical_id]:-$canonical_id}"; then
-                        pick_ids+=("$canonical_id")
+                for id in "${__ui_offered_ref[@]}"; do
+                    if __ui_text_matches "$query" "${__ui_search_ref[$id]:-$id}"; then
+                        pick_ids+=("$id")
                     fi
                 done
 
                 if (( ${#pick_ids[@]} == 0 )); then
-                    ui_message "No modules match '$query'."
+                    ui_message "No ${item}s match '$query'."
 
                     continue
                 fi
@@ -343,40 +367,40 @@ ui_choose_modules() {
                 ;;
             All)
                 pick_ids=("${__ui_offered_ref[@]}")
-                pick_prompt="All modules to $verb:"
+                pick_prompt="All ${item}s to $verb:"
                 ;;
             Done)
                 if (( ${#__ui_selected[@]} == 0 )); then
-                    ui_message "Select at least one module."
+                    ui_message "Select at least one $item."
 
                     continue
                 fi
 
-                __ui_modules_ref=()
-                for canonical_id in "${__ui_offered_ref[@]}"; do
-                    if [[ -v "__ui_selected[$canonical_id]" ]]; then
-                        __ui_modules_ref+=("$canonical_id")
+                __ui_chosen_ref=()
+                for id in "${__ui_offered_ref[@]}"; do
+                    if [[ -v "__ui_selected[$id]" ]]; then
+                        __ui_chosen_ref+=("$id")
                     fi
                 done
 
                 return 0
                 ;;
             *)
-                for canonical_id in "${__ui_offered_ref[@]}"; do
-                    if [[ "${canonical_id%%/*}" == "$choice" ]]; then
-                        pick_ids+=("$canonical_id")
+                for id in "${__ui_offered_ref[@]}"; do
+                    if [[ "$id" == "$choice/"* ]]; then
+                        pick_ids+=("$id")
                     fi
                 done
 
-                pick_prompt="$choice modules to $verb:"
+                pick_prompt="$choice ${item}s to $verb:"
                 ;;
         esac
 
         pick_items=()
-        for canonical_id in "${pick_ids[@]}"; do
-            pick_items+=("$canonical_id" "${__ui_labels_ref[$canonical_id]:-}")
+        for id in "${pick_ids[@]}"; do
+            pick_items+=("$id" "${__ui_labels_ref[$id]:-}")
         done
 
-        __ui_pick_modules "$pick_prompt" __ui_selected "${pick_items[@]}"
+        __ui_pick_items "$item" "$pick_prompt" __ui_selected "${pick_items[@]}"
     done
 }
