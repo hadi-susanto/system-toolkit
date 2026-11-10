@@ -75,6 +75,9 @@ main() {
         status)
             exec bash "$CONFIG_COMMAND/status.sh" "${args[@]}"
             ;;
+        ui)
+            exec bash "$CONFIG_COMMAND/ui.sh" "${args[@]}"
+            ;;
         *)
             if canonical_id="$(resolve_module "$CONFIG_MODULES" "${options[CMD]}")"; then
                 exec bash "$CONFIG_COMMAND/configure.sh" "$canonical_id" "${args[@]}"

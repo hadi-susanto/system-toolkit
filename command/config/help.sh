@@ -15,6 +15,7 @@ Commands:
   list            List available configuration modules.
   configure       Configure one configuration module.
   status          Show configuration module status.
+  ui              Open the interactive menu (requires whiptail).
 EOF
 }
 
@@ -94,6 +95,26 @@ Description:
 EOF
 }
 
+__ui_help() {
+    cat <<'EOF'
+System Toolkit Configuration Integration
+----------------------------------------
+
+Usage:
+  syskit-cfg ui
+
+Description:
+  Opens an interactive whiptail menu. Pick one configuration module by search
+  (ID, name, description, or alias), from the full list, or by category, then
+  configure it, configure it with --force, or show its status. Configuring
+  runs the module's own interactive menu; when it finishes, press Enter to
+  return to the module. "Status (all)" shows every module's status in a
+  scrollable dialog.
+
+  Requires whiptail and a terminal of at least 80x24.
+EOF
+}
+
 main() {
     local help_type="${1:-basic}"
 
@@ -112,6 +133,9 @@ main() {
             ;;
         status)
             __status_help
+            ;;
+        ui)
+            __ui_help
             ;;
         *)
             printf 'Unknown configuration help topic: %s\n\n' "$help_type" >&2
