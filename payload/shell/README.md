@@ -84,6 +84,8 @@ loaded after every regular integration.
 - [Claude Code](#claude-code-miscclaude-code)
 - [Eza](#eza-clieza)
 - [Git](#git-cligit)
+- [gocatcli](#gocatcli-cligocatcli)
+- [gocatcli-ex](#gocatcli-ex-cligocatcli-ex)
 - [kubectl](#kubectl-clikubectl)
 - [Pay Respects](#pay-respects-clipay-respects)
 - [Mise](#mise-devmise)
@@ -180,6 +182,40 @@ for both the configuration and shell toolkits.
 | `gwp`  | **Expands to:** `git worktree prune`<br><br>Prunes stale worktree administrative data.                                                  |
 | `gwd`  | **Expands to:** `git worktree remove`<br><br>Removes a worktree.                                                                        |
 | `gwr`  | **Expands to:** `git worktree repair`<br><br>Repairs worktree administrative files.                                                     |
+
+---
+
+# gocatcli (`cli/gocatcli`)
+
+Provides separate Bash and Zsh payloads that enable shell completion for
+[gocatcli](https://github.com/deadc0de6/gocatcli) using
+`source <(gocatcli completion <shell>)`. Each payload requires the `gocatcli`
+command; otherwise it logs an error and skips activation without interrupting
+shell startup. The Bash payload works best with the `bash-completion` package
+installed. The Zsh payload runs `compinit` when no other module has
+initialized completion. Both payloads are loaded after regular modules.
+
+The shell dependency check requires `gocatcli` to be installed before the
+integration can be installed unless `--force` is used. There is no
+corresponding configuration module.
+
+---
+
+# gocatcli-ex (`cli/gocatcli-ex`)
+
+Provides separate Bash and Zsh payloads that enable shell completion for
+[gocatcli-ex](https://github.com/hadi-susanto/gocatcli-ex), the `gocatcli-ex`
+binary built from the gocatcli fork, using
+`source <(gocatcli-ex completion <shell>)`. It registers completion for the
+`gocatcli-ex` command and is independent of `cli/gocatcli`. Each payload
+requires the `gocatcli-ex` command; otherwise it logs an error and skips
+activation without interrupting shell startup. The Zsh payload runs `compinit`
+when no other module has initialized completion. Both payloads are loaded
+after regular modules.
+
+The shell dependency check requires `gocatcli-ex` to be installed before the
+integration can be installed unless `--force` is used. There is no
+corresponding configuration module.
 
 ---
 
