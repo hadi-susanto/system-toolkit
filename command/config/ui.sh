@@ -85,7 +85,7 @@ __load_catalog() {
         fi
 
         resolve_module_aliases "$canonical_id" aliases
-        labels_ref["$canonical_id"]="${names_ref[$canonical_id]}: ${descriptions_ref[$canonical_id]}"
+        labels_ref["$canonical_id"]="${names_ref[$canonical_id]}"
         search_ref["$canonical_id"]="$canonical_id ${names_ref[$canonical_id]} ${descriptions_ref[$canonical_id]} ${aliases[*]}"
     done
 }
