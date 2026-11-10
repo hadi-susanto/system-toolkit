@@ -166,6 +166,9 @@ The binary toolkit manages standalone executable scripts sourced from the
 `payload/bin/` directory. It installs and uninstalls exact executable names in
 `~/.local/bin` by default or `/usr/local/bin` with global scope. Its status
 command compares SHA-256 checksums to report local and global state.
+`syskit-bin ui` opens a whiptail menu that shows both directories' state, asks
+for the scope, lets you pick executables, and then runs the equivalent command
+(through `sudo` for global operations).
 
 **Shell toolkit**
 
