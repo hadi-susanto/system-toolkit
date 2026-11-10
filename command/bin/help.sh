@@ -14,6 +14,7 @@ Commands:
   install         Install one or all SysKit executables.
   uninstall       Remove named SysKit executables.
   status          Show local and global installation status.
+  ui              Open the interactive menu (requires whiptail).
 
 Scope:
   Install and uninstall use local scope by default. Global operations require
@@ -103,6 +104,28 @@ Description:
 EOF
 }
 
+__ui_help() {
+    cat <<'EOF'
+System Toolkit Executable Integration
+-------------------------------------
+
+Usage:
+  syskit-bin ui
+
+Description:
+  Opens an interactive whiptail menu. It shows how many executables are
+  installed locally and globally and whether each directory is in PATH, then
+  guides through install, uninstall, or status: choose the local or global
+  directory, pick executables by search or from the full list (with their
+  installed and update state), choose options, and confirm. The equivalent
+  syskit-bin command is then run; global operations from a non-root user run
+  through sudo.
+
+  Uninstall offers only executables installed in the chosen directory.
+  Requires whiptail and a terminal of at least 80x24.
+EOF
+}
+
 main() {
     local help_type="${1:-basic}"
 
@@ -121,6 +144,9 @@ main() {
             ;;
         status)
             __status_help
+            ;;
+        ui)
+            __ui_help
             ;;
         *)
             printf 'Unknown executable help topic: %s\n\n' "$help_type" >&2
