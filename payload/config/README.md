@@ -15,6 +15,29 @@ The corresponding lifecycle logic lives under:
 modules/config/<category>/<module>/
 ```
 
+## Development Assets
+
+### Go (`dev/golang`)
+
+Provides `99-dev-golang.sh`, a POSIX `sh` profile script installed to
+`/etc/profile.d/99-dev-golang.sh`. At login it exports `GOBIN` from the user's
+`~/.local/state/syskit/dev/golang/gobin` (when absolute and `GOBIN` is not
+already set) and prepends `GOBIN` to `PATH`.
+
+### Mise (`dev/mise`)
+
+Provides `99-dev-mise.sh`, a POSIX `sh` profile script installed to
+`/etc/profile.d/99-dev-mise.sh`. At login it exports `MISE_DATA_DIR` from the
+user's `~/.local/state/syskit/dev/mise/data-dir` (when absolute and
+`MISE_DATA_DIR` is not already set) and prepends the Mise shims directory to
+`PATH`.
+
+Both files are copied verbatim (mode `0644`, via `sudo`). Their first line is
+the `# Managed by SysKit (dev/<module>)` marker that the modules use to
+recognize a managed target, so it must stay unchanged. The module status
+compares the installed file with this source and reports `[update-available]`
+when they differ.
+
 ## System Assets
 
 ### apt-fast (`sys/apt-fast`)

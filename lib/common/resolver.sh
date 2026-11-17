@@ -6,6 +6,7 @@ readonly __SYSKIT_RESOLVER_LOADED=1
 
 readonly -A __RESOLVER_MODULE_ALIASES=(
     [claude]="misc/claude-code"
+    [go]="dev/golang"
     [hide-password-asterisks]="sys/password-asterisks"
     [kvm]="misc/kvm-autoload"
     [omp]="term/oh-my-posh"
