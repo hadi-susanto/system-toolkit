@@ -86,6 +86,7 @@ __print_session_status() {
 
 __print_profile_status() {
     local state=0
+    local current=0
 
     golang_profile_state || state=$?
 
@@ -97,6 +98,22 @@ __print_profile_status() {
 
     if (( state == 2 )); then
         printf '%s[unmanaged]%s not written by SysKit\n' "$COLOR_RED" "$COLOR_RESET"
+
+        return 0
+    fi
+
+    golang_profile_current || current=$?
+
+    if (( current == 1 )); then
+        printf '%s[update-available]%s differs from the SysKit payload\n' \
+            "$COLOR_YELLOW" "$COLOR_RESET"
+
+        return 0
+    fi
+
+    if (( current == 2 )); then
+        printf '%s[unknown]%s cannot compare with the SysKit payload\n' \
+            "$COLOR_RED" "$COLOR_RESET"
 
         return 0
     fi

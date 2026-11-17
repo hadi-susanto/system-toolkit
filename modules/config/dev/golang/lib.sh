@@ -4,9 +4,12 @@ fi
 
 readonly __SYSKIT_GOLANG_CONFIG_LIB_LOADED=1
 
+source "$COMMON_LIB/checksum.sh"
+
 readonly __GOLANG_STATE_DIR="$HOME/.local/state/syskit/dev/golang"
 readonly __GOLANG_GOBIN_FILE="$__GOLANG_STATE_DIR/gobin"
 readonly __GOLANG_PROFILE_FILE="/etc/profile.d/99-dev-golang.sh"
+readonly __GOLANG_PROFILE_PAYLOAD="99-dev-golang.sh"
 readonly __GOLANG_PROFILE_MARKER="# Managed by SysKit (dev/golang)"
 readonly __GOLANG_MISE_SETTING="go.set_gobin"
 
@@ -179,46 +182,77 @@ golang_profile_state() {
 }
 
 ##
-# render_golang_profile
+# golang_profile_payload
+#
+# Resolves and validates the bundled profile script payload.
 #
 # Output:
-#   Prints the POSIX sh profile script. At login it exports the user's
-#   persisted GOBIN override (unless GOBIN is already set) and prepends GOBIN
-#   to PATH.
+#   Prints the payload path.
 #
-render_golang_profile() {
-    printf '%s\n' "$__GOLANG_PROFILE_MARKER"
-    cat <<'PROFILE'
-__syskit_golang_state_file="$HOME/.local/state/syskit/dev/golang/gobin"
-if [ -z "${GOBIN:-}" ] && [ -f "$__syskit_golang_state_file" ] && [ -r "$__syskit_golang_state_file" ]; then
-    __syskit_golang_gobin=""
-    IFS= read -r __syskit_golang_gobin <"$__syskit_golang_state_file" || :
-    case "$__syskit_golang_gobin" in
-        /*) GOBIN="$__syskit_golang_gobin"; export GOBIN ;;
-    esac
-    unset __syskit_golang_gobin
-fi
-unset __syskit_golang_state_file
+# Returns:
+#   1 when the payload is missing, symbolic, unreadable, or does not start
+#   with the SysKit marker.
+#
+golang_profile_payload() {
+    local source="${CONFIG_MODULE_PAYLOAD:-}/$__GOLANG_PROFILE_PAYLOAD"
+    local first_line=""
 
-if [ -n "${GOBIN:-}" ]; then
-    case ":$PATH:" in
-        *":$GOBIN:"*) ;;
-        *) PATH="$GOBIN:$PATH"; export PATH ;;
+    if [[ -z "${CONFIG_MODULE_PAYLOAD:-}" ]] ||
+        [[ -L "$source" ]] ||
+        [[ ! -f "$source" ]] ||
+        [[ ! -r "$source" ]]; then
+        log_error "Go profile payload is unavailable: $source"
+
+        return 1
+    fi
+
+    IFS= read -r first_line <"$source" || true
+    if [[ "$first_line" != "$__GOLANG_PROFILE_MARKER" ]]; then
+        log_error "Go profile payload does not start with '$__GOLANG_PROFILE_MARKER': $source"
+
+        return 1
+    fi
+
+    printf '%s\n' "$source"
+}
+
+##
+# golang_profile_current
+#
+# Compares the installed profile script with the bundled payload.
+#
+# Returns:
+#   1 when the installed script differs from the payload.
+#   2 when the payload is invalid or either file cannot be checksummed.
+#
+golang_profile_current() {
+    local source
+    local status=0
+
+    source="$(golang_profile_payload)" || return 2
+    checksums_match "$source" "$__GOLANG_PROFILE_FILE" || status=$?
+
+    case "$status" in
+        0 | 1)
+            return "$status"
+            ;;
     esac
-fi
-PROFILE
+
+    return 2
 }
 
 ##
 # write_golang_profile
 #
-# Installs the managed profile script that exports GOBIN for login shells.
+# Installs or updates the managed profile script that exports GOBIN for login
+# shells.
 #
 # Returns:
-#   1 when an unmanaged file occupies the target or the write fails.
+#   1 when the payload is invalid, an unmanaged file occupies the target, or
+#   the write fails.
 #
 write_golang_profile() {
-    local tmp
+    local source
     local state=0
 
     golang_profile_state || state=$?
@@ -229,29 +263,16 @@ write_golang_profile() {
         return 1
     fi
 
-    if ! tmp="$(mktemp)"; then
-        log_error "Failed to create a temporary file"
-
-        return 1
-    fi
-
-    if ! render_golang_profile >"$tmp"; then
-        rm -f -- "$tmp"
-        log_error "Failed to render the Go profile script"
-
-        return 1
-    fi
+    source="$(golang_profile_payload)" || return $?
 
     log_info "Administrator privileges are required to write $__GOLANG_PROFILE_FILE"
 
-    if ! sudo install -Dm0644 -- "$tmp" "$__GOLANG_PROFILE_FILE"; then
-        rm -f -- "$tmp"
+    if ! sudo install -Dm0644 -- "$source" "$__GOLANG_PROFILE_FILE"; then
         log_error "Failed to write $__GOLANG_PROFILE_FILE"
 
         return 1
     fi
 
-    rm -f -- "$tmp"
     log_info "Installed $__GOLANG_PROFILE_FILE; log out and back in to apply it"
 }
 

@@ -68,6 +68,7 @@ main() {
     local selected
     local -a options=()
     local profile_installed=0
+    local profile_current_status=0
 
     while true; do
         show_status $'Current Go Status:\n-----------------------' \
@@ -86,6 +87,15 @@ main() {
         else
             profile_installed=0
             options+=("Add GOBIN into $__GOLANG_PROFILE_FILE (login shells and GUI apps)")
+        fi
+
+        # Offer an update only when the installed profile differs from the payload
+        profile_current_status=0
+        if (( profile_installed )); then
+            golang_profile_current 2>/dev/null || profile_current_status=$?
+        fi
+        if (( profile_current_status == 1 )); then
+            options+=("Update $__GOLANG_PROFILE_FILE (update available)")
         fi
 
         if ! selected="$(
@@ -118,6 +128,9 @@ main() {
                 else
                     __install_profile || return $?
                 fi
+                ;;
+            7)
+                write_golang_profile || return $?
                 ;;
             X)
                 return 0

@@ -229,6 +229,13 @@ the data directory needs no reinstall. The file is marked
 `# Managed by SysKit (dev/mise)`; an unmanaged file at that path is never
 overwritten or removed. Changes apply after logging out and back in.
 
+Both the Mise and Go profile scripts are static files installed verbatim from
+`payload/config/dev/<module>/99-dev-<module>.sh`. Installation refuses a
+missing or symbolic payload, or one whose first line is not the module's
+SysKit marker. Status compares the installed script with the payload by
+SHA-256 and reports `[update-available]` when they differ; the menu then
+offers an extra `Update` action that reinstalls the payload.
+
 The Mise shell integration also leaves a pre-set `MISE_DATA_DIR` untouched and
 reads the data-dir state only when the variable is empty.
 

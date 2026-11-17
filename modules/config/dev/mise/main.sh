@@ -61,6 +61,7 @@ main() {
     local bash_loader_installed=0
     local zsh_loader_installed=0
     local profile_installed=0
+    local profile_current_status=0
 
     if [[ "${CONFIG_FORCE:-false}" == "true" ]]; then
         force=1
@@ -106,6 +107,15 @@ main() {
         else
             profile_installed=0
             options+=("Add mise shims into $__MISE_PROFILE_FILE (login shells and GUI apps)")
+        fi
+
+        # Offer an update only when the installed profile differs from the payload
+        profile_current_status=0
+        if (( profile_installed )); then
+            mise_profile_current 2>/dev/null || profile_current_status=$?
+        fi
+        if (( profile_current_status == 1 )); then
+            options+=("Update $__MISE_PROFILE_FILE (update available)")
         fi
 
         if ! selected="$(
@@ -161,6 +171,9 @@ main() {
                 else
                     __install_profile || return $?
                 fi
+                ;;
+            8)
+                write_mise_profile || return $?
                 ;;
             X)
                 return 0
