@@ -4,9 +4,12 @@ fi
 
 readonly __SYSKIT_MISE_CONFIG_LIB_LOADED=1
 
+source "$COMMON_LIB/checksum.sh"
+
 readonly __MISE_STATE_DIR="$HOME/.local/state/syskit/dev/mise"
 readonly __MISE_DATA_DIR_FILE="$__MISE_STATE_DIR/data-dir"
 readonly __MISE_PROFILE_FILE="/etc/profile.d/99-dev-mise.sh"
+readonly __MISE_PROFILE_PAYLOAD="99-dev-mise.sh"
 readonly __MISE_PROFILE_MARKER="# Managed by SysKit (dev/mise)"
 
 ##
@@ -159,49 +162,77 @@ mise_profile_state() {
 }
 
 ##
-# render_mise_profile
+# mise_profile_payload
+#
+# Resolves and validates the bundled profile script payload.
 #
 # Output:
-#   Prints the POSIX sh profile script. At login it exports the user's
-#   persisted MISE_DATA_DIR override (unless MISE_DATA_DIR is already set) and
-#   prepends the matching Mise shims directory to PATH.
+#   Prints the payload path.
 #
-render_mise_profile() {
-    printf '%s\n' "$__MISE_PROFILE_MARKER"
-    cat <<'PROFILE'
-__syskit_mise_state_file="$HOME/.local/state/syskit/dev/mise/data-dir"
-if [ -z "${MISE_DATA_DIR:-}" ] && [ -f "$__syskit_mise_state_file" ] && [ -r "$__syskit_mise_state_file" ]; then
-    __syskit_mise_data_dir=""
-    IFS= read -r __syskit_mise_data_dir <"$__syskit_mise_state_file" || :
-    case "$__syskit_mise_data_dir" in
-        /*) MISE_DATA_DIR="$__syskit_mise_data_dir"; export MISE_DATA_DIR ;;
-    esac
-    unset __syskit_mise_data_dir
-fi
-unset __syskit_mise_state_file
+# Returns:
+#   1 when the payload is missing, symbolic, unreadable, or does not start
+#   with the SysKit marker.
+#
+mise_profile_payload() {
+    local source="${CONFIG_MODULE_PAYLOAD:-}/$__MISE_PROFILE_PAYLOAD"
+    local first_line=""
 
-__syskit_mise_shims="${MISE_DATA_DIR:-$HOME/.local/share/mise}/shims"
-if [ -d "$__syskit_mise_shims" ]; then
-    case ":$PATH:" in
-        *":$__syskit_mise_shims:"*) ;;
-        *) PATH="$__syskit_mise_shims:$PATH"; export PATH ;;
+    if [[ -z "${CONFIG_MODULE_PAYLOAD:-}" ]] ||
+        [[ -L "$source" ]] ||
+        [[ ! -f "$source" ]] ||
+        [[ ! -r "$source" ]]; then
+        log_error "Mise profile payload is unavailable: $source"
+
+        return 1
+    fi
+
+    IFS= read -r first_line <"$source" || true
+    if [[ "$first_line" != "$__MISE_PROFILE_MARKER" ]]; then
+        log_error "Mise profile payload does not start with '$__MISE_PROFILE_MARKER': $source"
+
+        return 1
+    fi
+
+    printf '%s\n' "$source"
+}
+
+##
+# mise_profile_current
+#
+# Compares the installed profile script with the bundled payload.
+#
+# Returns:
+#   1 when the installed script differs from the payload.
+#   2 when the payload is invalid or either file cannot be checksummed.
+#
+mise_profile_current() {
+    local source
+    local status=0
+
+    source="$(mise_profile_payload)" || return 2
+    checksums_match "$source" "$__MISE_PROFILE_FILE" || status=$?
+
+    case "$status" in
+        0 | 1)
+            return "$status"
+            ;;
     esac
-fi
-unset __syskit_mise_shims
-PROFILE
+
+    return 2
 }
 
 ##
 # write_mise_profile
 #
-# Installs the managed profile script that adds Mise shims to PATH for login
-# shells.
+# Installs or updates the managed profile script that adds Mise shims to PATH
+# for login shells.
 #
 # Returns:
-#   1 when an unmanaged file occupies the target or the write fails.
+#   1 when the payload is invalid, an unmanaged file occupies the target, or
+#   the write fails.
 #
 write_mise_profile() {
-    local tmp
+    local source
     local state=0
 
     mise_profile_state || state=$?
@@ -212,29 +243,16 @@ write_mise_profile() {
         return 1
     fi
 
-    if ! tmp="$(mktemp)"; then
-        log_error "Failed to create a temporary file"
-
-        return 1
-    fi
-
-    if ! render_mise_profile >"$tmp"; then
-        rm -f -- "$tmp"
-        log_error "Failed to render the Mise profile script"
-
-        return 1
-    fi
+    source="$(mise_profile_payload)" || return $?
 
     log_info "Administrator privileges are required to write $__MISE_PROFILE_FILE"
 
-    if ! sudo install -Dm0644 -- "$tmp" "$__MISE_PROFILE_FILE"; then
-        rm -f -- "$tmp"
+    if ! sudo install -Dm0644 -- "$source" "$__MISE_PROFILE_FILE"; then
         log_error "Failed to write $__MISE_PROFILE_FILE"
 
         return 1
     fi
 
-    rm -f -- "$tmp"
     log_info "Installed $__MISE_PROFILE_FILE; log out and back in to apply it"
 }
 

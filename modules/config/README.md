@@ -46,6 +46,7 @@ canonical IDs are rejected. Current aliases:
 | Alias                         | Resolves to              |
 |-------------------------------|--------------------------|
 | `claude`                      | `misc/claude-code`       |
+| `go`                          | `dev/golang`             |
 | `kvm`                         | `misc/kvm-autoload`      |
 | `omp`                         | `term/oh-my-posh`        |
 | `plvl10k`                     | `term/power-level-10k`   |
@@ -196,6 +197,7 @@ and active state.
 
 | Canonical ID | Managed behavior                                                                                                                                                                    |
 |--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dev/golang` | Persists an optional `GOBIN` override, can export it for login shells through `/etc/profile.d`, and sets or resets Mise's `go.set_gobin` setting.                                   |
 | `dev/mise`   | Persists an optional Mise data directory override, installs Bash or Zsh initialization, can activate either SysKit shell loader, and can add Mise shims to `PATH` for login shells. |
 | `dev/sdkman` | Persists the SDKMAN! installation directory, installs Bash or Zsh initialization, and can activate either SysKit shell loader.                                                      |
 
@@ -227,8 +229,43 @@ the data directory needs no reinstall. The file is marked
 `# Managed by SysKit (dev/mise)`; an unmanaged file at that path is never
 overwritten or removed. Changes apply after logging out and back in.
 
+Both the Mise and Go profile scripts are static files installed verbatim from
+`payload/config/dev/<module>/99-dev-<module>.sh`. Installation refuses a
+missing or symbolic payload, or one whose first line is not the module's
+SysKit marker. Status compares the installed script with the payload by
+SHA-256 and reports `[update-available]` when they differ; the menu then
+offers an extra `Update` action that reinstalls the payload.
+
 The Mise shell integration also leaves a pre-set `MISE_DATA_DIR` untouched and
 reads the data-dir state only when the variable is empty.
+
+The Go module (`dev/golang`, alias `go`) has no shell integration. Its `GOBIN`
+override defaults to `$HOME/go/bin` in the prompt, must be absolute and
+writable, and is stored in `~/.local/state/syskit/dev/golang/gobin`. It takes
+effect only through `/etc/profile.d/99-dev-golang.sh` (requires `sudo`), a
+POSIX `sh` script marked `# Managed by SysKit (dev/golang)`. At login it
+exports `GOBIN` from each user's own state file when the value is absolute and
+`GOBIN` is not already set, then prepends `GOBIN` to `PATH`. The file content
+does not depend on the override, so changing `GOBIN` needs no reinstall, only
+a new login. Zsh reads `/etc/profile.d` only when its startup files source
+`/etc/profile`; on systems where they do not, terminals opened from the
+desktop session still inherit `GOBIN`, but a zsh login over SSH or a TTY does
+not.
+
+The Go module also manages Mise's `go.set_gobin` setting in the global Mise
+configuration (`mise settings set` / `mise settings unset`, run from `/` so a
+project `mise.toml` is not touched):
+
+| Value     | Mise behavior                                                     |
+|-----------|-------------------------------------------------------------------|
+| `true`    | Always sets `GOBIN` to the active Go install, overriding SysKit's |
+| `false`   | Never sets `GOBIN`                                                |
+| default   | Sets `GOBIN` to the active Go install only when `GOBIN` is unset  |
+
+These actions fail with an error when `mise` is not installed. Status shows
+whether Mise is installed, the effective `go.set_gobin` value (and a
+`MISE_GO_SET_GOBIN` environment override), the stored override, the current
+session `GOBIN`, and the profile state.
 
 ## Current GUI Modules
 
